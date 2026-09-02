@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Emergency Flood Early Warning System</title>
+  
+  <!-- Typography: Inter and JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 3D WebGL Globe Libraries: Three.js and Globe.gl (Requirement 1) -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
+
+  <!-- Lightweight Charting Library: Chart.js (Requirement 3) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- 1. Header Component                                                       -->
+  <!-- ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-shield">
+        <!-- SVG Wave / Water Crest Icon -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#041019" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+          <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+          <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>
+        </svg>
+        <span class="beacon-pulse"></span>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>PRAVAH</span>
+          <span class="brand-tag">v2.4 EOC</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Flash Flood Early Warning System</span>
+          <span>•</span>
+          <span>Maharashtra Western Ghats</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Live Telemetry & Counter Status -->
+    <div class="header-telemetry">
+      <div class="telemetry-pill">
+        <span class="telemetry-dot"></span>
+        <span>Sensor Feed Live</span>
+      </div>
+
+      <div class="status-counters">
+        <div class="counter-tag emergency">
+          <span>2 EMERGENCY</span>
+        </div>
+        <div class="counter-tag warning">
+          <span>4 WARNING</span>
+        </div>
+        <div class="counter-tag advisory">
+          <span>6 ADVISORY</span>
+        </div>
+      </div>
+
+      <div class="header-clock" id="systemClock">
+        22:52:00 IST
+      </div>
+
+      <button class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span>Alerts</span>
+      </button>
+
+      <!-- Sleek Live Weather & Nowcast Navigation Button -->
+      <a href="weather.html" target="_blank" class="nav-weather-btn magnetic" title="Launch Advanced Weather Forecasting & Doppler Nowcasting">
+        <svg class="weather-icon-pulse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path>
+          <polyline points="13 11 9 17 15 17 11 23"></polyline>
+        </svg>
+        <span>Live Weather &amp; Nowcast</span>
+        <span class="weather-radar-badge">LIVE</span>
+      </a>
+
+      <!-- CSS-Only Navigation Dropdown Menu (Requirement 1) -->
+      <div class="nav-dropdown-wrapper">
+        <button class="nav-dropdown-trigger magnetic" id="navDropdownTrigger" aria-label="System Menu">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span>Menu</span>
+          <svg class="dropdown-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <!-- "About the PRAVAH Team" Link (Triggers Animated Glass Modal) -->
+          <a href="#teamModal" class="dropdown-item glowing-hover-link" id="dropdownAboutTeamLink" onclick="openTeamModal(event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>About the PRAVAH Team</span>
+          </a>
+          <a href="awareness.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>Community Awareness</span>
+          </a>
+          <a href="weather.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+            </svg>
+            <span>Doppler Nowcasting</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Main Dashboard Shell (CSS Grid: Sidebar + Main Content)                -->
+  <!-- ========================================================================= -->
+  <main class="dashboard-shell">
+    
+    <!-- --------------------------------------------------------------------- -->
+    <!-- SIDEBAR: Controls, The Awareness Card, and Catchments Feed            -->
+    <!-- --------------------------------------------------------------------- -->
+    <aside class="sidebar">
+      
+      <!-- REQUIREMENT 4: The Awareness Card -->
+      <!-- Wrapped in anchor tag with href="awareness.html" target="_blank" -->
+      <a href="awareness.html" target="_blank" class="awareness-card magnetic" title="Open Disaster Awareness Program in a separate window">
+        <div class="awareness-card-content">
+          <div class="awareness-top">
+            <span class="awareness-badge">
+              <span class="live-training-beacon"></span>
+              <span>Civic Safety Protocol</span>
+            </span>
+            <!-- External window icon indicator -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+
+          <h2>
+            <span class="awareness-title-text">Disaster Awareness Program</span>
+          </h2>
+
+          <p>
+            Emergency evacuation routes, community hazard mapping, flash flood survival guides, and citizen rapid-response directives.
+          </p>
+
+          <div class="awareness-action-row">
+            <span class="awareness-action-label">Explore Citizen Safety Module</span>
+            <div class="awareness-arrow-circle">
+              <!-- Animated Action Arrow -->
+              <svg class="awareness-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Quick Catchment Search & Filter Panel -->
+      <div class="glass-panel sidebar-section" style="padding: 1.25rem;">
+        <div class="section-header">
+          <span class="section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Catchment Telemetry
+          </span>
+          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-cyan);">20 STATIONS</span>
+        </div>
+
+        <div class="search-input-box">
+          <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" placeholder="Search river gauges, districts..." />
+        </div>
+
+        <!-- Registered River Gauges Feed -->
+        <div class="station-list">
+          
+          <!-- Station 1: Karad (Emergency) -->
+          <div class="station-card magnetic active">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Karad</span>
+                <span class="station-code">MH_GAK_12</span>
+              </div>
+              <span class="tier-badge emergency">EMERGENCY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Satara</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-red); font-weight: 700;">85 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 2: Mahad (Emergency) -->
+          <div class="station-card magnetic">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Mahad</span>
+                <span class="station-code">MH_GAK_17</span>
+              </div>
+              <span class="tier-badge emergency">EMERGENCY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Savitri River • Raigad</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-red); font-weight: 700;">94 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 3: Terwad (Warning) -->
+          <div class="station-card magnetic">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Terwad</span>
+                <span class="station-code">MH_GAK_01</span>
+              </div>
+              <span class="tier-badge warning">WARNING</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Panchganga River • Kolhapur</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-orange); font-weight: 700;">62 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 4: Badlapur (Warning) -->
+          <div class="station-card magnetic">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Badlapur</span>
+                <span class="station-code">MH_GAK_18</span>
+              </div>
+              <span class="tier-badge warning">WARNING</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Ulhas River • Thane</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-orange); font-weight: 700;">58 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 5: Kurundwad (Advisory) -->
+          <div class="station-card magnetic">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Kurundwad</span>
+                <span class="station-code">MH_GAK_03</span>
+              </div>
+              <span class="tier-badge advisory">ADVISORY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Kolhapur</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-yellow); font-weight: 700;">36 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 6: Sangli (Normal) -->
+          <div class="station-card magnetic">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Sangli Bridge</span>
+                <span class="station-code">MH_GAK_09</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Sangli</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">18 mm/24h</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- MAIN CONTENT: Emergency Alert, GIS Map Viewport & Telemetry Cards     -->
+    <!-- --------------------------------------------------------------------- -->
+    <section class="main-content">
+      
+      <!-- Top High-Priority Incident Status -->
+      <div class="alert-overview-banner magnetic">
+        <div class="alert-overview-left">
+          <div class="alert-icon-box">
+            <!-- Alert Triangle SVG -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <div class="alert-message-box">
+            <h3>CRITICAL: High Flood Probability (84%) Detected in Krishna River Basin</h3>
+            <p>Immediate evacuation protocols recommended for Karad and downstream low-lying riparian settlements. SDRF teams placed on standby.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-shrink: 0;">
+          <button class="btn btn-alert magnetic">
+            <span>Issue Sirens</span>
+          </button>
+          <button class="btn btn-ghost magnetic">
+            <span>Export Bulletin</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- 3D HOLOGRAPHIC GLOBE & WEB-GIS TERMINAL (Requirements 1, 2, 3, 4, 5)  -->
+      <!-- ===================================================================== -->
+      <div class="glass-panel globe-terminal-container magnetic">
+        
+        <!-- Top Holographic HUD Overlay -->
+        <div class="globe-hud-header">
+          <div class="globe-status-pill">
+            <span class="globe-beacon-cyan"></span>
+            <span>ORBITAL TELEMETRY // 3D GEO-RADAR ACTIVE</span>
+          </div>
+
+          <div class="globe-coords-readout">
+            <span class="coords-label">FOCUS REGION:</span>
+            <span class="coords-val">18.5204° N, 73.8567° E (Western Ghats)</span>
+          </div>
+        </div>
+
+        <!-- 3D Globe Viewport Mounting Container -->
+        <div id="globeViewport" class="globe-viewport">
+          
+          <!-- CSS-Only Glowing Cyan Radar Skeleton Loading State (Requirement 5) -->
+          <div id="globeLoader" class="globe-loader-overlay">
+            <div class="globe-radar-spinner">
+              <div class="radar-scan-ring"></div>
+              <div class="radar-core-dot"></div>
+            </div>
+            <div class="globe-loader-text">
+              <span>INITIALIZING 3D HOLOGRAPHIC GLOBE...</span>
+              <small>Calibrating 20 Western Ghats River Gauges</small>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sleek Floating Glassmorphism Map Controls Panel (Requirement 4) -->
+        <div class="globe-floating-controls glass-panel">
+          <div class="controls-header">
+            <span>NAV CONTROLS</span>
+            <span class="control-dot"></span>
+          </div>
+          <div class="controls-btn-group">
+            <button id="globeZoomInBtn" type="button" class="btn btn-ctrl" title="Zoom In">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Zoom In</span>
+            </button>
+            <button id="globeZoomOutBtn" type="button" class="btn btn-ctrl" title="Zoom Out">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Zoom Out</span>
+            </button>
+            <button id="globeResetGhatsBtn" type="button" class="btn btn-ctrl btn-ctrl-accent" title="Reset to Western Ghats">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+              <span>Reset to Western Ghats</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Tooltip Overlay with Cyber Clip-Path (Requirement 4) -->
+        <div id="globeTooltip" class="globe-hologram-tooltip" style="display: none;">
+          <div class="tooltip-header">
+            <span id="tooltipStationId" class="tooltip-station-badge">MH_GAK_12</span>
+            <span id="tooltipRiskBadge" class="tooltip-risk-pill emergency">EMERGENCY</span>
+          </div>
+          <div id="tooltipStationName" class="tooltip-title">Karad Gauge Station</div>
+          <div id="tooltipRiverBasin" class="tooltip-subtitle">Krishna / Koyna Confluence, Satara</div>
+          <div class="tooltip-telemetry-row">
+            <div class="tooltip-metric">
+              <span class="metric-lbl">Current Rainfall</span>
+              <span id="tooltipRainfall" class="metric-num">85.0 mm</span>
+            </div>
+            <div class="tooltip-metric">
+              <span class="metric-lbl">Warning Stage</span>
+              <span id="tooltipWarning" class="metric-num">563.0 m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom-Right Risk Scale Legend -->
+        <div class="globe-legend-overlay">
+          <div class="legend-scale-title">RISK SCALE</div>
+          <div class="legend-scale-items">
+            <div class="legend-chip">
+              <span class="legend-dot-cyan"></span>
+              <span>NORMAL (&lt;25%)</span>
+            </div>
+            <div class="legend-chip">
+              <span class="legend-dot-yellow"></span>
+              <span>ADVISORY (25-50%)</span>
+            </div>
+            <div class="legend-chip">
+              <span class="legend-dot-orange"></span>
+              <span>WARNING (50-75%)</span>
+            </div>
+            <div class="legend-chip">
+              <span class="legend-dot-crimson"></span>
+              <span>EMERGENCY (&gt;75%)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- PREDICTION & RISK ANALYSIS PANEL (Requirements 1, 2, 3, 4, 5)         -->
+      <!-- ===================================================================== -->
+      <div id="predictionPanel" class="glass-panel prediction-panel magnetic">
+        
+        <!-- Panel Header -->
+        <div class="prediction-header">
+          <div class="prediction-title-group">
+            <div class="prediction-icon-shield">
+              <!-- AI Neural / Chip Icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <line x1="9" y1="1" x2="9" y2="4"></line>
+                <line x1="15" y1="1" x2="15" y2="4"></line>
+                <line x1="9" y1="20" x2="9" y2="23"></line>
+                <line x1="15" y1="20" x2="15" y2="23"></line>
+                <line x1="20" y1="9" x2="23" y2="9"></line>
+                <line x1="20" y1="14" x2="23" y2="14"></line>
+                <line x1="1" y1="9" x2="4" y2="9"></line>
+                <line x1="1" y1="14" x2="4" y2="14"></line>
+              </svg>
+            </div>
+            <div>
+              <h3 class="prediction-title">Prediction & Risk Analysis</h3>
+              <span id="predStationLabel" class="prediction-subtitle">Karad (MH_GAK_12) • Krishna / Koyna Basin</span>
+            </div>
+          </div>
+
+          <!-- Requirement 3: Risk Tier Badge with Continuous Soft Pulse Animation -->
+          <div id="predRiskBadge" class="risk-tier-pill emergency pulse-badge">
+            <span class="pulse-ring"></span>
+            <span class="tier-text">EMERGENCY</span>
+          </div>
+        </div>
+
+        <!-- Requirement 2: The Risk Gauge (Circular Progress Indicator) -->
+        <div class="gauge-section">
+          <div class="circular-gauge-wrapper">
+            <svg class="circular-gauge-svg" viewBox="0 0 120 120">
+              <circle class="gauge-track" cx="60" cy="60" r="50"></circle>
+              <circle id="gaugeProgressCircle" class="gauge-progress" cx="60" cy="60" r="50"></circle>
+            </svg>
+            <!-- Center Text Indicator -->
+            <div class="gauge-inner-content">
+              <span id="gaugeProbabilityValue" class="gauge-pct">0%</span>
+              <span class="gauge-caption">Flood Probability</span>
+            </div>
+          </div>
+
+          <!-- Risk Diagnosis Diagnostic Summary -->
+          <div class="gauge-diagnosis-box">
+            <div class="diagnosis-header">
+              <span>HYDRO-LOGIC DIAGNOSIS</span>
+              <span id="diagnosisCode" class="diagnosis-status-tag red">SURGING INFLOW</span>
+            </div>
+            <p id="diagnosisText" class="diagnosis-desc">
+              High-confidence flood probability detected. Upstream catchment headwaters have breached saturation threshold. Immediate alert active for low-lying riparian settlements.
+            </p>
+          </div>
+        </div>
+
+        <!-- Requirement 4: Rainfall Metrics Grid (3 Small Inner Glass Cards with Hover Effects) -->
+        <div class="rainfall-metrics-grid">
+          
+          <div class="metric-glass-subcard">
+            <div class="subcard-header">
+              <span>1-Day (mm)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+            </div>
+            <div class="subcard-val-row">
+              <span id="metricRain1d" class="subcard-num">85.0</span>
+              <span class="subcard-unit">mm</span>
+            </div>
+            <div class="subcard-footer">
+              <span>24h Antecedent Total</span>
+            </div>
+          </div>
+
+          <div class="metric-glass-subcard">
+            <div class="subcard-header">
+              <span>3-Day (mm)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </div>
+            <div class="subcard-val-row">
+              <span id="metricRain3d" class="subcard-num">190.4</span>
+              <span class="subcard-unit">mm</span>
+            </div>
+            <div class="subcard-footer">
+              <span>72h Cumulative Inflow</span>
+            </div>
+          </div>
+
+          <div class="metric-glass-subcard">
+            <div class="subcard-header">
+              <span>7-Day (mm)</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <div class="subcard-val-row">
+              <span id="metricRain7d" class="subcard-num">320.0</span>
+              <span class="subcard-unit">mm</span>
+            </div>
+            <div class="subcard-footer">
+              <span>168h Cumulative Horizon</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Requirement 3: Graphical Presentation (Time-Series Chart: Rainfall vs Flood Threshold) -->
+        <div class="prediction-chart-box">
+          <div class="chart-box-header">
+            <div class="chart-header-left">
+              <div class="chart-title-tag">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18 9l-5 5-4-4-6 6"></path>
+                </svg>
+                <span>7-DAY HYETOGRAPH // PRECIPITATION VS. DANGER THRESHOLD</span>
+              </div>
+              <span class="chart-subtitle">Daily Inflow Accumulation vs Historical Evacuation Threshold (120 mm/24h)</span>
+            </div>
+
+            <div class="chart-legend-chips">
+              <div class="chart-chip">
+                <span class="chip-bar-cyan"></span>
+                <span>Observed Rainfall (mm)</span>
+              </div>
+              <div class="chart-chip">
+                <span class="chip-line-dashed-red"></span>
+                <span>Danger Mark (120 mm)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Canvas Area with Transparent Background (Requirement 3) -->
+          <div class="chart-canvas-wrapper">
+            <canvas id="rainfallTimeseriesChart"></canvas>
+            <!-- Custom HTML/CSS Styled Tooltip -->
+            <div id="chartCustomTooltip" class="chart-custom-tooltip" style="opacity: 0;"></div>
+          </div>
+        </div>
+
+        <!-- Requirement 5: Model Details Footer -->
+        <div class="prediction-footer">
+          <div class="footer-status-dot"></div>
+          <span>AI Model: LightGBM (Calibrated) | Live Data Active</span>
+        </div>
+
+      </div>
+
+      <!-- Bottom Analytics & Telemetry Grid -->
+      <div class="analytics-grid">
+        
+        <!-- Metric Card 1: 24h Rainfall -->
+        <div class="glass-panel metric-card magnetic">
+          <div class="metric-header">
+            <span>24h Inundation Intensity</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+            </svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-large-number">85.0</span>
+            <span class="metric-unit">mm / 24h</span>
+          </div>
+          <div class="metric-footer">
+            <span style="color: var(--alert-red); font-weight: 700;">▲ +42% Surge</span>
+            <span>vs 3-day baseline average</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 2: Cumulative Discharge -->
+        <div class="glass-panel metric-card magnetic">
+          <div class="metric-header">
+            <span>7-Day Cumulative Aggregate</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-large-number">320.4</span>
+            <span class="metric-unit">mm</span>
+          </div>
+          <div class="metric-footer">
+            <span style="color: var(--alert-orange); font-weight: 700;">Historical Flood Mark: 120 mm/day</span>
+          </div>
+        </div>
+
+        <!-- Metric Card 3: Evacuation Readiness -->
+        <div class="glass-panel metric-card magnetic">
+          <div class="metric-header">
+            <span>Public Protection Readiness</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-large-number" style="color: var(--accent-cyan);">92%</span>
+            <span class="metric-unit">DEPLOYED</span>
+          </div>
+          <div class="metric-footer">
+            <span style="color: var(--alert-green); font-weight: 700;">8 Relief Shelters Active</span>
+            <span>in Karad Corridor</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Advanced Emergency Warning Popup Modal (Requirement 1 & 2)             -->
+  <!-- ========================================================================= -->
+  <div id="warningModalOverlay" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      
+      <!-- Close cross button -->
+      <button type="button" class="modal-close-cross" onclick="PRAVAH && PRAVAH.dismissWarningPopup()" aria-label="Close modal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Animated ⚠️ Warning Icon with Breathing/Pulsing Animation -->
+      <div class="modal-icon-wrapper">
+        <svg class="warning-triangle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+
+      <!-- Emergency Level Badge -->
+      <div class="modal-header-badge">
+        <span class="pulse-beacon-red"></span>
+        <span>RED ALERT • FLASH FLOOD EMERGENCY DIRECTIVE</span>
+      </div>
+
+      <!-- Modal Title & Catchment Details -->
+      <h2 class="modal-title">CRITICAL INUNDATION IMMINENT</h2>
+      <p class="modal-station">
+        <strong>Karad Gauge Station (MH_GAK_12)</strong> • Krishna / Koyna Confluence, Satara
+      </p>
+
+      <!-- Telemetry Highlights Grid -->
+      <div class="modal-telemetry-grid">
+        <div class="telemetry-item">
+          <span class="telemetry-label">Flood Probability</span>
+          <span class="telemetry-val text-red">84%</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">24h Precipitation</span>
+          <span class="telemetry-val">85.0 mm</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">Warning Stage</span>
+          <span class="telemetry-val text-orange">563.0 m (Breached)</span>
+        </div>
+      </div>
+
+      <!-- Actionable Evacuation Guidance -->
+      <div class="modal-instruction">
+        <strong>OPERATIONAL ACTION:</strong> River stage approaching critical danger threshold (565.8m). Immediate evacuation ordered for riparian settlements in Wards 3, 5, and 8. SDRF Water Rescue Unit mobilized.
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="modal-actions-row">
+        <a href="awareness.html" target="_blank" class="btn btn-ghost magnetic">
+          <span>Evacuation Guide</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+
+        <!-- "Dismiss Alert" Button with Sleek Hover Sweep Effect -->
+        <button id="dismissAlertBtn" type="button" class="btn btn-sweep-dismiss">
+          <span>Dismiss Alert</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. Team Modal: "Meet the PRAVAH Team" (Requirements 2, 3, 4)              -->
+  <!-- ========================================================================= -->
+  <div id="teamModalOverlay" class="team-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle">
+    <div class="team-modal-card">
+      
+      <!-- Sleek Close Button with Magnetic Hover (Requirement 2) -->
+      <button class="team-modal-close-btn magnetic" onclick="closeTeamModal()" aria-label="Close Team Modal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Modal Header (Requirement 2) -->
+      <div class="team-modal-header">
+        <div class="team-consortium-badge">
+          <span class="radar-pulse-dot" style="width: 7px; height: 7px;"></span>
+          <span>RESEARCH &amp; ENGINEERING CONSORTIUM</span>
+        </div>
+        <h2 id="teamModalTitle" class="team-modal-title">Meet the PRAVAH Team</h2>
+        <p class="team-modal-subtitle">
+          An interdisciplinary Hydro-Informatics and Geomatics task force developing AI-driven flash flood resilience, live Web-GIS telemetry, and early warning intelligence across the Maharashtra Western Ghats.
+        </p>
+      </div>
+
+      <!-- 6-Member Team Grid Layout (Requirement 3 & 4) -->
+      <div class="team-grid">
+        
+        <!-- Member 1: Arya Abhinav Samal -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AAS</div>
+          </div>
+          <span class="team-member-pill-badge">TEAM LEADER</span>
+          <h3 class="team-member-name">Arya Abhinav Samal</h3>
+          <div class="team-member-role">Team Leader | GIS &amp; Remote Sensing Specialist</div>
+          <p class="team-member-bio">
+            Spearheaded multi-spectral satellite imagery ingestion, DEM terrain extraction, and GIS delineation of 20 Western Ghats river basins with high-resolution spatial hazard vulnerability mapping.
+          </p>
+        </div>
+
+        <!-- Member 2: Ashirbad Das -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AD</div>
+          </div>
+          <span class="team-member-pill-badge">DATA SYSTEMS</span>
+          <h3 class="team-member-name">Ashirbad Das</h3>
+          <div class="team-member-role">Geo-spatial Data &amp; API Engineer</div>
+          <p class="team-member-bio">
+            Architected the real-time hydrometric telemetry pipelines, automated Open-Meteo Doppler radar ingest, spatial GeoJSON stream parsing, and end-to-end data provenance tracking.
+          </p>
+        </div>
+
+        <!-- Member 3: Abhisek Ghose -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AG</div>
+          </div>
+          <span class="team-member-pill-badge">UI / UX ARCHITECT</span>
+          <h3 class="team-member-name">Abhisek Ghose</h3>
+          <div class="team-member-role">Frontend &amp; UI/UX Developer</div>
+          <p class="team-member-bio">
+            Crafted this high-contrast Obsidian dark glassmorphism interface, interactive 3D Web-GIS Globe, real-time hyetograph visual analytics, and rapid-response emergency workflow UX.
+          </p>
+        </div>
+
+        <!-- Member 4: Asmit Mahapatra -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AM</div>
+          </div>
+          <span class="team-member-pill-badge">BACKEND CORE</span>
+          <h3 class="team-member-name">Asmit Mahapatra</h3>
+          <div class="team-member-role">Backend Developer &amp; Database Engineer</div>
+          <p class="team-member-bio">
+            Engineered the high-throughput FastAPI inference engine, asynchronous worker pools, RESTful telemetry routing, and resilient PostgreSQL/PostGIS spatial time-series persistence.
+          </p>
+        </div>
+
+        <!-- Member 5: Anisha Dogra -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AD</div>
+          </div>
+          <span class="team-member-pill-badge">HYDROLOGY</span>
+          <h3 class="team-member-name">Anisha Dogra</h3>
+          <div class="team-member-role">Hydrological Modeler</div>
+          <p class="team-member-bio">
+            Modeled steep-slope catchment rainfall-runoff relationships, antecedent soil moisture indices (API), retention dynamics, and physical flood wave crest kinematics.
+          </p>
+        </div>
+
+        <!-- Member 6: Adyashree Mishra -->
+        <div class="team-member-card">
+          <div class="team-avatar-wrap">
+            <div class="team-avatar-img">AM</div>
+          </div>
+          <span class="team-member-pill-badge">MACHINE LEARNING</span>
+          <h3 class="team-member-name">Adyashree Mishra</h3>
+          <div class="team-member-role">AI/ML Engineer</div>
+          <p class="team-member-bio">
+            Formulated the calibrated LightGBM and XGBoost probabilistic models, resolved severe positive-class event imbalances, and optimized warning tier thresholds for zero false-dismissals.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Globe Controller & Master Scripts -->
+  <script src="globe-controller.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Community Flood Awareness & Public Safety Program</title>
+  
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Shared Design System Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="awareness-page-container">
+
+  <!-- ========================================================================= -->
+  <!-- 1. Top Navigation Bar (Educational Context)                               -->
+  <!-- ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-shield">
+        <!-- Shield Icon with Safe Checkmark -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#041019" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span class="beacon-pulse"></span>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>PRAVAH SAFETY PORTAL</span>
+          <span class="brand-tag">PUBLIC DIRECTIVE</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Disaster Management Authority</span>
+          <span>•</span>
+          <span>Maharashtra Western Ghats</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-pill">
+        <span class="telemetry-dot"></span>
+        <span>Public Education Edition 2026</span>
+      </div>
+
+      <!-- Quick Link to return to main live telemetry dashboard -->
+      <a href="index.html" class="btn btn-primary magnetic" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Back to Live EOC Dashboard</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Cinematic Hero Section with Parallax Background (Requirement 2)         -->
+  <!-- ========================================================================= -->
+  <section class="parallax-hero">
+    <div class="parallax-hero-content">
+      
+      <!-- Top Priority Tag -->
+      <div class="hero-pill-badge">
+        <span class="pulse-beacon-red" style="background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan);"></span>
+        <span>Western Ghats Monsoon Protocol • Public Advisory</span>
+      </div>
+
+      <!-- Bold Title (Requirement 2) -->
+      <h1 class="hero-title">
+        PRAVAH Community Flood Awareness
+      </h1>
+
+      <!-- Cinematic Subtitle -->
+      <p class="hero-description">
+        Flash floods along the Western Ghats corridor can inundate river basins in less than 90 minutes. Review vital pre-flood safety measures, direct emergency contact hotlines, and designated high-ground evacuation sectors before monsoon cloudbursts strike.
+      </p>
+
+      <!-- Key Preparedness Telemetry Stats -->
+      <div class="hero-stats-strip">
+        <div class="hero-stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Flash Inflow Window: <strong class="hero-stat-val">&lt; 90 mins</strong></span>
+        </div>
+
+        <div class="hero-stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--alert-red)" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          </svg>
+          <span>Danger Threshold: <strong class="hero-stat-val" style="color: var(--alert-red);">120 mm / 24h</strong></span>
+        </div>
+
+        <div class="hero-stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--alert-green)" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>Active Shelters: <strong class="hero-stat-val" style="color: var(--alert-green);">28 Relief Camps</strong></span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Content Modules Grid with Staggered Animations (Requirement 3 & 4)     -->
+  <!-- ========================================================================= -->
+  <main class="awareness-content-wrapper">
+    
+    <div class="awareness-grid-3col">
+      
+      <!-- ------------------------------------------------------------------- -->
+      <!-- MODULE 1: Pre-Flood Preparation Steps (Card 1: 0.1s Stagger Delay)  -->
+      <!-- ------------------------------------------------------------------- -->
+      <article class="awareness-module-card stagger-card-1">
+        
+        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+          <div class="card-header-icon-box">
+            <!-- Checklist / Clipboard Icon -->
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <path d="M9 14l2 2 4-4"></path>
+            </svg>
+          </div>
+          <div class="card-title-group">
+            <h2>Pre-Flood Preparation Steps</h2>
+            <div class="card-subtitle">Proactive Protocols Before Flood Crest</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+          When heavy rain alerts or <strong>ADVISORY</strong> thresholds are issued, take these life-saving measures immediately:
+        </p>
+
+        <!-- Preparation Step-by-Step List -->
+        <div class="prep-step-list">
+          
+          <div class="prep-step-item">
+            <span class="step-seq-pill">01</span>
+            <div class="step-text-wrap">
+              <h3>Pack a 72-Hour Waterproof Go-Bag</h3>
+              <p>Prepare emergency cash, Aadhaar/deed documents in a sealed pouch, water purification tablets, 3 days of dry rations, and personal medications.</p>
+            </div>
+          </div>
+
+          <div class="prep-step-item">
+            <span class="step-seq-pill">02</span>
+            <div class="step-text-wrap">
+              <h3>Relocate Cattle & Farm Equipment</h3>
+              <p>Move livestock early to pre-designated highland community holding grounds before culverts and access causeways flood.</p>
+            </div>
+          </div>
+
+          <div class="prep-step-item">
+            <span class="step-seq-pill">03</span>
+            <div class="step-text-wrap">
+              <h3>Clear Local Runoff Inlets & Ditches</h3>
+              <p>Ensure farm perimeter trenches and neighborhood stormwater culverts are free of debris, fallen bamboo, and plastics.</p>
+            </div>
+          </div>
+
+          <div class="prep-step-item">
+            <span class="step-seq-pill">04</span>
+            <div class="step-text-wrap">
+              <h3>Elevate Hazardous Utilities & Fuel</h3>
+              <p>Turn off gas cylinders, disconnect solar inverters, and isolate main electrical panel breakers before leaving homes.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </article>
+
+      <!-- ------------------------------------------------------------------- -->
+      <!-- MODULE 2: Emergency Contacts (Card 2: 0.3s Stagger Delay)           -->
+      <!-- ------------------------------------------------------------------- -->
+      <article class="awareness-module-card alert-variant stagger-card-2">
+        
+        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+          <div class="card-header-icon-box red-glow">
+            <!-- Telephone Emergency Icon -->
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </div>
+          <div class="card-title-group">
+            <h2>Emergency Contacts</h2>
+            <div class="card-subtitle">24x7 Verified Disaster Command Lines</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+          Direct communication lines to regional emergency control rooms, rescue battalions, and flood monitoring authorities:
+        </p>
+
+        <!-- Emergency Directory Items -->
+        <div class="contact-directory-list">
+          
+          <div class="contact-card-item">
+            <div class="contact-agency-info">
+              <h3>National Emergency Helpline</h3>
+              <span>Police, Fire, Medical, Disaster (Toll-Free)</span>
+            </div>
+            <a href="tel:112" class="contact-dial-btn" title="Dial 112">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>112</span>
+            </a>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-agency-info">
+              <h3>Maharashtra State EOC (SEOC)</h3>
+              <span>State Disaster Management Authority</span>
+            </div>
+            <a href="tel:1070" class="contact-dial-btn" title="Dial 1070">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>1070</span>
+            </a>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-agency-info">
+              <h3>NDRF 5th Battalion (Pune HQ)</h3>
+              <span>Western Ghats Water Rescue Command</span>
+            </div>
+            <a href="tel:02027103211" class="contact-dial-btn" title="Call NDRF Pune">
+              <span>020-27103211</span>
+            </a>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-agency-info">
+              <h3>Satara District Flood Cell (Karad)</h3>
+              <span>Krishna / Koyna Basin Disaster Desk</span>
+            </div>
+            <a href="tel:02162238889" class="contact-dial-btn" title="Call Satara EOC">
+              <span>02162-238889</span>
+            </a>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-agency-info">
+              <h3>Raigad District Flood Control (Mahad)</h3>
+              <span>Savitri River Basin Emergency Hub</span>
+            </div>
+            <a href="tel:02141222118" class="contact-dial-btn" title="Call Raigad EOC">
+              <span>02141-222118</span>
+            </a>
+          </div>
+
+        </div>
+
+      </article>
+
+      <!-- ------------------------------------------------------------------- -->
+      <!-- MODULE 3: Evacuation Routes (Card 3: 0.5s Stagger Delay)            -->
+      <!-- ------------------------------------------------------------------- -->
+      <article class="awareness-module-card evac-variant stagger-card-3">
+        
+        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+          <div class="card-header-icon-box orange-glow">
+            <!-- Map Pin / Route Navigation Icon -->
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+          </div>
+          <div class="card-title-group">
+            <h2>Evacuation Routes</h2>
+            <div class="card-subtitle">Elevated Corridors & Staging Shelters</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.5;">
+          High-ground corridors designated by the District Disaster Management Authority to bypass submerged river bends:
+        </p>
+
+        <!-- Designated Sector Routes -->
+        <div class="evacuation-routes-list">
+          
+          <div class="route-sector-card">
+            <div class="route-badge-row">
+              <span class="route-sector-title">Sector 1: Karad & Krishna Confluence</span>
+              <span class="elevation-pill">Elev: 588m AMSL</span>
+            </div>
+            <p class="route-detail-text">
+              Evacuate eastwards along NH-48 towards Vidyanagar elevation ridge. Avoid the Koyna-Krishna sangam causeway.
+            </p>
+            <div class="route-assembly-point">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Assembly: Shivaji High School Relief Staging Ground</span>
+            </div>
+          </div>
+
+          <div class="route-sector-card">
+            <div class="route-badge-row">
+              <span class="route-sector-title">Sector 2: Mahad & Savitri Corridor</span>
+              <span class="elevation-pill">Elev: 45m AMSL</span>
+            </div>
+            <p class="route-detail-text">
+              Move towards Poladpur foothills via Old Mumbai-Goa Highway link roads. Do not cross low-lying Savitri bridges.
+            </p>
+            <div class="route-assembly-point">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Assembly: Dr. Babasaheb Ambedkar College Shelter</span>
+            </div>
+          </div>
+
+          <div class="route-sector-card">
+            <div class="route-badge-row">
+              <span class="route-sector-title">Sector 3: Kolhapur & Panchganga Basin</span>
+              <span class="elevation-pill">Elev: 562m AMSL</span>
+            </div>
+            <p class="route-detail-text">
+              Terwad & Kurundwad residents relocate to Shirol high school plateaus. Shirol-Jaysingpur bypass remains operational.
+            </p>
+            <div class="route-assembly-point">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Assembly: Shirol Tehsil Community Relief Center</span>
+            </div>
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 4. Universal Flood Survival Rules & Citizen Action Guidelines         -->
+    <!-- ===================================================================== -->
+    <section class="safety-rules-strip">
+      <div class="rules-strip-header">
+        <div>
+          <h3>Golden Rules of Flood Survival</h3>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.2rem;">
+            Follow these life-saving golden rules established by the National Disaster Management Authority (NDMA):
+          </p>
+        </div>
+        <span class="hero-pill-badge" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+          ZERO CASUALTY DIRECTIVE
+        </span>
+      </div>
+
+      <div class="rules-grid">
+        
+        <div class="rule-box">
+          <span class="rule-box-title red">
+            <!-- Warning Sign -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Turn Around, Don't Drown
+          </span>
+          <p>
+            Just 15 cm (6 inches) of swiftly moving flood water can sweep an adult off their feet. 30 cm (12 inches) will float most passenger cars. Never attempt to wade, swim, or drive across flooded roads or submerged bridge culverts.
+          </p>
+        </div>
+
+        <div class="rule-box">
+          <span class="rule-box-title orange">
+            <!-- Electric Flash -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Electrocution Hazards
+          </span>
+          <p>
+            Avoid touching fallen power lines, submerged electrical poles, or flooded transformer sub-stations. Report sparkling cables immediately to MSEDCL emergency lines and keep a distance of at least 15 meters.
+          </p>
+        </div>
+
+        <div class="rule-box">
+          <span class="rule-box-title">
+            <!-- Radio Broadcast -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path></svg>
+            Official Information Channels
+          </span>
+          <p>
+            Rely exclusively on alerts issued by PRAVAH, the Central Water Commission (CWC), and District Collectorates. Do not forward unverified social media voice notes or panicking rumors during active cloudburst events.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 5. Footer                                                                 -->
+  <!-- ========================================================================= -->
+  <footer style="background: rgba(15, 23, 42, 0.95); border-top: 1px solid var(--glass-border); padding: 2rem 1.5rem; text-align: center; color: #64748b; font-size: 0.78rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-weight: 800; color: #ffffff;">PRAVAH</span>
+        <span>— Advanced Flash Flood Early Warning System & Civic Preparedness Network</span>
+      </div>
+      <div>
+        <span>Maharashtra State Disaster Management Authority • Central Water Commission • IndoFloods Benchmark</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
