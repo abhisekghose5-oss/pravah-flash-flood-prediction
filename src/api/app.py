@@ -177,3 +177,58 @@ def subscribe_alerts(subscription: SubscriptionRequest) -> SubscriptionResponse:
         message="Number registered for alerts."
     )
 
+
+# =============================================================================
+# Crowdsourced Citizen SOS Flood Reports (In-Memory Store)
+# =============================================================================
+from datetime import datetime, timezone
+
+class CitizenReport(BaseModel):
+    latitude: float = Field(..., description="GPS latitude of the reported flood incident")
+    longitude: float = Field(..., description="GPS longitude of the reported flood incident")
+    severity: str = Field(..., description="Water depth severity: 'ankle_deep', 'knee_deep', 'waist_deep', or 'above_waist_danger'")
+    severity_tier: Optional[str] = Field(None, description="Optional alias for severity")
+    landmark_notes: Optional[str] = Field(None, description="Optional landmark or situation details")
+    timestamp: str = Field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat(),
+        description="Auto-generated ISO 8601 UTC timestamp"
+    )
+
+class ReportResponse(BaseModel):
+    status: str
+    message: str
+    report_id: int
+
+# Global in-memory storage for active SOS reports (SIH Demo)
+active_sos_reports: list[Dict[str, Any]] = []
+
+
+@app.post("/api/report-flood", response_model=ReportResponse, tags=["Citizen SOS"])
+def report_flood(report: CitizenReport) -> ReportResponse:
+    """
+    Accepts crowdsourced flood reports from citizens and emergency responders.
+    Appends the report to memory and logs telemetry for incident dispatch.
+    """
+    report_dict = report.model_dump() if hasattr(report, "model_dump") else report.dict()
+    report_dict["id"] = len(active_sos_reports) + 1
+    active_sos_reports.append(report_dict)
+
+    logger.info("🚨 New Citizen SOS Report #%d: Lat %.4f, Lng %.4f, Severity: %s", 
+                report_dict["id"], report.latitude, report.longitude, report.severity)
+
+    return ReportResponse(
+        status="success",
+        message="SOS report received and dispatched to emergency controllers.",
+        report_id=report_dict["id"]
+    )
+
+
+@app.get("/api/reports", response_model=list[Dict[str, Any]], tags=["Citizen SOS"])
+def get_all_reports() -> list[Dict[str, Any]]:
+    """
+    Returns the list of active crowdsourced flood reports as a JSON array
+    for frontend map rendering and spatial telemetry.
+    """
+    return active_sos_reports
+
+

@@ -1356,6 +1356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reportPayload = {
           latitude: parseFloat(lat),
           longitude: parseFloat(lng),
+          severity: severity,
           severity_tier: severity,
           landmark_notes: landmark,
           client_timestamp: new Date().toISOString(),
