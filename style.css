@@ -3494,6 +3494,153 @@ body.map-focus-active .globe-terminal-container {
   border-color: rgba(6, 182, 212, 0.7);
 }
 
+/* ==========================================================================
+   MISSION-CRITICAL ENTERPRISE FOOTER (ADD-ONLY EXTENSION)
+   ========================================================================== */
+
+/* Provide buffer space at bottom of document body for fixed 40px footer */
+body {
+  padding-bottom: 40px;
+}
+
+/* Fixed, ultra-slim bottom bar (Height: 40px, z-index: 50) */
+.enterprise-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 40px;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  pointer-events: auto !important;
+}
+
+/* Outer layout container */
+.footer-container {
+  width: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 0.73rem;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+/* Left, Center, and Right Flex Alignment */
+.footer-left,
+.footer-center,
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+/* Left: Branding */
+.footer-brand {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.footer-tag {
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Center: Attribution & Disclaimer */
+.footer-center strong {
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+/* Vertical Muted Divider */
+.footer-divider {
+  color: #475569;
+  font-size: 0.7rem;
+}
+
+/* Right: Institutional System Status Indicator */
+.system-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Subtly Pulsing Emerald Dot */
+.status-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  animation: pulseDotSubtle 2.4s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes pulseDotSubtle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.75;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.85);
+  }
+}
+
+.status-label {
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* Right: Documentation Link */
+.footer-doc-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.footer-doc-link:hover,
+.footer-doc-link:focus-visible {
+  color: #ffffff;
+  text-decoration: none;
+  outline: none;
+}
+
+/* Responsive Handling: Gracefully collapse center and tags on narrower displays */
+@media (max-width: 900px) {
+  .footer-center {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .footer-tag {
+    display: none;
+  }
+  .footer-left .footer-divider {
+    display: none;
+  }
+}
+
+
 
 
 
