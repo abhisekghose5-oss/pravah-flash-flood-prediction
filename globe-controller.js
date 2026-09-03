@@ -648,5 +648,50 @@
       }
     },
     getStations: () => WESTERN_GHATS_STATIONS,
+    getGlobeInstance: () => globeInstance,
+    updateCitizenSosRings: (reports) => {
+      if (!globeInstance || !Array.isArray(reports)) return;
+      globeInstance
+        .ringsData(reports)
+        .ringLat((d) => d.latitude ?? d.lat)
+        .ringLng((d) => d.longitude ?? d.lng)
+        .ringColor(() => (t) => `rgba(239, 68, 68, ${Math.max(0, 1 - t)})`)
+        .ringMaxRadius(2)
+        .ringPropagationSpeed(1)
+        .ringRepeatPeriod(800);
+    },
   };
+
+  // =========================================================================
+  // CITIZEN SOS REPORTS POLLING & RINGS VISUALIZATION (ADD-ONLY EXTENSION)
+  // =========================================================================
+  let citizenSosReports = [];
+
+  async function fetchCitizenReports() {
+    try {
+      const response = await fetch('/api/reports');
+      if (!response.ok) return;
+      const data = await response.json();
+      if (Array.isArray(data) && globeInstance) {
+        citizenSosReports = data;
+        globeInstance
+          .ringsData(citizenSosReports)
+          .ringLat((d) => d.latitude ?? d.lat)
+          .ringLng((d) => d.longitude ?? d.lng)
+          .ringColor(() => (t) => `rgba(239, 68, 68, ${Math.max(0, 1 - t)})`)
+          .ringMaxRadius(2)
+          .ringPropagationSpeed(1)
+          .ringRepeatPeriod(800);
+
+        console.log(`[Globe.gl] Rendered ${data.length} Citizen SOS beacon ring(s).`);
+      }
+    } catch (e) {
+      // Graceful offline fallback
+    }
+  }
+
+  // Initial fetch & poll every 5 seconds
+  setTimeout(fetchCitizenReports, 2500);
+  setInterval(fetchCitizenReports, 5000);
 })();
+
