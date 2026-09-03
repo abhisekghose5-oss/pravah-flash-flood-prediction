@@ -978,3 +978,135 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 
+// =========================================================================
+// SMART MAP FOCUS MODE & LOCATION HIGHLIGHT ZOOM (ADD-ONLY EXTENSION)
+// =========================================================================
+(function initSmartMapFocusMode() {
+  let focusDebounceTimer = null;
+  const FOCUS_IDLE_TIMEOUT_MS = 1500; // 1.5 seconds
+
+  // List of UI panels to fade out on map interaction
+  function getPanelsToFade() {
+    return document.querySelectorAll(
+      '.sidebar, .alert-overview-banner, .prediction-panel, .app-header, .globe-hud-header, .globe-legend-overlay'
+    );
+  }
+
+  // Activates Focus Mode: Drops opacity to 15% and slides panels toward screen edges
+  function activateMapFocus() {
+    document.body.classList.add('map-focus-active');
+    const panels = getPanelsToFade();
+    panels.forEach((panel) => {
+      panel.classList.add('fade-ui-on-zoom');
+    });
+
+    // Reset debounce timer
+    if (focusDebounceTimer) {
+      clearTimeout(focusDebounceTimer);
+    }
+
+    // 1.5s after user stops zooming/panning, restore panels smoothly
+    focusDebounceTimer = setTimeout(() => {
+      deactivateMapFocus();
+    }, FOCUS_IDLE_TIMEOUT_MS);
+  }
+
+  // Deactivates Focus Mode: Smoothly restores full opacity to all panels
+  function deactivateMapFocus() {
+    document.body.classList.remove('map-focus-active');
+    const panels = getPanelsToFade();
+    panels.forEach((panel) => {
+      panel.classList.remove('fade-ui-on-zoom');
+    });
+    if (focusDebounceTimer) {
+      clearTimeout(focusDebounceTimer);
+      focusDebounceTimer = null;
+    }
+  }
+
+  // Bind map interaction listeners
+  function bindMapListeners() {
+    const mapContainer = document.getElementById('globeViewport') || document.querySelector('.globe-terminal-container');
+    if (!mapContainer) return;
+
+    // 1. Wheel zoom
+    mapContainer.addEventListener('wheel', activateMapFocus, { passive: true });
+
+    // 2. Mouse drag / pan
+    mapContainer.addEventListener('mousedown', activateMapFocus);
+    mapContainer.addEventListener('mousemove', (e) => {
+      if (e.buttons > 0) {
+        activateMapFocus();
+      }
+    });
+
+    // 3. Touch pan / pinch-zoom
+    mapContainer.addEventListener('touchstart', activateMapFocus, { passive: true });
+    mapContainer.addEventListener('touchmove', activateMapFocus, { passive: true });
+
+    // 4. Pointer events
+    mapContainer.addEventListener('pointerdown', activateMapFocus);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindMapListeners);
+  } else {
+    bindMapListeners();
+  }
+
+  // =========================================================================
+  // Location Highlight Zoom (Standalone Function)
+  // =========================================================================
+  window.zoomToLocation = function (latOrStationId, lng, altitude = 0.42, duration = 1400) {
+    let targetLat = latOrStationId;
+    let targetLng = lng;
+    let targetAlt = altitude;
+
+    // Handle object argument: { lat, lng, altitude, duration }
+    if (typeof latOrStationId === 'object' && latOrStationId !== null) {
+      targetLat = latOrStationId.lat;
+      targetLng = latOrStationId.lng;
+      targetAlt = latOrStationId.altitude || altitude;
+      duration = latOrStationId.duration || duration;
+    }
+    // Handle string station ID or name: e.g. 'MH_GAK_12' or 'Karad'
+    else if (typeof latOrStationId === 'string') {
+      const stationId = latOrStationId.trim();
+      if (window.PRAVAH && typeof window.PRAVAH.selectStation === 'function') {
+        window.PRAVAH.selectStation(stationId);
+      }
+      if (window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.flyToStation === 'function') {
+        window.PRAVAH_GLOBE.flyToStation(stationId);
+      }
+      return;
+    }
+
+    // Direct numeric coordinates
+    if (typeof targetLat === 'number' && typeof targetLng === 'number') {
+      if (window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.getStations === 'function') {
+        const stations = window.PRAVAH_GLOBE.getStations();
+        const matched = stations.find(
+          (s) => Math.abs(s.lat - targetLat) < 0.15 && Math.abs(s.lng - targetLng) < 0.15
+        );
+        if (matched) {
+          if (window.PRAVAH && window.PRAVAH.selectStation) {
+            window.PRAVAH.selectStation(matched.station_id);
+          }
+          if (window.PRAVAH_GLOBE.flyToStation) {
+            window.PRAVAH_GLOBE.flyToStation(matched.station_id);
+          }
+          return;
+        }
+      }
+
+      // Fallback to globe instance if exposed directly
+      if (window.globeInstance && typeof window.globeInstance.pointOfView === 'function') {
+        window.globeInstance.pointOfView({ lat: targetLat, lng: targetLng, altitude: targetAlt }, duration);
+      }
+    }
+
+    console.log(`[PRAVAH] zoomToLocation invoked for [${targetLat}, ${targetLng}]`);
+  };
+})();
+
+

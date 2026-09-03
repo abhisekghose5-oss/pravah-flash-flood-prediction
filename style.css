@@ -3383,6 +3383,118 @@ body::after {
   margin-top: 0.25rem;
 }
 
+/* ==========================================================================
+   SMART MAP FOCUS MODE — (ADD-ONLY EXTENSION)
+   ========================================================================== */
+
+/* 1. Smart Layout Adjustments: Click & Drag through empty layout spaces */
+.dashboard-shell,
+.main-content,
+.sidebar {
+  pointer-events: none;
+}
+
+/* Restore pointer events to all interactive UI components, cards, and buttons */
+.glass-panel,
+.station-card,
+.awareness-card,
+.alert-overview-banner,
+.prediction-panel,
+.app-header,
+.globe-floating-controls,
+.globe-hud-header,
+.globe-legend-overlay,
+.globe-hologram-tooltip,
+.nav-dropdown-wrapper,
+.btn,
+a,
+button,
+input {
+  pointer-events: auto;
+}
+
+/* Ensure the 3D map viewport has full pointer interaction */
+#globeViewport,
+#globeViewport canvas,
+.globe-terminal-container {
+  pointer-events: auto !important;
+}
+
+/* 2. Focus Mode: Smoothly fade panels to 15% opacity and slide to edges */
+.sidebar,
+.alert-overview-banner,
+.prediction-panel,
+.app-header,
+.globe-hud-header,
+.globe-legend-overlay {
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-ui-on-zoom,
+body.map-focus-active .sidebar,
+body.map-focus-active .alert-overview-banner,
+body.map-focus-active .prediction-panel,
+body.map-focus-active .app-header,
+body.map-focus-active .globe-hud-header,
+body.map-focus-active .globe-legend-overlay {
+  opacity: 0.15 !important;
+  filter: blur(1.5px);
+  pointer-events: none !important;
+}
+
+/* Slide panels toward screen edges for unobstructed 3D globe inspection */
+body.map-focus-active .sidebar,
+.sidebar.fade-ui-on-zoom {
+  transform: translateX(-24px) scale(0.98);
+}
+
+body.map-focus-active .alert-overview-banner,
+.alert-overview-banner.fade-ui-on-zoom,
+body.map-focus-active .app-header,
+.app-header.fade-ui-on-zoom {
+  transform: translateY(-16px) scale(0.99);
+}
+
+body.map-focus-active .prediction-panel,
+.prediction-panel.fade-ui-on-zoom {
+  transform: translateY(24px) scale(0.98);
+}
+
+/* Direct Hover Override: Instantly restore any card the user hovers over */
+.sidebar.fade-ui-on-zoom:hover,
+.alert-overview-banner.fade-ui-on-zoom:hover,
+.prediction-panel.fade-ui-on-zoom:hover,
+body.map-focus-active .sidebar:hover,
+body.map-focus-active .alert-overview-banner:hover,
+body.map-focus-active .prediction-panel:hover {
+  opacity: 1 !important;
+  filter: blur(0px) !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* Keep 3D Globe Terminal and floating navigation controls fully vibrant */
+.globe-terminal-container,
+#globeViewport,
+.globe-floating-controls,
+.globe-hologram-tooltip {
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto !important;
+}
+
+/* Glowing terminal rim pulse when Map Focus Mode is active */
+body.map-focus-active .globe-terminal-container {
+  box-shadow: 
+    inset 0 0 70px rgba(6, 182, 212, 0.4),
+    0 0 45px rgba(6, 182, 212, 0.3),
+    0 25px 60px rgba(0, 0, 0, 0.95);
+  border-color: rgba(6, 182, 212, 0.7);
+}
+
+
 
 
 
