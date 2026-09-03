@@ -181,7 +181,7 @@
         </div>
       </a>
 
-      <!-- Quick Catchment Search & Filter Panel -->
+      <!-- Quick Catchment Search & Filter Panel (Workable 20-Station Telemetry Feed) -->
       <div class="glass-panel sidebar-section" style="padding: 1.25rem;">
         <div class="section-header">
           <span class="section-title">
@@ -190,7 +190,7 @@
             </svg>
             Catchment Telemetry
           </span>
-          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-cyan);">20 STATIONS</span>
+          <span id="stationCountBadge" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-cyan);">20 STATIONS</span>
         </div>
 
         <div class="search-input-box">
@@ -198,14 +198,15 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" placeholder="Search river gauges, districts..." />
+          <input type="text" id="stationSearchInput" placeholder="Search river gauges, districts..." autocomplete="off" />
+          <button type="button" id="clearStationSearchBtn" class="clear-search-btn" style="display: none;" title="Clear search">&times;</button>
         </div>
 
-        <!-- Registered River Gauges Feed -->
-        <div class="station-list">
+        <!-- Registered River Gauges Feed (All 20 Stations Workable & Synchronized) -->
+        <div class="station-list" id="stationListContainer">
           
           <!-- Station 1: Karad (Emergency) -->
-          <div class="station-card magnetic active">
+          <div class="station-card magnetic active" data-station-id="MH_GAK_12" data-name="Karad" data-code="MH_GAK_12" data-river="Krishna" data-district="Satara" data-risk="EMERGENCY">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Karad</span>
@@ -220,7 +221,7 @@
           </div>
 
           <!-- Station 2: Mahad (Emergency) -->
-          <div class="station-card magnetic">
+          <div class="station-card magnetic" data-station-id="MH_GAK_17" data-name="Mahad" data-code="MH_GAK_17" data-river="Savitri" data-district="Raigad" data-risk="EMERGENCY">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Mahad</span>
@@ -235,7 +236,7 @@
           </div>
 
           <!-- Station 3: Terwad (Warning) -->
-          <div class="station-card magnetic">
+          <div class="station-card magnetic" data-station-id="MH_GAK_01" data-name="Terwad" data-code="MH_GAK_01" data-river="Panchganga" data-district="Kolhapur" data-risk="WARNING">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Terwad</span>
@@ -250,7 +251,7 @@
           </div>
 
           <!-- Station 4: Badlapur (Warning) -->
-          <div class="station-card magnetic">
+          <div class="station-card magnetic" data-station-id="MH_GAK_18" data-name="Badlapur" data-code="MH_GAK_18" data-river="Ulhas" data-district="Thane" data-risk="WARNING">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Badlapur</span>
@@ -264,8 +265,23 @@
             </div>
           </div>
 
-          <!-- Station 5: Kurundwad (Advisory) -->
-          <div class="station-card magnetic">
+          <!-- Station 5: Chiplun (Warning) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_14" data-name="Chiplun" data-code="MH_GAK_14" data-river="Vashishti" data-district="Ratnagiri" data-risk="WARNING">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Chiplun</span>
+                <span class="station-code">MH_GAK_14</span>
+              </div>
+              <span class="tier-badge warning">WARNING</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Vashishti River • Ratnagiri</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-orange); font-weight: 700;">68 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 6: Kurundwad (Advisory) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_03" data-name="Kurundwad" data-code="MH_GAK_03" data-river="Krishna" data-district="Kolhapur" data-risk="ADVISORY">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Kurundwad</span>
@@ -279,8 +295,53 @@
             </div>
           </div>
 
-          <!-- Station 6: Sangli (Normal) -->
-          <div class="station-card magnetic">
+          <!-- Station 7: Shirol (Advisory) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_02" data-name="Shirol" data-code="MH_GAK_02" data-river="Dudhganga" data-district="Kolhapur" data-risk="ADVISORY">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Shirol</span>
+                <span class="station-code">MH_GAK_02</span>
+              </div>
+              <span class="tier-badge advisory">ADVISORY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Dudhganga River • Kolhapur</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-yellow); font-weight: 700;">34 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 8: Poladpur (Advisory) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_16" data-name="Poladpur" data-code="MH_GAK_16" data-river="Savitri" data-district="Raigad" data-risk="ADVISORY">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Poladpur</span>
+                <span class="station-code">MH_GAK_16</span>
+              </div>
+              <span class="tier-badge advisory">ADVISORY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Savitri River • Raigad</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-yellow); font-weight: 700;">32 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 9: Bhilawadi (Advisory) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_08" data-name="Bhilawadi" data-code="MH_GAK_08" data-river="Krishna" data-district="Sangli" data-risk="ADVISORY">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Bhilawadi</span>
+                <span class="station-code">MH_GAK_08</span>
+              </div>
+              <span class="tier-badge advisory">ADVISORY</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Sangli</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-yellow); font-weight: 700;">28 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 10: Sangli Bridge (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_09" data-name="Sangli Bridge" data-code="MH_GAK_09" data-river="Krishna" data-district="Sangli" data-risk="NORMAL">
             <div class="station-card-top">
               <div class="station-name-row">
                 <span class="station-name">Sangli Bridge</span>
@@ -294,6 +355,166 @@
             </div>
           </div>
 
+          <!-- Station 11: Arjunwad (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_04" data-name="Arjunwad" data-code="MH_GAK_04" data-river="Krishna" data-district="Kolhapur" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Arjunwad</span>
+                <span class="station-code">MH_GAK_04</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Kolhapur</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">16 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 12: Rajaapur (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_05" data-name="Rajaapur" data-code="MH_GAK_05" data-river="Krishna" data-district="Kolhapur" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Rajaapur</span>
+                <span class="station-code">MH_GAK_05</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Kolhapur</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">14 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 13: Koyna Dam (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_06" data-name="Koyna Dam" data-code="MH_GAK_06" data-river="Koyna" data-district="Satara" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Koyna Dam</span>
+                <span class="station-code">MH_GAK_06</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Koyna River • Satara</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">45 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 14: Warna Dam (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_07" data-name="Warna Dam" data-code="MH_GAK_07" data-river="Warna" data-district="Sangli" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Warna Dam</span>
+                <span class="station-code">MH_GAK_07</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Warna River • Sangli</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">38 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 15: Miraj (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_10" data-name="Miraj" data-code="MH_GAK_10" data-river="Krishna" data-district="Sangli" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Miraj</span>
+                <span class="station-code">MH_GAK_10</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Krishna River • Sangli</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">15 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 16: Shirala (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_11" data-name="Shirala" data-code="MH_GAK_11" data-river="Morna" data-district="Sangli" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Shirala</span>
+                <span class="station-code">MH_GAK_11</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Morna River • Sangli</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">21 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 17: Patan (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_13" data-name="Patan" data-code="MH_GAK_13" data-river="Kera" data-district="Satara" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Patan</span>
+                <span class="station-code">MH_GAK_13</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Kera River • Satara</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">22 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 18: Khed (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_15" data-name="Khed" data-code="MH_GAK_15" data-river="Jagbudi" data-district="Ratnagiri" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Khed</span>
+                <span class="station-code">MH_GAK_15</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Jagbudi River • Ratnagiri</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">17 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 19: Bhivpuri (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_19" data-name="Bhivpuri" data-code="MH_GAK_19" data-river="Pej" data-district="Raigad" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Bhivpuri</span>
+                <span class="station-code">MH_GAK_19</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Pej River • Raigad</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">19 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Station 20: Khopoli (Normal) -->
+          <div class="station-card magnetic" data-station-id="MH_GAK_20" data-name="Khopoli" data-code="MH_GAK_20" data-river="Patalganga" data-district="Raigad" data-risk="NORMAL">
+            <div class="station-card-top">
+              <div class="station-name-row">
+                <span class="station-name">Khopoli</span>
+                <span class="station-code">MH_GAK_20</span>
+              </div>
+              <span class="tier-badge normal">NORMAL</span>
+            </div>
+            <div class="station-card-meta">
+              <span>Patalganga River • Raigad</span>
+              <span style="font-family: var(--font-mono); color: var(--alert-green); font-weight: 700;">23 mm/24h</span>
+            </div>
+          </div>
+
+          <!-- Empty State Search Result -->
+          <div id="stationEmptyState" class="station-empty-state" style="display: none;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            <p id="stationEmptyMsg">No river gauges match your query.</p>
+          </div>
+
         </div>
       </div>
     </aside>
@@ -304,9 +525,9 @@
     <section class="main-content">
       
       <!-- Top High-Priority Incident Status -->
-      <div class="alert-overview-banner magnetic">
+      <div id="alertBannerContainer" class="alert-overview-banner magnetic">
         <div class="alert-overview-left">
-          <div class="alert-icon-box">
+          <div id="alertBannerIcon" class="alert-icon-box">
             <!-- Alert Triangle SVG -->
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -315,13 +536,13 @@
             </svg>
           </div>
           <div class="alert-message-box">
-            <h3>CRITICAL: High Flood Probability (84%) Detected in Krishna River Basin</h3>
-            <p>Immediate evacuation protocols recommended for Karad and downstream low-lying riparian settlements. SDRF teams placed on standby.</p>
+            <h3 id="alertBannerHeadline">CRITICAL: High Flood Probability (84%) Detected in Krishna River Basin</h3>
+            <p id="alertBannerDescription">Immediate evacuation protocols recommended for Karad and downstream low-lying riparian settlements. SDRF teams placed on standby.</p>
           </div>
         </div>
 
         <div style="display: flex; gap: 0.6rem; align-items: center; flex-shrink: 0;">
-          <button class="btn btn-alert magnetic">
+          <button id="alertBannerActionBtn" class="btn btn-alert magnetic">
             <span>Issue Sirens</span>
           </button>
           <button class="btn btn-ghost magnetic">

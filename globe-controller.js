@@ -1,10 +1,10 @@
 /**
- * PRAVAH — Web GIS 3D Globe Controller
- * Powered by Three.js & Globe.gl with holographic terminal HUD
+ * PRAVAH — Ultra-Realistic Cinematic 3D Web-GIS Globe Controller
+ * Powered by Three.js & Globe.gl with holographic command-center HUD
  */
 
 (function () {
-  // 20 Central Water Commission & IndoFloods Western Ghats gauge stations
+  // 20 Central Water Commission & IndoFloods Western Ghats gauge stations with flood probabilities
   const WESTERN_GHATS_STATIONS = [
     {
       station_id: 'MH_GAK_12',
@@ -17,9 +17,8 @@
       warning_level_m: 563.0,
       danger_level_m: 565.8,
       risk: 'EMERGENCY',
+      flood_prob: 0.84, // 84%
       color: '#ef4444',
-      altitude: 0.09,
-      radius: 0.85,
     },
     {
       station_id: 'MH_GAK_17',
@@ -32,9 +31,8 @@
       warning_level_m: 6.5,
       danger_level_m: 8.0,
       risk: 'EMERGENCY',
+      flood_prob: 0.92, // 92%
       color: '#ef4444',
-      altitude: 0.09,
-      radius: 0.85,
     },
     {
       station_id: 'MH_GAK_01',
@@ -47,9 +45,8 @@
       warning_level_m: 535.0,
       danger_level_m: 537.5,
       risk: 'WARNING',
+      flood_prob: 0.65, // 65%
       color: '#f97316',
-      altitude: 0.06,
-      radius: 0.65,
     },
     {
       station_id: 'MH_GAK_18',
@@ -62,174 +59,8 @@
       warning_level_m: 16.5,
       danger_level_m: 18.2,
       risk: 'WARNING',
+      flood_prob: 0.58, // 58%
       color: '#f97316',
-      altitude: 0.06,
-      radius: 0.65,
-    },
-    {
-      station_id: 'MH_GAK_03',
-      name: 'Kurundwad',
-      river: 'Krishna',
-      district: 'Kolhapur',
-      lat: 16.6833,
-      lng: 74.6000,
-      rainfall: '36.5 mm',
-      warning_level_m: 532.0,
-      danger_level_m: 534.5,
-      risk: 'ADVISORY',
-      color: '#eab308',
-      altitude: 0.045,
-      radius: 0.5,
-    },
-    {
-      station_id: 'MH_GAK_09',
-      name: 'Sangli Bridge',
-      river: 'Krishna',
-      district: 'Sangli',
-      lat: 16.8500,
-      lng: 74.5667,
-      rainfall: '18.2 mm',
-      warning_level_m: 540.0,
-      danger_level_m: 542.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_02',
-      name: 'Shirol',
-      river: 'Dudhganga',
-      district: 'Kolhapur',
-      lat: 16.7167,
-      lng: 74.6167,
-      rainfall: '34.0 mm',
-      warning_level_m: 533.0,
-      danger_level_m: 535.5,
-      risk: 'ADVISORY',
-      color: '#eab308',
-      altitude: 0.045,
-      radius: 0.5,
-    },
-    {
-      station_id: 'MH_GAK_04',
-      name: 'Takli',
-      river: 'Krishna',
-      district: 'Kolhapur',
-      lat: 16.6167,
-      lng: 74.5500,
-      rainfall: '14.5 mm',
-      warning_level_m: 530.0,
-      danger_level_m: 532.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_05',
-      name: 'Bhedasgaon',
-      river: 'Varna',
-      district: 'Kolhapur',
-      lat: 16.8833,
-      lng: 74.0167,
-      rainfall: '16.0 mm',
-      warning_level_m: 550.0,
-      danger_level_m: 552.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_06',
-      name: 'Arjunwad',
-      river: 'Krishna',
-      district: 'Kolhapur',
-      lat: 16.6500,
-      lng: 74.5833,
-      rainfall: '28.0 mm',
-      warning_level_m: 531.0,
-      danger_level_m: 533.5,
-      risk: 'ADVISORY',
-      color: '#eab308',
-      altitude: 0.045,
-      radius: 0.5,
-    },
-    {
-      station_id: 'MH_GAK_07',
-      name: 'Bastwad',
-      river: 'Dudhganga',
-      district: 'Kolhapur',
-      lat: 16.6000,
-      lng: 74.6333,
-      rainfall: '12.0 mm',
-      warning_level_m: 529.0,
-      danger_level_m: 531.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_08',
-      name: 'Kowad',
-      river: 'Tamraparni',
-      district: 'Kolhapur',
-      lat: 15.9500,
-      lng: 74.3167,
-      rainfall: '15.0 mm',
-      warning_level_m: 640.0,
-      danger_level_m: 642.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_10',
-      name: 'Warunji',
-      river: 'Koyna',
-      district: 'Satara',
-      lat: 17.3167,
-      lng: 74.1500,
-      rainfall: '19.5 mm',
-      warning_level_m: 564.0,
-      danger_level_m: 566.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_11',
-      name: 'Shirala',
-      river: 'Morna',
-      district: 'Sangli',
-      lat: 16.9833,
-      lng: 74.1333,
-      rainfall: '21.0 mm',
-      warning_level_m: 575.0,
-      danger_level_m: 577.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
-    },
-    {
-      station_id: 'MH_GAK_13',
-      name: 'Patan',
-      river: 'Kera',
-      district: 'Satara',
-      lat: 17.3667,
-      lng: 73.9000,
-      rainfall: '22.4 mm',
-      warning_level_m: 580.0,
-      danger_level_m: 582.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
     },
     {
       station_id: 'MH_GAK_14',
@@ -242,24 +73,36 @@
       warning_level_m: 6.8,
       danger_level_m: 8.2,
       risk: 'WARNING',
+      flood_prob: 0.62, // 62%
       color: '#f97316',
-      altitude: 0.06,
-      radius: 0.65,
     },
     {
-      station_id: 'MH_GAK_15',
-      name: 'Khed',
-      river: 'Jagbudi',
-      district: 'Ratnagiri',
-      lat: 17.7167,
-      lng: 73.3833,
-      rainfall: '17.5 mm',
-      warning_level_m: 6.0,
-      danger_level_m: 7.5,
-      risk: 'NORMAL',
-      color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
+      station_id: 'MH_GAK_03',
+      name: 'Kurundwad',
+      river: 'Krishna',
+      district: 'Kolhapur',
+      lat: 16.6833,
+      lng: 74.6000,
+      rainfall: '36.5 mm',
+      warning_level_m: 532.0,
+      danger_level_m: 534.5,
+      risk: 'ADVISORY',
+      flood_prob: 0.38, // 38%
+      color: '#eab308',
+    },
+    {
+      station_id: 'MH_GAK_02',
+      name: 'Shirol',
+      river: 'Dudhganga',
+      district: 'Kolhapur',
+      lat: 16.7167,
+      lng: 74.6167,
+      rainfall: '34.0 mm',
+      warning_level_m: 533.0,
+      danger_level_m: 535.5,
+      risk: 'ADVISORY',
+      flood_prob: 0.35, // 35%
+      color: '#eab308',
     },
     {
       station_id: 'MH_GAK_16',
@@ -272,9 +115,148 @@
       warning_level_m: 14.0,
       danger_level_m: 16.0,
       risk: 'ADVISORY',
+      flood_prob: 0.32, // 32%
       color: '#eab308',
-      altitude: 0.045,
-      radius: 0.5,
+    },
+    {
+      station_id: 'MH_GAK_08',
+      name: 'Bhilawadi',
+      river: 'Krishna',
+      district: 'Sangli',
+      lat: 17.0167,
+      lng: 74.4500,
+      rainfall: '28.0 mm',
+      warning_level_m: 542.0,
+      danger_level_m: 544.5,
+      risk: 'ADVISORY',
+      flood_prob: 0.28, // 28%
+      color: '#eab308',
+    },
+    {
+      station_id: 'MH_GAK_09',
+      name: 'Sangli Bridge',
+      river: 'Krishna',
+      district: 'Sangli',
+      lat: 16.8500,
+      lng: 74.5667,
+      rainfall: '18.2 mm',
+      warning_level_m: 540.0,
+      danger_level_m: 542.5,
+      risk: 'NORMAL',
+      flood_prob: 0.18, // 18%
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_04',
+      name: 'Arjunwad',
+      river: 'Krishna',
+      district: 'Kolhapur',
+      lat: 16.6333,
+      lng: 74.6500,
+      rainfall: '16.0 mm',
+      warning_level_m: 530.0,
+      danger_level_m: 532.5,
+      risk: 'NORMAL',
+      flood_prob: 0.15,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_05',
+      name: 'Rajaapur',
+      river: 'Krishna',
+      district: 'Kolhapur',
+      lat: 16.5833,
+      lng: 74.7000,
+      rainfall: '14.5 mm',
+      warning_level_m: 528.0,
+      danger_level_m: 530.5,
+      risk: 'NORMAL',
+      flood_prob: 0.12,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_06',
+      name: 'Koyna Dam',
+      river: 'Koyna',
+      district: 'Satara',
+      lat: 17.4000,
+      lng: 73.7500,
+      rainfall: '45.0 mm',
+      warning_level_m: 657.0,
+      danger_level_m: 660.0,
+      risk: 'NORMAL',
+      flood_prob: 0.22,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_07',
+      name: 'Warna Dam',
+      river: 'Warna',
+      district: 'Sangli',
+      lat: 17.1333,
+      lng: 73.8000,
+      rainfall: '38.0 mm',
+      warning_level_m: 624.0,
+      danger_level_m: 627.0,
+      risk: 'NORMAL',
+      flood_prob: 0.20,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_10',
+      name: 'Miraj',
+      river: 'Krishna',
+      district: 'Sangli',
+      lat: 16.8333,
+      lng: 74.6333,
+      rainfall: '15.0 mm',
+      warning_level_m: 538.0,
+      danger_level_m: 540.5,
+      risk: 'NORMAL',
+      flood_prob: 0.14,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_11',
+      name: 'Shirala',
+      river: 'Morna',
+      district: 'Sangli',
+      lat: 16.9833,
+      lng: 74.1333,
+      rainfall: '21.0 mm',
+      warning_level_m: 575.0,
+      danger_level_m: 577.5,
+      risk: 'NORMAL',
+      flood_prob: 0.16,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_13',
+      name: 'Patan',
+      river: 'Kera',
+      district: 'Satara',
+      lat: 17.3667,
+      lng: 73.9000,
+      rainfall: '22.4 mm',
+      warning_level_m: 580.0,
+      danger_level_m: 582.5,
+      risk: 'NORMAL',
+      flood_prob: 0.17,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'MH_GAK_15',
+      name: 'Khed',
+      river: 'Jagbudi',
+      district: 'Ratnagiri',
+      lat: 17.7167,
+      lng: 73.3833,
+      rainfall: '17.5 mm',
+      warning_level_m: 6.0,
+      danger_level_m: 7.5,
+      risk: 'NORMAL',
+      flood_prob: 0.15,
+      color: '#06b6d4',
     },
     {
       station_id: 'MH_GAK_19',
@@ -287,9 +269,8 @@
       warning_level_m: 24.0,
       danger_level_m: 26.5,
       risk: 'NORMAL',
+      flood_prob: 0.16,
       color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
     },
     {
       station_id: 'MH_GAK_20',
@@ -302,15 +283,15 @@
       warning_level_m: 48.0,
       danger_level_m: 50.5,
       risk: 'NORMAL',
+      flood_prob: 0.19,
       color: '#06b6d4',
-      altitude: 0.035,
-      radius: 0.45,
     },
   ];
 
   let globeInstance = null;
   let idleTimer = null;
   let isInteracting = false;
+  let cloudsMesh = null;
 
   // Western Ghats regional target coordinate
   const WESTERN_GHATS_VIEW = {
@@ -319,14 +300,15 @@
     altitude: 0.72,
   };
 
+  // Cinematic start perspective (deep space view of Earth against stars)
   const GLOBAL_SPACE_VIEW = {
     lat: 20.0,
     lng: 55.0,
-    altitude: 2.6,
+    altitude: 3.2,
   };
 
   /**
-   * Initializes the 3D Globe using Globe.gl & Three.js
+   * Initializes the Ultra-Realistic Cinematic 3D Globe
    */
   function initGlobe() {
     const container = document.getElementById('globeViewport');
@@ -338,81 +320,174 @@
     const width = container.clientWidth || 800;
     const height = container.clientHeight || 540;
 
-    // Check if Globe.gl library is loaded
-    if (typeof Globe === 'undefined') {
-      console.warn('[PRAVAH Globe] Globe.gl library not detected. Loading dynamically...');
+    // Check if Globe.gl and Three.js libraries are ready
+    if (typeof Globe === 'undefined' || typeof THREE === 'undefined') {
+      console.warn('[PRAVAH Globe] WebGL libraries loading dynamically...');
       loadGlobeLibraries(() => initGlobe());
       return;
     }
 
     try {
-      // 1. Initialize 3D Globe Instance
+      // 1. Initialize Globe Instance with NASA Blue Marble & Topographical Bump Map (Requirement 1 & 2)
       globeInstance = Globe()(container)
         .width(width)
         .height(height)
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-        .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-        .atmosphereColor('#06b6d4')
-        .atmosphereAltitude(0.24)
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') // High-res satellite image
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png') // Topographical relief depth
+        .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // High-res starfield space background
+        .atmosphereColor('#06b6d4') // Theme Neon Cyan atmospheric glow
+        .atmosphereAltitude(0.26)
         .showAtmosphere(true);
 
-      // 2. Add 20 Gauge Stations Points
+      // 2. Add Transparent Independently Rotating Cloud Layer (Requirement 2)
+      const globeRadius = globeInstance.getGlobeRadius();
+      const cloudsTextureUrl = 'https://unpkg.com/three-globe/example/img/earth-clouds.png';
+      new THREE.TextureLoader().load(cloudsTextureUrl, (cloudsTexture) => {
+        cloudsMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(globeRadius * 1.015, 75, 75),
+          new THREE.MeshPhongMaterial({
+            map: cloudsTexture,
+            transparent: true,
+            opacity: 0.38,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          })
+        );
+        globeInstance.scene().add(cloudsMesh);
+
+        // Continuous independent cloud rotation
+        (function animateClouds() {
+          if (cloudsMesh) {
+            cloudsMesh.rotation.y += -0.0006;
+          }
+          requestAnimationFrame(animateClouds);
+        })();
+      });
+
+      // 3. Add Advanced 3D Glowing Data Pillars Protruding from Surface (Requirement 3)
       globeInstance
-        .pointsData(WESTERN_GHATS_STATIONS)
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor('color')
-        .pointAltitude('altitude')
-        .pointRadius('radius')
-        .pointResolution(24)
-        .onPointHover((point, prevPoint) => {
-          handlePointHover(point, tooltip);
+        .customLayerData(WESTERN_GHATS_STATIONS)
+        .customThreeObject((d) => {
+          // Dynamic pillar height based on Flood Probability percentage (Requirement 3)
+          const prob = d.flood_prob || 0.2;
+          const height = Math.max(6, prob * 36); // 3D height proportional to flood probability
+          const radius = 1.3;
+
+          // Hexagonal 3D Column Geometry
+          const geometry = new THREE.CylinderGeometry(radius * 0.75, radius, height, 8);
+          geometry.translate(0, height / 2, 0); // Base sits exactly on the surface
+
+          const isEmergency = d.risk === 'EMERGENCY';
+          const isWarning = d.risk === 'WARNING';
+          const isAdvisory = d.risk === 'ADVISORY';
+
+          const colorHex = isEmergency ? 0xef4444 : isWarning ? 0xf97316 : isAdvisory ? 0xeab308 : 0x06b6d4;
+
+          const material = new THREE.MeshPhongMaterial({
+            color: colorHex,
+            emissive: colorHex,
+            emissiveIntensity: isEmergency ? 0.95 : 0.45,
+            transparent: true,
+            opacity: 0.92,
+            shininess: 100,
+          });
+
+          const pillar = new THREE.Mesh(geometry, material);
+
+          // Top Beacon Cap (glowing sphere beacon at pillar apex)
+          const beaconGeo = new THREE.SphereGeometry(radius * 1.25, 12, 12);
+          const beaconMat = new THREE.MeshBasicMaterial({
+            color: isEmergency ? 0xffffff : colorHex,
+            transparent: true,
+            opacity: 0.95,
+          });
+          const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+          beacon.position.set(0, height, 0);
+          pillar.add(beacon);
+
+          // Base footprint telemetry ring
+          const ringGeo = new THREE.RingGeometry(radius * 0.8, radius * 2.2, 16);
+          ringGeo.rotateX(-Math.PI / 2);
+          const ringMat = new THREE.MeshBasicMaterial({
+            color: colorHex,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.65,
+          });
+          const baseRing = new THREE.Mesh(ringGeo, ringMat);
+          pillar.add(baseRing);
+
+          pillar.userData = {
+            station: d,
+            baseHeight: height,
+            baseEmissive: isEmergency ? 0.95 : 0.45,
+          };
+
+          return pillar;
         })
-        .onPointClick((point) => {
-          if (!point) return;
-          // Smoothly fly camera to clicked gauge station
+        .customThreeObjectUpdate((obj, d) => {
+          // Map coordinates & orient perpendicular to globe surface
+          const coords = globeInstance.getCoords(d.lat, d.lng, 0.005);
+          obj.position.copy(coords);
+          // Vector from globe center (0,0,0) to position is the radial surface normal
+          obj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), obj.position.clone().normalize());
+        })
+        // 4. Raycasting / Hover: Glowing 3D Pillar & Glass Tooltip (Requirement 4)
+        .onCustomLayerHover((obj, prevObj) => {
+          if (prevObj && prevObj.material) {
+            prevObj.scale.set(1, 1, 1);
+            prevObj.material.emissiveIntensity = prevObj.userData.baseEmissive;
+          }
+          if (obj && obj.material) {
+            obj.scale.set(1.25, 1.25, 1.25);
+            obj.material.emissiveIntensity = 1.45; // Make 3D pillar glow brighter
+            handlePointHover(obj.userData.station, tooltip);
+          } else if (!obj) {
+            handlePointHover(null, tooltip);
+          }
+        })
+        .onCustomLayerClick((obj) => {
+          if (!obj || !obj.userData) return;
+          const station = obj.userData.station;
           globeInstance.pointOfView(
             {
-              lat: point.lat,
-              lng: point.lng,
-              altitude: 0.45,
+              lat: station.lat,
+              lng: station.lng,
+              altitude: 0.42,
             },
-            1200
+            1400
           );
-          // Highlight left sidebar station if available
           if (window.PRAVAH && window.PRAVAH.selectStation) {
-            window.PRAVAH.selectStation(point.station_id);
+            window.PRAVAH.selectStation(station.station_id);
           }
         });
 
-      // 3. Add Pulsing Radar Wave Rings (Pulsing Red for Emergency & Cyan for Normal)
+      // 5. Rippling Wave Animation Radiating Outward (Requirement 3)
       globeInstance
         .ringsData(WESTERN_GHATS_STATIONS)
         .ringLat('lat')
         .ringLng('lng')
         .ringColor((d) =>
           d.risk === 'EMERGENCY'
-            ? () => 'rgba(239, 68, 68, 0.75)'
+            ? (t) => `rgba(239, 68, 68, ${0.9 * (1 - t)})`
             : d.risk === 'WARNING'
-            ? () => 'rgba(249, 115, 22, 0.65)'
-            : () => 'rgba(6, 182, 212, 0.55)'
+            ? (t) => `rgba(249, 115, 22, ${0.75 * (1 - t)})`
+            : (t) => `rgba(6, 182, 212, ${0.55 * (1 - t)})`
         )
-        .ringMaxRadius((d) => (d.risk === 'EMERGENCY' ? 4.2 : 2.0))
-        .ringPropagationSpeed((d) => (d.risk === 'EMERGENCY' ? 3.8 : 1.6))
-        .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 650 : 1300));
+        .ringMaxRadius((d) => (d.risk === 'EMERGENCY' ? 4.8 : d.risk === 'WARNING' ? 3.0 : 1.8))
+        .ringPropagationSpeed((d) => (d.risk === 'EMERGENCY' ? 4.2 : 2.0))
+        .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 600 : 1300));
 
-      // 4. Set Initial Zoomed-Out Camera View (Space perspective)
+      // 6. Cinematic Start: Zoomed Out in Space (Requirement 4)
       globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 0);
 
-      // 5. Configure Idle Spin (Slow Earth Rotation)
+      // 7. Idle Spin & Camera Controls (Requirement 4)
       const controls = globeInstance.controls();
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
+      controls.autoRotateSpeed = 0.6;
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
 
-      // Pause rotation during user interaction, resume after 3.5s idle
       controls.addEventListener('start', () => {
         isInteracting = true;
         controls.autoRotate = false;
@@ -427,12 +502,12 @@
         }, 3500);
       });
 
-      // 6. Smoothly animate to Western Ghats on initial presentation after 1.8s
+      // 8. Cinematic Camera Fly-In: Zeroing in on Western Ghats of India (Requirement 4)
       setTimeout(() => {
-        globeInstance.pointOfView(WESTERN_GHATS_VIEW, 2400);
-      }, 1800);
+        globeInstance.pointOfView(WESTERN_GHATS_VIEW, 3200);
+      }, 1200);
 
-      // 7. Hide Loader
+      // 9. Hide Radar Skeleton Loader
       if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => {
@@ -440,13 +515,11 @@
         }, 400);
       }
 
-      // 8. Bind Floating Overlay Controls
+      // 10. Bind Navigation Controls
       bindMapControls();
-
-      // 9. Handle Window Resize
       window.addEventListener('resize', handleResize);
 
-      console.log('[PRAVAH] 3D Holographic Globe Initialized Successfully.');
+      console.log('[PRAVAH] Ultra-Realistic Cinematic 3D Globe Initialized.');
     } catch (err) {
       console.error('[PRAVAH Globe Error]', err);
       if (loader) {
@@ -461,7 +534,7 @@
   }
 
   /**
-   * Handles Tooltip positioning & custom styling on marker hover
+   * Tooltip Handler for 3D Marker Hover
    */
   function handlePointHover(point, tooltip) {
     if (!tooltip) return;
@@ -471,7 +544,6 @@
       return;
     }
 
-    // Populate Tooltip Fields
     const idEl = document.getElementById('tooltipStationId');
     const badgeEl = document.getElementById('tooltipRiskBadge');
     const nameEl = document.getElementById('tooltipStationName');
@@ -480,22 +552,22 @@
     const warnEl = document.getElementById('tooltipWarning');
 
     if (idEl) idEl.textContent = point.station_id;
-    if (nameEl) nameEl.textContent = `${point.name} Gauge`;
-    if (basinEl) basinEl.textContent = `${point.river} River • ${point.district}`;
+    if (nameEl) nameEl.textContent = `${point.name} Catchment`;
+    if (basinEl) basinEl.textContent = `${point.river} Basin • ${point.district}`;
     if (rainEl) rainEl.textContent = point.rainfall;
     if (warnEl) warnEl.textContent = `${point.warning_level_m} m`;
 
     if (badgeEl) {
-      badgeEl.textContent = `${point.risk} RISK`;
+      const pct = Math.round((point.flood_prob || 0.2) * 100);
+      badgeEl.textContent = `${point.risk} (${pct}%)`;
       badgeEl.className = `tooltip-risk-pill ${point.risk.toLowerCase()}`;
     }
 
-    // Position tooltip near mouse pointer
     tooltip.style.display = 'block';
   }
 
   /**
-   * Bind Floating Glassmorphism Map Controls
+   * Bind Map Control Buttons
    */
   function bindMapControls() {
     const zoomInBtn = document.getElementById('globeZoomInBtn');
@@ -505,28 +577,16 @@
     if (zoomInBtn) {
       zoomInBtn.addEventListener('click', () => {
         if (!globeInstance) return;
-        const currentPov = globeInstance.pointOfView();
-        globeInstance.pointOfView(
-          {
-            ...currentPov,
-            altitude: Math.max(0.18, currentPov.altitude - 0.35),
-          },
-          600
-        );
+        const pov = globeInstance.pointOfView();
+        globeInstance.pointOfView({ ...pov, altitude: Math.max(0.18, pov.altitude - 0.35) }, 600);
       });
     }
 
     if (zoomOutBtn) {
       zoomOutBtn.addEventListener('click', () => {
         if (!globeInstance) return;
-        const currentPov = globeInstance.pointOfView();
-        globeInstance.pointOfView(
-          {
-            ...currentPov,
-            altitude: Math.min(3.5, currentPov.altitude + 0.45),
-          },
-          600
-        );
+        const pov = globeInstance.pointOfView();
+        globeInstance.pointOfView({ ...pov, altitude: Math.min(3.8, pov.altitude + 0.45) }, 600);
       });
     }
 
@@ -538,25 +598,17 @@
     }
   }
 
-  /**
-   * Resize Handler
-   */
   function handleResize() {
     const container = document.getElementById('globeViewport');
     if (!container || !globeInstance) return;
     globeInstance.width(container.clientWidth).height(container.clientHeight);
   }
 
-  /**
-   * Dynamic CDN Loader fallback
-   */
   function loadGlobeLibraries(onReady) {
     if (typeof THREE === 'undefined') {
       const threeScript = document.createElement('script');
       threeScript.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
-      threeScript.onload = () => {
-        loadGlobeScript(onReady);
-      };
+      threeScript.onload = () => loadGlobeScript(onReady);
       document.head.appendChild(threeScript);
     } else {
       loadGlobeScript(onReady);
@@ -572,17 +624,29 @@
     document.head.appendChild(globeScript);
   }
 
-  // Auto-boot on DOM Content Loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initGlobe);
   } else {
     initGlobe();
   }
 
-  // Expose global control instance
   window.PRAVAH_GLOBE = {
     resetToWesternGhats: () => globeInstance && globeInstance.pointOfView(WESTERN_GHATS_VIEW, 1500),
     zoomToGlobal: () => globeInstance && globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 1500),
+    flyToStation: (stationId) => {
+      if (!globeInstance) return;
+      const st = WESTERN_GHATS_STATIONS.find((s) => s.station_id === stationId);
+      if (st) {
+        globeInstance.pointOfView(
+          {
+            lat: st.lat,
+            lng: st.lng,
+            altitude: 0.42,
+          },
+          1400
+        );
+      }
+    },
     getStations: () => WESTERN_GHATS_STATIONS,
   };
 })();
