@@ -30,7 +30,7 @@
 - [Repository Structure](#-repository-structure)
 - [Installation & Setup Instructions](#-installation--setup-instructions)
 - [Live Interactive Modules](#-live-interactive-modules)
-- [Team PRAVAH](#-team-pravah-sih-2026)
+- [Team CRITICAL VECTOR](#-team-critical-vector-sih-2026)
 - [Acknowledgements & Citations](#-acknowledgements--citations)
 
 ---
@@ -292,7 +292,7 @@ pytest tests/ -v
 
 ---
 
-## 👥 Team PRAVAH (SIH 2026)
+## 👥 Team CRITICAL VECTOR (SIH 2026)
 
 An interdisciplinary task force spanning Hydro-Informatics, Geomatics, Machine Learning, and Full-Stack Engineering:
 
@@ -318,5 +318,5 @@ An interdisciplinary task force spanning Hydro-Informatics, Geomatics, Machine L
 
 <div align="center">
   <sub>Built with precision for the <b>Smart India Hackathon (SIH) 2026</b>. Advancing disaster resilience through open hydro-intelligence.</sub><br/>
-  <sub>© 2026 Team PRAVAH. Released under the <a href="LICENSE">MIT License</a>.</sub>
+  <sub>© 2026 Team CRITICAL VECTOR. Released under the <a href="LICENSE">MIT License</a>.</sub>
 </div>
