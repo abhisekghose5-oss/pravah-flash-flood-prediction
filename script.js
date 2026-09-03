@@ -1158,6 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 3. Mock or Live POST request to /api/subscribe
       try {
         const payload = {
+          phone_number: '+91' + phone,
           phone: '+91' + phone,
           catchment_id: zone,
           channel: ['SMS', 'WhatsApp'],

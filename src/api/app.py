@@ -142,3 +142,38 @@ def predict_historical_date(
 def get_models_benchmark_summary() -> Dict[str, Any]:
     """Retrieve comprehensive Phase 3 performance benchmarks and top feature importances."""
     return engine.get_models_summary()
+
+
+# =============================================================================
+# Citizen WhatsApp/SMS Emergency Alerts Subscription (In-Memory Store)
+# =============================================================================
+from pydantic import BaseModel, Field
+
+class SubscriptionRequest(BaseModel):
+    phone_number: str = Field(..., description="Recipient phone number with country code")
+    catchment_id: str = Field(..., description="Subscribed catchment zone ID (or 'ALL')")
+
+class SubscriptionResponse(BaseModel):
+    status: str
+    message: str
+
+# Global in-memory storage for subscriptions (SIH Demo)
+active_subscriptions: list[Dict[str, Any]] = []
+
+
+@app.post("/api/subscribe", response_model=SubscriptionResponse, tags=["Alerts"])
+def subscribe_alerts(subscription: SubscriptionRequest) -> SubscriptionResponse:
+    """
+    Register a user for automated WhatsApp/SMS emergency flash flood alerts.
+    """
+    record = {
+        "phone_number": subscription.phone_number,
+        "catchment_id": subscription.catchment_id,
+    }
+    active_subscriptions.append(record)
+    logger.info("Registered emergency subscription: %s | Total active: %d", record, len(active_subscriptions))
+    return SubscriptionResponse(
+        status="success",
+        message="Number registered for alerts."
+    )
+
