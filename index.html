@@ -1151,6 +1151,100 @@
   </div>
 
   <!-- ========================================================================= -->
+  <!-- CITIZEN SOS & FLOOD REPORT (Floating Action Button & Modal)               -->
+  <!-- ========================================================================= -->
+  <!-- SOS Floating Action Button (FAB) -->
+  <button type="button" id="sosFabBtn" class="sos-fab-btn" aria-label="Report Flood SOS" title="Report Flood SOS">
+    <div class="sos-fab-icon-wrap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+    <span class="sos-fab-label">Report Flood</span>
+  </button>
+
+  <!-- SOS Report Modal Overlay -->
+  <div id="sosModalOverlay" class="sos-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sosModalTitle" style="display: none;">
+    <div class="sos-modal-card">
+      <!-- Modal Close Button -->
+      <button type="button" id="sosModalCloseBtn" class="sos-modal-close" aria-label="Close SOS Report Modal">&times;</button>
+
+      <!-- Modal Header -->
+      <div class="sos-modal-header">
+        <div class="sos-badge-pill">
+          <span class="sos-pulse-ring"></span>
+          <span>CITIZEN EMERGENCY INCIDENT INGESTION</span>
+        </div>
+        <h2 id="sosModalTitle" class="sos-modal-title">Citizen SOS &amp; Flood Report</h2>
+        <p class="sos-modal-subtitle">
+          Submit live field ground-truth telemetry directly to SDRF incident controllers. Your GPS coordinates will calibrate real-time catchment hydrodynamic verification.
+        </p>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="sosReportForm" class="sos-form" onsubmit="event.preventDefault();">
+        <!-- Geolocation Trigger Button -->
+        <button type="button" id="btnAutoDetectLocation" class="btn btn-geolocate magnetic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+            <circle cx="12" cy="12" r="8"></circle>
+          </svg>
+          <span id="geoBtnText">📍 Auto-Detect My Location</span>
+        </button>
+
+        <!-- Coordinates Inputs (Read-Only) -->
+        <div class="sos-coords-grid">
+          <div class="sos-form-group">
+            <label for="sosLatInput" class="sos-form-label">Latitude</label>
+            <input type="text" id="sosLatInput" class="sos-form-input readonly-coord" placeholder="Waiting for GPS..." readonly required />
+          </div>
+          <div class="sos-form-group">
+            <label for="sosLngInput" class="sos-form-label">Longitude</label>
+            <input type="text" id="sosLngInput" class="sos-form-input readonly-coord" placeholder="Waiting for GPS..." readonly required />
+          </div>
+        </div>
+
+        <!-- Water Level Severity Dropdown -->
+        <div class="sos-form-group">
+          <label for="sosSeveritySelect" class="sos-form-label">Water Level Severity</label>
+          <div class="sos-select-wrap">
+            <select id="sosSeveritySelect" class="sos-form-input sos-select" required>
+              <option value="ankle_deep" selected>Ankle Deep (&lt; 15 cm)</option>
+              <option value="knee_deep">Knee Deep (15 - 50 cm)</option>
+              <option value="waist_deep">Waist Deep (50 - 100 cm)</option>
+              <option value="above_waist_danger">Above Waist / Dangerous (&gt; 100 cm)</option>
+            </select>
+            <svg class="sos-chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Optional Landmark / Description Field -->
+        <div class="sos-form-group">
+          <label for="sosLandmarkInput" class="sos-form-label">Landmark / Immediate Situation (Optional)</label>
+          <input type="text" id="sosLandmarkInput" class="sos-form-input" placeholder="e.g., Near Karad bridge, culvert overflowing..." maxlength="120" />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btnSubmitSosReport" class="btn btn-sos-submit magnetic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          <span>Submit SOS Report</span>
+        </button>
+
+        <!-- Status Notification -->
+        <div id="sosStatusMsg" class="sos-status-box" style="display: none;" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
   <!-- MISSION-CRITICAL ENTERPRISE FOOTER (Requirement: Add-Only)                -->
   <!-- ========================================================================= -->
   <footer class="enterprise-footer" role="contentinfo" aria-label="System status, attribution, and documentation">
