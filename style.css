@@ -3640,6 +3640,220 @@ body {
   }
 }
 
+/* ==========================================================================
+   SUBSCRIBE TO CATCHMENT ALERTS WIDGET (ADD-ONLY EXTENSION)
+   ========================================================================== */
+
+.alert-subscription-card {
+  position: relative;
+  background: rgba(10, 20, 32, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(6, 182, 212, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: auto !important;
+}
+
+.alert-subscription-card:hover {
+  border-color: rgba(6, 182, 212, 0.45);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 15px rgba(6, 182, 212, 0.15);
+}
+
+.notification-type-pill {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #06b6d4;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.subscription-card-desc {
+  font-size: 0.77rem;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.subscription-card-desc strong {
+  color: #ef4444;
+}
+
+.subscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.subscription-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.subscription-form .form-label {
+  font-family: var(--font-sans, Inter, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #cbd5e1;
+}
+
+/* Form Inputs (Custom Select & Phone Input) */
+.subscription-form .custom-select-wrapper,
+.subscription-form .phone-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.subscription-form .form-input {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-sans, Inter, sans-serif);
+  font-size: 0.8rem;
+  color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.subscription-form .form-input::placeholder {
+  color: #64748b;
+}
+
+.subscription-form .form-input:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.22), 0 0 12px rgba(6, 182, 212, 0.3);
+}
+
+/* Custom Select Specifics */
+.subscription-form .custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+.subscription-form .custom-select option {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.subscription-form .select-chevron-svg {
+  position: absolute;
+  right: 0.75rem;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  color: #94a3b8;
+}
+
+/* Phone Input with +91 Prefix */
+.subscription-form .phone-prefix {
+  position: absolute;
+  left: 0.75rem;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #06b6d4;
+  pointer-events: none;
+  user-select: none;
+}
+
+.subscription-form .phone-input {
+  padding-left: 2.7rem;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  letter-spacing: 0.05em;
+}
+
+/* Sleek Subscribe Button Glowing Neon Cyan */
+.btn-subscribe {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(14, 165, 233, 0.15));
+  border: 1px solid #06b6d4;
+  border-radius: 8px;
+  font-family: var(--font-sans, Inter, sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-subscribe:hover {
+  background: linear-gradient(135deg, #06b6d4, #0284c7);
+  color: #041019;
+  border-color: #38bdf8;
+  box-shadow: 0 0 24px rgba(6, 182, 212, 0.65), 0 0 8px #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-subscribe:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+.btn-subscribe:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status Message */
+.subscribe-status-msg {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 0.2rem;
+  animation: fadeInStatus 0.3s ease forwards;
+}
+
+.subscribe-status-msg.success {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.subscribe-status-msg.error {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes fadeInStatus {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 
 
 

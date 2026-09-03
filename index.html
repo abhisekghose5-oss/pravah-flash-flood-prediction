@@ -517,6 +517,92 @@
 
         </div>
       </div>
+
+      <!-- ===================================================================== -->
+      <!-- SUBSCRIBE TO CATCHMENT ALERTS (WhatsApp/SMS Citizen Notification Card) -->
+      <!-- ===================================================================== -->
+      <div class="glass-panel sidebar-section alert-subscription-card" id="alertSubscriptionCard" style="padding: 1.25rem;">
+        <div class="section-header" style="margin-bottom: 0.85rem;">
+          <span class="section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            Get Emergency Alerts (WhatsApp/SMS)
+          </span>
+          <span class="notification-type-pill">LIVE SMS/WA</span>
+        </div>
+
+        <p class="subscription-card-desc">
+          Receive instantaneous priority broadcasts directly to your mobile device whenever your catchment area exceeds the <strong>EMERGENCY (75%+)</strong> risk threshold.
+        </p>
+
+        <form id="catchmentAlertsForm" class="subscription-form" onsubmit="event.preventDefault();">
+          <!-- Catchment Zone Dropdown -->
+          <div class="form-group">
+            <label for="catchmentZoneSelect" class="form-label">Catchment Zone</label>
+            <div class="custom-select-wrapper">
+              <select id="catchmentZoneSelect" class="form-input custom-select" required>
+                <option value="ALL" selected>All Western Ghats Catchments (20 Stations)</option>
+                <option value="MH_GAK_12">Karad (Krishna River • Satara)</option>
+                <option value="MH_GAK_17">Mahad (Savitri River • Raigad)</option>
+                <option value="MH_GAK_01">Terwad (Panchganga River • Kolhapur)</option>
+                <option value="MH_GAK_18">Badlapur (Ulhas River • Thane)</option>
+                <option value="MH_GAK_14">Chiplun (Vashishti River • Ratnagiri)</option>
+                <option value="MH_GAK_03">Kurundwad (Krishna River • Kolhapur)</option>
+                <option value="MH_GAK_02">Shirol (Dudhganga River • Kolhapur)</option>
+                <option value="MH_GAK_16">Poladpur (Savitri River • Raigad)</option>
+                <option value="MH_GAK_08">Bhilawadi (Krishna River • Sangli)</option>
+                <option value="MH_GAK_09">Sangli Bridge (Krishna River • Sangli)</option>
+                <option value="MH_GAK_04">Arjunwad (Krishna River • Kolhapur)</option>
+                <option value="MH_GAK_05">Rajaapur (Krishna River • Kolhapur)</option>
+                <option value="MH_GAK_06">Koyna Dam (Koyna River • Satara)</option>
+                <option value="MH_GAK_07">Warna Dam (Warna River • Sangli)</option>
+                <option value="MH_GAK_10">Miraj (Krishna River • Sangli)</option>
+                <option value="MH_GAK_11">Shirala (Morna River • Sangli)</option>
+                <option value="MH_GAK_13">Patan (Kera River • Satara)</option>
+                <option value="MH_GAK_15">Khed (Jagbudi River • Ratnagiri)</option>
+                <option value="MH_GAK_19">Bhivpuri (Pej River • Raigad)</option>
+                <option value="MH_GAK_20">Khopoli (Patalganga River • Raigad)</option>
+              </select>
+              <svg class="select-chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Phone Number Input -->
+          <div class="form-group">
+            <label for="subscriberPhoneInput" class="form-label">Mobile Number</label>
+            <div class="phone-input-wrapper">
+              <span class="phone-prefix">+91</span>
+              <input 
+                type="tel" 
+                id="subscriberPhoneInput" 
+                class="form-input phone-input" 
+                placeholder="98765 43210" 
+                maxlength="10" 
+                pattern="[0-9]{10}"
+                required 
+                autocomplete="tel-national" 
+              />
+            </div>
+          </div>
+
+          <!-- Subscribe Button -->
+          <button type="submit" id="btnSubscribeAlerts" class="btn btn-subscribe magnetic">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Subscribe</span>
+          </button>
+
+          <!-- Status Message Span -->
+          <span id="subscribeStatusMsg" class="subscribe-status-msg" style="display: none;" role="status" aria-live="polite"></span>
+        </form>
+      </div>
+
     </aside>
 
     <!-- --------------------------------------------------------------------- -->
