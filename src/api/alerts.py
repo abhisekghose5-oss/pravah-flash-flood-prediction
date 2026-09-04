@@ -1,4 +1,4 @@
-﻿import os
+import os
 import logging
 from typing import Optional
 from twilio.rest import Client
@@ -70,3 +70,76 @@ def trigger_emergency_alert(
     except Exception as exc:
         logger.error("Unexpected error in trigger_emergency_alert: %s", exc)
         return None
+
+
+# -----------------------------------------------------------------------------
+# Non-Blocking Asynchronous Twilio Dispatcher (SRE / Fast-Fail Patch)
+# -----------------------------------------------------------------------------
+import asyncio
+from typing import List, Dict, Any
+
+async def async_trigger_emergency_alert(
+    phone_number: str,
+    catchment_name: str,
+    probability: float,
+    timeout_secs: float = 4.0,
+) -> Optional[str]:
+    """
+    Asynchronous, non-blocking wrapper around trigger_emergency_alert.
+    Runs the blocking network I/O in a separate thread pool with a hard timeout
+    to prevent Twilio latency spikes from stalling the FastAPI event loop.
+    """
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(
+                trigger_emergency_alert,
+                phone_number=phone_number,
+                catchment_name=catchment_name,
+                probability=probability,
+            ),
+            timeout=timeout_secs,
+        )
+    except asyncio.TimeoutError:
+        logger.warning(
+            "Twilio alert request timed out after %.1fs for %s. Bypassed to preserve event loop.",
+            timeout_secs,
+            phone_number,
+        )
+        return None
+    except Exception as exc:
+        logger.error("Async alert dispatch error for %s: %s", phone_number, exc)
+        return None
+
+
+async def batch_dispatch_emergency_alerts(
+    subscribers: List[Dict[str, Any]],
+    catchment_name: str,
+    probability: float,
+) -> int:
+    """
+    Concurrently dispatches emergency WhatsApp alerts to all matching subscribers
+    using asyncio.gather, ensuring instantaneous broadcast without blocking.
+    """
+    if not subscribers:
+        return 0
+
+    tasks = [
+        async_trigger_emergency_alert(
+            phone_number=sub.get("phone_number") or sub.get("phone", ""),
+            catchment_name=catchment_name,
+            probability=probability,
+        )
+        for sub in subscribers
+        if sub.get("phone_number") or sub.get("phone")
+    ]
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    success_count = sum(1 for r in results if isinstance(r, str) and r)
+    logger.info(
+        "Dispatched %d/%d emergency WhatsApp alerts for %s",
+        success_count,
+        len(tasks),
+        catchment_name,
+    )
+    return success_count
+

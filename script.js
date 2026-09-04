@@ -1318,15 +1318,51 @@ document.addEventListener('DOMContentLoaded', () => {
           (err) => {
             geoBtn.disabled = false;
             if (geoBtnText) geoBtnText.textContent = '📍 Auto-Detect My Location';
+
+            // Unlock coordinates input fields for manual typing
+            if (latInput) {
+              latInput.removeAttribute('readonly');
+              latInput.classList.remove('readonly-coord');
+              latInput.placeholder = 'e.g. 17.2890 (Enter manually)';
+            }
+            if (lngInput) {
+              lngInput.removeAttribute('readonly');
+              lngInput.classList.remove('readonly-coord');
+              lngInput.placeholder = 'e.g. 74.1810 (Enter manually)';
+            }
+
+            let friendlyMessage = '⚠️ Geolocation unavailable. Please enter coordinates manually.';
+            if (err.code === 1) { // PERMISSION_DENIED
+              friendlyMessage = '🔒 GPS access denied by browser. Manual coordinate entry has been unlocked below.';
+            } else if (err.code === 2) { // POSITION_UNAVAILABLE
+              friendlyMessage = '📡 GPS signal lost or offline. Manual coordinate entry unlocked.';
+            } else if (err.code === 3) { // TIMEOUT
+              friendlyMessage = '⏱️ GPS request timed out. Please type coordinates or try again.';
+            }
+
             if (statusMsg) {
               statusMsg.className = 'sos-status-box error';
-              statusMsg.textContent = `⚠️ Geolocation Error (${err.code}): ${err.message || 'Permission denied.'}`;
+              statusMsg.innerHTML = `${friendlyMessage} <br/><button type="button" id="btnPresetGhatsCoord" style="margin-top:4px; font-size:0.7rem; background:rgba(255,255,255,0.15); border:1px solid #fff; color:#fff; border-radius:4px; padding:2px 8px; cursor:pointer;">Use Western Ghats Preset (Karad)</button>`;
               statusMsg.style.display = 'block';
+
+              // Quick-fill helper for live demonstrations without real GPS hardware
+              const presetBtn = document.getElementById('btnPresetGhatsCoord');
+              if (presetBtn) {
+                presetBtn.addEventListener('click', () => {
+                  if (latInput) latInput.value = '17.2890';
+                  if (lngInput) lngInput.value = '74.1810';
+                  statusMsg.className = 'sos-status-box success';
+                  statusMsg.textContent = '📍 Demo Coordinates Set: Karad [17.2890° N, 74.1810° E]';
+                  if (typeof window.zoomToLocation === 'function') {
+                    window.zoomToLocation(17.289, 74.181, 0.45, 1400);
+                  }
+                });
+              }
             }
           },
           {
             enableHighAccuracy: true,
-            timeout: 10000,
+            timeout: 8000,
             maximumAge: 0,
           }
         );

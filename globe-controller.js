@@ -683,39 +683,72 @@
   };
 
   // =========================================================================
-  // CITIZEN SOS REPORTS POLLING & RINGS VISUALIZATION (ADD-ONLY EXTENSION)
+  // CITIZEN SOS REPORTS POLLING & RINGS VISUALIZATION (SRE HARDENED)
   // =========================================================================
   let citizenSosReports = [];
+  const MAX_SOS_BEACONS = 25; // Bounds GPU geometry memory to sustain 60 FPS
+
+  function sanitizeSosPoint(item) {
+    if (!item || typeof item !== 'object') return null;
+    const lat = parseFloat(item.latitude ?? item.lat);
+    const lng = parseFloat(item.longitude ?? item.lng);
+
+    // Filter out null, undefined, NaN, Infinity, and out-of-range coords
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+
+    return {
+      ...item,
+      latitude: lat,
+      longitude: lng,
+      severity: typeof item.severity === 'string' ? item.severity : 'knee_deep',
+    };
+  }
 
   async function fetchCitizenReports() {
+    // Memory & GPU Guard: Pause polling if user has minimized or switched tabs
+    if (document.hidden) return;
+
     try {
       const response = await fetch('/api/reports');
       if (!response.ok) return;
       const data = await response.json();
+
       if (Array.isArray(data) && globeInstance) {
-        citizenSosReports = data;
+        // Sanitize incoming array and keep only the latest bounded set
+        const validReports = data
+          .map(sanitizeSosPoint)
+          .filter(Boolean)
+          .slice(-MAX_SOS_BEACONS);
+
+        citizenSosReports = validReports;
         globeInstance
           .ringsData(citizenSosReports)
-          .ringLat((d) => d.latitude ?? d.lat)
-          .ringLng((d) => d.longitude ?? d.lng)
+          .ringLat((d) => d.latitude)
+          .ringLng((d) => d.longitude)
           .ringColor(() => (t) => `rgba(239, 68, 68, ${Math.max(0, 1 - t)})`)
           .ringMaxRadius(2)
           .ringPropagationSpeed(1)
           .ringRepeatPeriod(800);
 
-        console.log(`[Globe.gl] Rendered ${data.length} Citizen SOS beacon ring(s).`);
+        if (validReports.length > 0) {
+          console.log(`[Globe.gl] Rendered ${validReports.length} sanitized Citizen SOS beacon(s).`);
+        }
       }
     } catch (e) {
-      // Graceful offline fallback
+      // Graceful offline fallback; WebGL never throws fatal crash
     }
   }
 
-  // Initial fetch & poll every 5 seconds
-  setTimeout(fetchCitizenReports, 2500);
-  setInterval(fetchCitizenReports, 5000);
+  // Manage interval cleanly to prevent accumulation
+  if (window._pravahSosPollingInterval) {
+    clearInterval(window._pravahSosPollingInterval);
+  }
+  setTimeout(fetchCitizenReports, 2000);
+  window._pravahSosPollingInterval = setInterval(fetchCitizenReports, 5000);
 
   // =========================================================================
-  // EVACUATION ROUTES & SAFE ZONE LABELS (ADD-ONLY EXTENSION)
+  // EVACUATION ROUTES & SAFE ZONE LABELS (SRE HARDENED)
   // =========================================================================
   let evacuationArcs = [];
   let reliefCamps = [
@@ -732,7 +765,7 @@
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          reliefCamps = data;
+          reliefCamps = data.map(sanitizeSosPoint).filter(Boolean);
         }
       }
     } catch {
@@ -743,22 +776,34 @@
     }
   }
 
-  // Fetch nearest safe zone and render animated evacuation flight-path arc
+  // Fetch nearest safe zone and render animated evacuation flight-path arc with bounds checking
   async function fetchAndRenderEvacuation(dangerLat, dangerLng) {
+    const sLat = parseFloat(dangerLat);
+    const sLng = parseFloat(dangerLng);
+
+    // Validate start coordinate sanity before dispatching WebGL arc
+    if (!Number.isFinite(sLat) || !Number.isFinite(sLng) || sLat < -90 || sLat > 90 || sLng < -180 || sLng > 180) {
+      console.warn('[PRAVAH Evac] Aborting arc render: Invalid danger coordinate input', dangerLat, dangerLng);
+      return;
+    }
+
     try {
-      const res = await fetch(`/api/evacuation-route?lat=${dangerLat}&lng=${dangerLng}`);
+      const res = await fetch(`/api/evacuation-route?lat=${sLat}&lng=${sLng}`);
       if (!res.ok) throw new Error('Route fetch failed');
       const data = await res.json();
       const camp = data.nearest_camp;
 
-      if (camp && globeInstance) {
+      const eLat = camp ? parseFloat(camp.latitude) : NaN;
+      const eLng = camp ? parseFloat(camp.longitude) : NaN;
+
+      if (Number.isFinite(eLat) && Number.isFinite(eLng) && globeInstance) {
         const newArc = {
-          startLat: parseFloat(dangerLat),
-          startLng: parseFloat(dangerLng),
-          endLat: camp.latitude,
-          endLng: camp.longitude,
-          campName: camp.name,
-          distanceKm: data.distance_km,
+          startLat: sLat,
+          startLng: sLng,
+          endLat: eLat,
+          endLng: eLng,
+          campName: camp.name || 'Safe Refuge',
+          distanceKm: data.distance_km || 0,
         };
 
         evacuationArcs = [newArc];
@@ -767,7 +812,7 @@
 
         // Trigger Dynamic Evacuation Directive UI Card
         if (typeof window.showEvacuationCard === 'function') {
-          window.showEvacuationCard(camp.name, data.distance_km, camp.latitude, camp.longitude);
+          window.showEvacuationCard(camp.name, data.distance_km, eLat, eLng);
         }
       }
     } catch (err) {
