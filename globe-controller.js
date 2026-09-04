@@ -764,6 +764,11 @@
         evacuationArcs = [newArc];
         globeInstance.arcsData(evacuationArcs);
         console.log(`[PRAVAH Evac] Evacuation route drawn to ${camp.name} (${data.distance_km} km)`);
+
+        // Trigger Dynamic Evacuation Directive UI Card
+        if (typeof window.showEvacuationCard === 'function') {
+          window.showEvacuationCard(camp.name, data.distance_km, camp.latitude, camp.longitude);
+        }
       }
     } catch (err) {
       console.warn('[PRAVAH Evac] Error loading evacuation route:', err);
@@ -775,6 +780,9 @@
     evacuationArcs = [];
     if (globeInstance) {
       globeInstance.arcsData([]);
+    }
+    if (typeof window.hideEvacuationCard === 'function') {
+      window.hideEvacuationCard();
     }
     console.log('[PRAVAH Evac] Evacuation routes cleared.');
   }

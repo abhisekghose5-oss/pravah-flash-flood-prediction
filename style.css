@@ -4201,6 +4201,227 @@ body {
   }
 }
 
+/* ==========================================================================
+   DYNAMIC EVACUATION DIRECTIVE UI CARD (ADD-ONLY EXTENSION)
+   ========================================================================== */
+
+.evacuation-directive-card {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  z-index: 40;
+  max-width: 380px;
+  width: calc(100% - 40px);
+  background: rgba(10, 20, 32, 0.88);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.25), 0 15px 35px rgba(0, 0, 0, 0.8);
+  padding: 1.15rem;
+  box-sizing: border-box;
+  color: #ffffff;
+  pointer-events: auto !important;
+  animation: evacBorderPulse 2.5s infinite alternate ease-in-out;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.evacuation-directive-card.evac-card-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: evacSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards, evacBorderPulse 2.5s infinite alternate ease-in-out;
+}
+
+.evacuation-directive-card.evac-card-hidden {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  pointer-events: none !important;
+}
+
+@keyframes evacSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes evacBorderPulse {
+  0% {
+    border-color: rgba(34, 197, 94, 0.45);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.25), 0 10px 30px rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    border-color: rgba(249, 115, 22, 0.7);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.35), 0 12px 35px rgba(0, 0, 0, 0.85);
+  }
+}
+
+.evac-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.evac-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.evac-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulseDotGreen 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseDotGreen {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.evac-title-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #ef4444;
+}
+
+.evac-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.evac-close-btn:hover {
+  color: #ffffff;
+}
+
+.evac-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.evac-target-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.evac-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.evac-val-primary {
+  font-family: var(--font-sans, Inter, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.evac-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.55rem;
+}
+
+.evac-metric-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.evac-metric-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+.evac-metric-val {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evac-metric-val.green-text {
+  color: #4ade80;
+}
+
+.evac-actions-row {
+  margin-top: 0.35rem;
+}
+
+.btn-evac-maps {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.15));
+  border: 1px solid #22c55e;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font-sans, Inter, sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.btn-evac-maps:hover {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #05200d;
+  border-color: #86efac;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.7), 0 0 8px #ffffff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .evacuation-directive-card {
+    top: 50px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    width: auto;
+  }
+}
+
+
 
 
 

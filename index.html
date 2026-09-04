@@ -655,6 +655,50 @@
           </div>
         </div>
 
+        <!-- ===================================================================== -->
+        <!-- DYNAMIC EVACUATION DIRECTIVE UI CARD (Requirement: Add-Only)          -->
+        <!-- ===================================================================== -->
+        <div id="evacuationDirectiveCard" class="evacuation-directive-card evac-card-hidden" style="display: none;" role="alert" aria-live="assertive">
+          <div class="evac-card-header">
+            <div class="evac-header-left">
+              <span class="evac-pulse-dot" aria-hidden="true"></span>
+              <span class="evac-title-text">🚨 EVACUATION DIRECTIVE ISSUED</span>
+            </div>
+            <button type="button" id="btnDismissEvacCard" class="evac-close-btn" aria-label="Dismiss Evacuation Directive">&times;</button>
+          </div>
+
+          <div class="evac-card-body">
+            <div class="evac-target-row">
+              <span class="evac-label">NEAREST SAFE REFUGE:</span>
+              <span id="evacCampName" class="evac-val-primary">Searching nearest relief camp...</span>
+            </div>
+
+            <div class="evac-metrics-grid">
+              <div class="evac-metric-box">
+                <span class="evac-metric-label">DISTANCE</span>
+                <span id="evacDistance" class="evac-metric-val">-- km</span>
+              </div>
+              <div class="evac-metric-box">
+                <span class="evac-metric-label">EST. TRANSIT</span>
+                <span id="evacTransitTime" class="evac-metric-val">-- mins</span>
+              </div>
+              <div class="evac-metric-box">
+                <span class="evac-metric-label">FACILITY TYPE</span>
+                <span id="evacCapacity" class="evac-metric-val green-text">Elevated Shelter</span>
+              </div>
+            </div>
+
+            <div class="evac-actions-row">
+              <a id="btnEvacGoogleMaps" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-evac-maps magnetic">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                </svg>
+                <span>Open in Google Maps</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- 3D Globe Viewport Mounting Container -->
         <div id="globeViewport" class="globe-viewport">
           

@@ -1432,6 +1432,72 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
+// =========================================================================
+// DYNAMIC EVACUATION DIRECTIVE UI LOGIC (ADD-ONLY EXTENSION)
+// =========================================================================
+function showEvacuationCard(campName, distance, campLat, campLng) {
+  const card = document.getElementById('evacuationDirectiveCard');
+  const campNameEl = document.getElementById('evacCampName');
+  const distanceEl = document.getElementById('evacDistance');
+  const transitEl = document.getElementById('evacTransitTime');
+  const mapsBtn = document.getElementById('btnEvacGoogleMaps');
+
+  if (!card) return;
+
+  // 1. Injects the fetched camp name and distance into the HTML
+  if (campNameEl) {
+    campNameEl.textContent = campName || 'Designated High Ground Refuge';
+  }
+
+  const distNum = parseFloat(distance) || 0;
+  if (distanceEl) {
+    distanceEl.textContent = distNum ? `${distNum.toFixed(1)} km` : `${distance} km`;
+  }
+
+  if (transitEl) {
+    const mins = Math.max(5, Math.round(distNum * 12));
+    transitEl.textContent = `~${mins} mins walk`;
+  }
+
+  // 2. Updates the "Open in Google Maps" button href
+  if (mapsBtn && campLat && campLng) {
+    mapsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${campLat},${campLng}`;
+  }
+
+  // 3. Unhides the card with smooth CSS fade-in/slide-up animation
+  card.style.display = 'block';
+  void card.offsetWidth; // Force browser layout recalculation for animation
+  card.classList.remove('evac-card-hidden');
+  card.classList.add('evac-card-visible');
+
+  console.log(`[PRAVAH UI] Evacuation Directive activated: ${campName} (${distance} km)`);
+}
+
+function hideEvacuationCard() {
+  const card = document.getElementById('evacuationDirectiveCard');
+  if (!card) return;
+  card.classList.remove('evac-card-visible');
+  card.classList.add('evac-card-hidden');
+  setTimeout(() => {
+    if (card.classList.contains('evac-card-hidden')) {
+      card.style.display = 'none';
+    }
+  }, 300);
+}
+
+// Bind close button
+document.addEventListener('DOMContentLoaded', () => {
+  const dismissBtn = document.getElementById('btnDismissEvacCard');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', hideEvacuationCard);
+  }
+});
+
+// Expose globally
+window.showEvacuationCard = showEvacuationCard;
+window.hideEvacuationCard = hideEvacuationCard;
+
+
 
 
 
