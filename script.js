@@ -834,6 +834,19 @@ document.addEventListener('DOMContentLoaded', () => {
       window.PRAVAH_GLOBE.flyToStation(stationId);
     }
 
+    // 5. Automatic Evacuation Routing: Trigger animated arcs for WARNING/EMERGENCY
+    if (window.PRAVAH_GLOBE) {
+      if (station.risk === 'EMERGENCY' || station.risk === 'WARNING') {
+        if (typeof window.PRAVAH_GLOBE.fetchAndRenderEvacuation === 'function') {
+          window.PRAVAH_GLOBE.fetchAndRenderEvacuation(station.lat, station.lng);
+        }
+      } else {
+        if (typeof window.PRAVAH_GLOBE.clearEvacuationRoutes === 'function') {
+          window.PRAVAH_GLOBE.clearEvacuationRoutes();
+        }
+      }
+    }
+
     console.log(`[PRAVAH] Synchronized to Station: ${station.name} (${stationId})`);
   }
 

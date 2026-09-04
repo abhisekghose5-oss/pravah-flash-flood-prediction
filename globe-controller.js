@@ -476,7 +476,27 @@
         )
         .ringMaxRadius((d) => (d.risk === 'EMERGENCY' ? 4.8 : d.risk === 'WARNING' ? 3.0 : 1.8))
         .ringPropagationSpeed((d) => (d.risk === 'EMERGENCY' ? 4.2 : 2.0))
-        .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 600 : 1300));
+        .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 600 : 1300))
+        // 5b. Evacuation Flight-Paths (Arcs) & Safe Zone Labels (Requirement: Add-Only)
+        .arcsData([])
+        .arcStartLat('startLat')
+        .arcStartLng('startLng')
+        .arcEndLat('endLat')
+        .arcEndLng('endLng')
+        .arcColor(() => ['#ef4444', '#22c55e']) // Crimson to Neon Green gradient
+        .arcAltitude(0.22)
+        .arcStroke(2.0)
+        .arcDashLength(0.5)
+        .arcDashGap(0.2)
+        .arcDashAnimateTime(1000)
+        .labelsData([])
+        .labelLat('latitude')
+        .labelLng('longitude')
+        .labelText((d) => `🛡️ ${d.name}`)
+        .labelSize(1.2)
+        .labelDotRadius(0.7)
+        .labelColor(() => '#22c55e')
+        .labelAltitude(0.015);
 
       // 6. Cinematic Start: Zoomed Out in Space (Requirement 4)
       globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 0);
@@ -693,5 +713,79 @@
   // Initial fetch & poll every 5 seconds
   setTimeout(fetchCitizenReports, 2500);
   setInterval(fetchCitizenReports, 5000);
+
+  // =========================================================================
+  // EVACUATION ROUTES & SAFE ZONE LABELS (ADD-ONLY EXTENSION)
+  // =========================================================================
+  let evacuationArcs = [];
+  let reliefCamps = [
+    { id: 1, name: 'Shivaji Nagar Elevated Shelter', latitude: 18.5312, longitude: 73.8445, type: 'Elevated Shelter' },
+    { id: 2, name: 'Sinhagad Road Govt School', latitude: 18.4789, longitude: 73.8192, type: 'Government School' },
+    { id: 3, name: 'Lonavala Emergency Refuge', latitude: 18.7557, longitude: 73.4091, type: 'Elevated Shelter' },
+    { id: 4, name: 'Panchganga Model School', latitude: 18.3842, longitude: 73.8567, type: 'Government School' },
+  ];
+
+  // Fetch safe zones and populate globe labels
+  async function fetchSafeZones() {
+    try {
+      const res = await fetch('/api/safe-zones');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          reliefCamps = data;
+        }
+      }
+    } catch {
+      // Graceful offline fallback
+    }
+    if (globeInstance) {
+      globeInstance.labelsData(reliefCamps);
+    }
+  }
+
+  // Fetch nearest safe zone and render animated evacuation flight-path arc
+  async function fetchAndRenderEvacuation(dangerLat, dangerLng) {
+    try {
+      const res = await fetch(`/api/evacuation-route?lat=${dangerLat}&lng=${dangerLng}`);
+      if (!res.ok) throw new Error('Route fetch failed');
+      const data = await res.json();
+      const camp = data.nearest_camp;
+
+      if (camp && globeInstance) {
+        const newArc = {
+          startLat: parseFloat(dangerLat),
+          startLng: parseFloat(dangerLng),
+          endLat: camp.latitude,
+          endLng: camp.longitude,
+          campName: camp.name,
+          distanceKm: data.distance_km,
+        };
+
+        evacuationArcs = [newArc];
+        globeInstance.arcsData(evacuationArcs);
+        console.log(`[PRAVAH Evac] Evacuation route drawn to ${camp.name} (${data.distance_km} km)`);
+      }
+    } catch (err) {
+      console.warn('[PRAVAH Evac] Error loading evacuation route:', err);
+    }
+  }
+
+  // Clear all evacuation arcs when risk returns to normal
+  function clearEvacuationRoutes() {
+    evacuationArcs = [];
+    if (globeInstance) {
+      globeInstance.arcsData([]);
+    }
+    console.log('[PRAVAH Evac] Evacuation routes cleared.');
+  }
+
+  // Expose on window.PRAVAH_GLOBE
+  window.PRAVAH_GLOBE.fetchAndRenderEvacuation = fetchAndRenderEvacuation;
+  window.PRAVAH_GLOBE.clearEvacuationRoutes = clearEvacuationRoutes;
+  window.PRAVAH_GLOBE.fetchSafeZones = fetchSafeZones;
+
+  // Render safe zone markers on load
+  setTimeout(fetchSafeZones, 1800);
 })();
+
 
