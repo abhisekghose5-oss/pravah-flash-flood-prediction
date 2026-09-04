@@ -477,26 +477,28 @@
         .ringMaxRadius((d) => (d.risk === 'EMERGENCY' ? 4.8 : d.risk === 'WARNING' ? 3.0 : 1.8))
         .ringPropagationSpeed((d) => (d.risk === 'EMERGENCY' ? 4.2 : 2.0))
         .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 600 : 1300))
-        // 5b. Evacuation Flight-Paths (Arcs) & Safe Zone Labels (Requirement: Add-Only)
+        // 5b. Evacuation Flight-Paths (Arcs) & Safe Zone Labels (Optimized WebGL Scales)
         .arcsData([])
         .arcStartLat('startLat')
         .arcStartLng('startLng')
         .arcEndLat('endLat')
         .arcEndLng('endLng')
-        .arcColor(() => ['#ef4444', '#22c55e']) // Crimson to Neon Green gradient
-        .arcAltitude(0.22)
-        .arcStroke(2.0)
-        .arcDashLength(0.5)
+        .arcColor(() => ['#ef4444', '#22c55e']) // Crimson danger to Emerald safety gradient
+        .arcAltitude(0.15)                      // Graceful parabolic trajectory
+        .arcStroke(0.45)                        // Laser-thin curve (drastically scaled down from 2.0)
+        .arcDashLength(0.4)
         .arcDashGap(0.2)
+        .arcDashAnimateTime(1200)
         .labelsData([])
         .labelLat('latitude')
         .labelLng('longitude')
-        .labelText((d) => (d && d.name ? `🛡️ ${d.name.replace(/(Government|Disaster|Emergency|Refuge|Center|Model)\s*/gi, '').trim()}` : ''))
-        .labelSize(0.55)
-        .labelDotRadius(0.28)
-        .labelColor(() => '#4ade80')
-        .labelAltitude(0.08)
-        .labelResolution(6);
+        // Clean ASCII text without unicode emojis (eliminates "??" render artifact)
+        .labelText((d) => (d && d.name ? `[SAFE] ${d.name.replace(/(Government|Disaster|Emergency|Refuge|Center|Model)\s*/gi, '').trim()}` : ''))
+        .labelSize(0.65)                        // Readable, proportional font scale
+        .labelDotRadius(0.25)                   // Precise point marker
+        .labelColor(() => '#4ade80')            // High-contrast neon green
+        .labelAltitude(0.06)                    // Floats cleanly above 3D terrain
+        .labelResolution(4);
 
       // 6. Cinematic Start: Zoomed Out in Space (Requirement 4)
       globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 0);
