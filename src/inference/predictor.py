@@ -240,8 +240,20 @@ class PravahInferenceEngine:
         onset_thresh = float(onset_bundle["threshold"])
 
         X_onset = static_row[onset_cols]
+
+        # ---------------------------------------------------------------------
+        # MLOps Inference Logging: Telemetry before predict_proba()
+        # ---------------------------------------------------------------------
+        print(f"\n[PRAVAH ML Pipeline] Ingesting Telemetry for Gauge: {gid} ({station_info.get('station_name', 'Unknown')})")
+        print(f"  • Model Architecture : {onset_key}")
+        print(f"  • Feature Array Shape: {X_onset.shape} ({X_onset.shape[0]} row, {X_onset.shape[1]} columns)")
+        print(f"  • Columns Registered : {list(X_onset.columns)}")
+        if "rain_1d" in X_onset.columns:
+            print(f"  • Antecedent Profile : 1d={X_onset['rain_1d'].iloc[0]:.1f}mm | 3d={X_onset.get('rain_3d_sum', [0]).iloc[0]:.1f}mm | 7d={X_onset.get('rain_7d_sum', [0]).iloc[0]:.1f}mm | 10d={X_onset.get('rain_10d_sum', [0]).iloc[0]:.1f}mm")
+
         onset_prob = float(onset_model.predict_proba(X_onset)[0, 1])
         onset_pred = bool(onset_prob >= onset_thresh)
+        print(f"  • Predicted Risk     : {onset_prob * 100:.2f}% (Tuned Threshold: {onset_thresh:.4f})\n")
 
         # 6. Predict Task B (Active)
         active_key = f"task_b_active_{active_model_name}"
