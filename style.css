@@ -4421,13 +4421,49 @@ body {
   }
 }
 
+/* ==========================================================================
+   ANTI-GRAVITY UI FLOATING ANIMATION (ADD-ONLY EXTENSION)
+   ========================================================================== */
 
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
 
+.floating-card {
+  animation: floating 6s ease-in-out infinite;
+  will-change: transform;
+}
 
+/* Staggered animation delays to avoid synchronized movement */
+.floating-card.delay-1 {
+  animation-delay: 0.8s;
+}
 
+.floating-card.delay-2 {
+  animation-delay: 1.6s;
+}
 
+.floating-card.delay-3 {
+  animation-delay: 2.4s;
+}
 
+.floating-card.delay-4 {
+  animation-delay: 3.2s;
+}
 
+.floating-card.delay-5 {
+  animation-delay: 4.0s;
+}
 
-
-
+/* Smooth interaction pause on user hover */
+.floating-card:hover {
+  animation-play-state: paused;
+}

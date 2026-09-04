@@ -841,4 +841,171 @@
   setTimeout(fetchSafeZones, 1800);
 })();
 
+// =========================================================================
+// ANTI-GRAVITY THREE.JS PARTICLE FIELD & CURSOR REPULSION (ADD-ONLY)
+// =========================================================================
+(function initAntiGravityField() {
+  if (window._pravahAntiGravityInitialized) return;
+
+  const PARTICLE_COUNT = 800;
+  const Y_MIN = -220;
+  const Y_MAX = 220;
+
+  function createGlowTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(56, 189, 248, 1)');      // Vibrant sky blue
+    grad.addColorStop(0.28, 'rgba(6, 182, 212, 0.85)'); // Neon cyan
+    grad.addColorStop(0.65, 'rgba(6, 182, 212, 0.22)'); // Cyan halo
+    grad.addColorStop(1, 'rgba(6, 182, 212, 0)');       // Transparent outer
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  function setupParticles() {
+    const globe = window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.getGlobeInstance === 'function'
+      ? window.PRAVAH_GLOBE.getGlobeInstance()
+      : null;
+
+    if (!globe || typeof globe.scene !== 'function' || !globe.scene() || typeof THREE === 'undefined') {
+      setTimeout(setupParticles, 250);
+      return;
+    }
+
+    const scene = globe.scene();
+    const container = document.getElementById('globeViewport') || document.body;
+
+    const positions = new Float32Array(PARTICLE_COUNT * 3);
+    const speeds = new Float32Array(PARTICLE_COUNT);
+    const radii = new Float32Array(PARTICLE_COUNT);
+    const angles = new Float32Array(PARTICLE_COUNT);
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const r = 115 + Math.random() * 135;
+      const th = Math.random() * Math.PI * 2;
+      radii[i] = r;
+      angles[i] = th;
+      speeds[i] = 0.28 + Math.random() * 0.42; // Upward drift velocity
+
+      positions[i * 3] = r * Math.cos(th);
+      positions[i * 3 + 1] = Y_MIN + Math.random() * (Y_MAX - Y_MIN);
+      positions[i * 3 + 2] = r * Math.sin(th);
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 3.2,
+      map: createGlowTexture(),
+      color: new THREE.Color(0x38bdf8),
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    // Interactive Cursor Repulsion State
+    const mouseNDC = new THREE.Vector2(-999, -999);
+    const cursorWorld = new THREE.Vector3();
+    const raycaster = new THREE.Raycaster();
+    let isHovering = false;
+
+    container.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        isHovering = true;
+      }
+    });
+
+    container.addEventListener('mouseleave', () => {
+      isHovering = false;
+      mouseNDC.set(-999, -999);
+    });
+
+    // 60 FPS Anti-Gravity Animation Loop
+    let lastTime = performance.now();
+    function animateAntiGravity(time) {
+      requestAnimationFrame(animateAntiGravity);
+
+      if (document.hidden) return; // Save GPU/CPU when tab inactive
+
+      const delta = Math.min((time - lastTime) / 16.6, 2.0);
+      lastTime = time;
+
+      const pos = geometry.attributes.position.array;
+      const camera = typeof globe.camera === 'function' ? globe.camera() : null;
+
+      let hasCursorWorld = false;
+      if (isHovering && camera && mouseNDC.x > -2) {
+        raycaster.setFromCamera(mouseNDC, camera);
+        const focalDist = Math.max(80, camera.position.length() * 0.78);
+        raycaster.ray.at(focalDist, cursorWorld);
+        hasCursorWorld = true;
+      }
+
+      const REPEL_RADIUS = 50;
+      const REPEL_RADIUS_SQ = REPEL_RADIUS * REPEL_RADIUS;
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const i3 = i * 3;
+
+        // 1. Upward anti-gravity drift
+        pos[i3 + 1] += speeds[i] * delta;
+
+        // 2. Wrap around apex to base
+        if (pos[i3 + 1] > Y_MAX) {
+          pos[i3 + 1] = Y_MIN;
+          angles[i] = Math.random() * Math.PI * 2;
+          radii[i] = 115 + Math.random() * 135;
+          pos[i3] = radii[i] * Math.cos(angles[i]);
+          pos[i3 + 2] = radii[i] * Math.sin(angles[i]);
+        }
+
+        // 3. Subtle floating oscillation
+        pos[i3] += Math.sin(time * 0.0012 + i) * 0.04 * delta;
+        pos[i3 + 2] += Math.cos(time * 0.0012 + i) * 0.04 * delta;
+
+        // 4. Interactive cursor repulsion
+        if (hasCursorWorld) {
+          const dx = pos[i3] - cursorWorld.x;
+          const dy = pos[i3 + 1] - cursorWorld.y;
+          const dz = pos[i3 + 2] - cursorWorld.z;
+          const distSq = dx * dx + dy * dy + dz * dz;
+
+          if (distSq < REPEL_RADIUS_SQ && distSq > 0.01) {
+            const dist = Math.sqrt(distSq);
+            const force = (1 - dist / REPEL_RADIUS) * 2.2 * delta;
+            pos[i3] += (dx / dist) * force;
+            pos[i3 + 1] += (dy / dist) * force * 0.5;
+            pos[i3 + 2] += (dz / dist) * force;
+          }
+        }
+      }
+
+      geometry.attributes.position.needsUpdate = true;
+    }
+
+    requestAnimationFrame(animateAntiGravity);
+    window._pravahAntiGravityInitialized = true;
+    console.log(`[PRAVAH WebGL] Anti-Gravity Particle Field online (${PARTICLE_COUNT} upward particles).`);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(setupParticles, 600));
+  } else {
+    setTimeout(setupParticles, 600);
+  }
+})();
+
+
 
