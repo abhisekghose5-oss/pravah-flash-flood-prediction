@@ -29,8 +29,6 @@ def trigger_emergency_alert(
     :return: Twilio Message SID if sent successfully, None otherwise.
     """
     try:
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
         # Normalize probability to integer percentage
         prob_pct = int(probability * 100) if probability <= 1.0 else int(probability)
 
@@ -50,6 +48,24 @@ def trigger_emergency_alert(
             f"Please stay safe, avoid low-lying riparian areas, and follow official SDRF directives."
         )
 
+        # SIH Live Demo Sandbox Fallback (when credentials are unconfigured)
+        is_demo_mode = (
+            TWILIO_ACCOUNT_SID == "YOUR_TWILIO_ACCOUNT_SID"
+            or not TWILIO_ACCOUNT_SID
+            or TWILIO_ACCOUNT_SID.startswith("YOUR_")
+        )
+        if is_demo_mode:
+            simulated_sid = f"SM_DEMO_SANDBOX_{abs(hash(cleaned_number + catchment_name)) % 1000000:06d}"
+            logger.info(
+                "📢 [DEMO SIMULATION] WhatsApp alert simulated for %s (%s, %d%% risk). Simulated SID: %s",
+                to_whatsapp,
+                catchment_name,
+                prob_pct,
+                simulated_sid,
+            )
+            return simulated_sid
+
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         message = client.messages.create(
             from_=TWILIO_WHATSAPP_FROM,
             to=to_whatsapp,

@@ -1,4 +1,4 @@
-﻿"""
+"""
 ===============================================================================
 PRAVAH — End-to-End Integration & System Verification Suite (SIH 2026)
 ===============================================================================
@@ -12,6 +12,10 @@ from __future__ import annotations
 import argparse
 import sys
 from typing import Any, Dict
+
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import requests
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -196,21 +196,32 @@ class SubscriptionResponse(BaseModel):
     status: str
     message: str
 
-# Global in-memory storage for subscriptions (SIH Demo)
-active_subscriptions: list[Dict[str, Any]] = []
+# SQLite Persistence Layer Integration
+from src.data.db import (
+    save_subscription,
+    get_all_subscriptions,
+    save_sos_report,
+    get_all_sos_reports,
+)
+
+# Active cache backed by persistent SQLite
+active_subscriptions: list[Dict[str, Any]] = get_all_subscriptions()
 
 
 @app.post("/api/subscribe", response_model=SubscriptionResponse, tags=["Alerts"])
 def subscribe_alerts(subscription: SubscriptionRequest) -> SubscriptionResponse:
     """
     Register a user for automated WhatsApp/SMS emergency flash flood alerts.
+    Persists to SQLite database to survive process restarts.
     """
+    row_id = save_subscription(subscription.phone_number, subscription.catchment_id)
     record = {
+        "id": row_id,
         "phone_number": subscription.phone_number,
         "catchment_id": subscription.catchment_id,
     }
-    active_subscriptions.append(record)
-    logger.info("Registered emergency subscription: %s | Total active: %d", record, len(active_subscriptions))
+    active_subscriptions.insert(0, record)
+    logger.info("Registered emergency subscription #%d: %s | Total active: %d", row_id, record, len(active_subscriptions))
     return SubscriptionResponse(
         status="success",
         message="Number registered for alerts."
@@ -218,7 +229,7 @@ def subscribe_alerts(subscription: SubscriptionRequest) -> SubscriptionResponse:
 
 
 # =============================================================================
-# Crowdsourced Citizen SOS Flood Reports (In-Memory Store)
+# Crowdsourced Citizen SOS Flood Reports (SQLite Backed)
 # =============================================================================
 from datetime import datetime, timezone
 
@@ -238,37 +249,46 @@ class ReportResponse(BaseModel):
     message: str
     report_id: int
 
-# Global in-memory storage for active SOS reports (SIH Demo)
-active_sos_reports: list[Dict[str, Any]] = []
+# Active cache initialized from SQLite database
+active_sos_reports: list[Dict[str, Any]] = get_all_sos_reports()
 
 
 @app.post("/api/report-flood", response_model=ReportResponse, tags=["Citizen SOS"])
 def report_flood(report: CitizenReport) -> ReportResponse:
     """
     Accepts crowdsourced flood reports from citizens and emergency responders.
-    Appends the report to memory and logs telemetry for incident dispatch.
+    Persists the report to SQLite database and logs telemetry for incident dispatch.
     """
+    row_id = save_sos_report(
+        latitude=report.latitude,
+        longitude=report.longitude,
+        severity=report.severity,
+        severity_tier=report.severity_tier,
+        landmark_notes=report.landmark_notes,
+        timestamp=report.timestamp,
+    )
+
     report_dict = report.model_dump() if hasattr(report, "model_dump") else report.dict()
-    report_dict["id"] = len(active_sos_reports) + 1
+    report_dict["id"] = row_id
     active_sos_reports.append(report_dict)
 
-    logger.info("🚨 New Citizen SOS Report #%d: Lat %.4f, Lng %.4f, Severity: %s", 
-                report_dict["id"], report.latitude, report.longitude, report.severity)
+    logger.info("🚨 New Citizen SOS Report #%d: Lat %.4f, Lng %.4f, Severity: %s (Persisted to SQLite)", 
+                row_id, report.latitude, report.longitude, report.severity)
 
     return ReportResponse(
         status="success",
         message="SOS report received and dispatched to emergency controllers.",
-        report_id=report_dict["id"]
+        report_id=row_id
     )
 
 
 @app.get("/api/reports", response_model=list[Dict[str, Any]], tags=["Citizen SOS"])
 def get_all_reports() -> list[Dict[str, Any]]:
     """
-    Returns the list of active crowdsourced flood reports as a JSON array
+    Returns the list of active crowdsourced flood reports from SQLite
     for frontend map rendering and spatial telemetry.
     """
-    return active_sos_reports
+    return get_all_sos_reports()
 
 
 # =============================================================================

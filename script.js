@@ -1533,7 +1533,114 @@ document.addEventListener('DOMContentLoaded', () => {
 window.showEvacuationCard = showEvacuationCard;
 window.hideEvacuationCard = hideEvacuationCard;
 
+// =========================================================================
+// BACKEND HEALTH STATUS MONITOR & JUDGE DEMO SIMULATOR (E2E INTEGRATION)
+// =========================================================================
+(function initBackendIntegration() {
+  async function pollBackendHealth() {
+    const pill = document.getElementById('backendStatusPill');
+    const text = document.getElementById('backendStatusText');
+    if (!pill || !text) return;
 
+    try {
+      const res = await fetch('/api/health');
+      if (res.ok) {
+        const data = await res.json();
+        pill.className = 'telemetry-pill backend-status-pill connected';
+        text.textContent = 'API Connected (FastAPI v1.0)';
+        pill.title = `FastAPI Online | Models: ${data.model_loaded ? 'Loaded' : 'Pending'} | Catchments: ${data.total_catchments || 20}`;
+      } else {
+        throw new Error('Health check non-200');
+      }
+    } catch {
+      pill.className = 'telemetry-pill backend-status-pill offline';
+      text.textContent = 'Simulation Mode (Offline)';
+      pill.title = 'FastAPI backend unreachable; running on local Western Ghats simulated dataset.';
+    }
+  }
 
+  // Initial check and periodic poll every 12 seconds
+  setTimeout(pollBackendHealth, 800);
+  setInterval(pollBackendHealth, 12000);
 
+  // Judge Demo Disaster Simulation Trigger
+  function setupDemoTrigger() {
+    const btn = document.getElementById('btnJudgeDemoSimulate');
+    if (!btn) return;
 
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Simulating...</span>';
+
+      try {
+        console.log('[PRAVAH Demo] Initiating SIH Judge Flood Disaster Simulation...');
+
+        // 1. Target Mahad Station (Highest risk catchment in Raigad district)
+        const mahadLat = 18.0833;
+        const mahadLng = 73.4167;
+
+        // 2. Fly 3D Globe camera to Mahad catchment
+        if (window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.flyToStation === 'function') {
+          window.PRAVAH_GLOBE.flyToStation('MH_GAK_17');
+        }
+
+        // 3. Trigger Evacuation Route & Directive Card
+        if (window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.fetchAndRenderEvacuation === 'function') {
+          await window.PRAVAH_GLOBE.fetchAndRenderEvacuation(mahadLat, mahadLng);
+        }
+
+        // 4. Dispatch a simulated Citizen SOS report beacon
+        if (window.PRAVAH_GLOBE && typeof window.PRAVAH_GLOBE.updateCitizenSosRings === 'function') {
+          window.PRAVAH_GLOBE.updateCitizenSosRings([
+            { latitude: mahadLat, longitude: mahadLng, severity: 'above_waist_danger' },
+          ]);
+        }
+
+        // 5. User Feedback Notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 99999;
+          background: rgba(15, 23, 42, 0.95);
+          border: 1px solid #ef4444;
+          box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
+          border-radius: 12px;
+          padding: 12px 24px;
+          color: #ffffff;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.82rem;
+          backdrop-filter: blur(16px);
+          animation: slideUpModal 0.3s ease forwards;
+        `;
+        toast.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.2rem;">🚨</span>
+            <div>
+              <strong style="color: #f87171;">SIH SIMULATION ACTIVATED:</strong>
+              <div>Cloudburst detected at Mahad (92% flood risk). Evacuation flight-path & shelter directive issued!</div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 6000);
+
+      } catch (err) {
+        console.warn('[PRAVAH Demo] Simulation error:', err);
+      } finally {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="demo-bolt-icon">⚡</span><span>Simulate Disaster</span>';
+        }, 3000);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupDemoTrigger);
+  } else {
+    setupDemoTrigger();
+  }
+})();

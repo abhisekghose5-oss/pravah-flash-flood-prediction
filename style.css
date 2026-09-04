@@ -4467,3 +4467,68 @@ body {
 .floating-card:hover {
   animation-play-state: paused;
 }
+
+/* ==========================================================================
+   BACKEND STATUS PILL & DEMO DISASTER TRIGGER BUTTON
+   ========================================================================== */
+
+.backend-status-pill {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: default;
+}
+
+.backend-status-pill.connected {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+}
+
+.backend-status-pill.connected .backend-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.backend-status-pill.offline {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+
+.backend-status-pill.offline .backend-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.btn-demo-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(249, 115, 22, 0.25));
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-demo-trigger:hover {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  border-color: #ffffff;
+  box-shadow: 0 0 26px rgba(239, 68, 68, 0.7), 0 0 10px #ffffff;
+  transform: translateY(-1px) scale(1.02);
+}
+
+.btn-demo-trigger .demo-bolt-icon {
+  font-size: 0.9rem;
+  animation: radarPing 1.8s infinite;
+}
+

@@ -1,4 +1,4 @@
-﻿"""
+"""
 ===============================================================================
 PRAVAH — Standalone Machine Learning Diagnostic & Stress-Testing Script
 ===============================================================================
@@ -14,6 +14,10 @@ import logging
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
+
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import numpy as np
 import pandas as pd
@@ -100,9 +104,9 @@ def generate_synthetic_features(feature_cols: List[str]) -> pd.DataFrame:
         elif "danger_level" in col_lower:
             data[col] = [544.0]
         
-        # Categorical / metadata features
-        elif any(k in col_lower for k in ["station", "river", "basin", "state", "privacy"]):
-            data[col] = ["Karad"] if "station" in col_lower else ["Krishna"] if "river" in col_lower else ["Maharashtra"]
+        # True Categorical Features (Processed via OneHotEncoder)
+        elif any(cat in col_lower for cat in ["koppen", "climate", "land cover", "soil", "lithology"]):
+            data[col] = ["Am"] if ("koppen" in col_lower or "climate" in col_lower) else ["Forest"] if "land" in col_lower else ["Clay"] if "soil" in col_lower else ["Basalt"]
         else:
             data[col] = [1.0]
 

@@ -56,6 +56,12 @@
         <span>Sensor Feed Live</span>
       </div>
 
+      <!-- Live Backend Status Pill -->
+      <div class="telemetry-pill backend-status-pill offline" id="backendStatusPill" title="FastAPI Engine Connection Status">
+        <span class="telemetry-dot backend-dot" id="backendDot"></span>
+        <span id="backendStatusText">Checking API...</span>
+      </div>
+
       <div class="status-counters">
         <div class="counter-tag emergency">
           <span>2 EMERGENCY</span>
@@ -71,6 +77,12 @@
       <div class="header-clock" id="systemClock">
         22:52:00 IST
       </div>
+
+      <!-- Judge Demonstration: Instant Disaster Simulation Trigger -->
+      <button class="btn-demo-trigger magnetic" id="btnJudgeDemoSimulate" title="Simulate Monsoon Cloudburst & Evacuation Route for SIH Judges">
+        <span class="demo-bolt-icon">⚡</span>
+        <span>Simulate Disaster</span>
+      </button>
 
       <button class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

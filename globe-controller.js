@@ -368,13 +368,13 @@
       globeInstance
         .customLayerData(WESTERN_GHATS_STATIONS)
         .customThreeObject((d) => {
-          // Dynamic pillar height based on Flood Probability percentage (Requirement 3)
+          // Dynamic pillar height scaled proportionately (1.8 to 7.5 units)
           const prob = d.flood_prob || 0.2;
-          const height = Math.max(6, prob * 36); // 3D height proportional to flood probability
-          const radius = 1.3;
+          const height = Math.max(1.8, prob * 7.5);
+          const radius = 0.32; // Precision needle radius (scaled down from 1.3 to avoid clutter)
 
           // Hexagonal 3D Column Geometry
-          const geometry = new THREE.CylinderGeometry(radius * 0.75, radius, height, 8);
+          const geometry = new THREE.CylinderGeometry(radius * 0.7, radius, height, 8);
           geometry.translate(0, height / 2, 0); // Base sits exactly on the surface
 
           const isEmergency = d.risk === 'EMERGENCY';
@@ -395,7 +395,7 @@
           const pillar = new THREE.Mesh(geometry, material);
 
           // Top Beacon Cap (glowing sphere beacon at pillar apex)
-          const beaconGeo = new THREE.SphereGeometry(radius * 1.25, 12, 12);
+          const beaconGeo = new THREE.SphereGeometry(radius * 1.3, 10, 10);
           const beaconMat = new THREE.MeshBasicMaterial({
             color: isEmergency ? 0xffffff : colorHex,
             transparent: true,
@@ -406,7 +406,7 @@
           pillar.add(beacon);
 
           // Base footprint telemetry ring
-          const ringGeo = new THREE.RingGeometry(radius * 0.8, radius * 2.2, 16);
+          const ringGeo = new THREE.RingGeometry(radius * 0.8, radius * 2.0, 16);
           ringGeo.rotateX(-Math.PI / 2);
           const ringMat = new THREE.MeshBasicMaterial({
             color: colorHex,
@@ -488,15 +488,15 @@
         .arcStroke(2.0)
         .arcDashLength(0.5)
         .arcDashGap(0.2)
-        .arcDashAnimateTime(1000)
         .labelsData([])
         .labelLat('latitude')
         .labelLng('longitude')
-        .labelText((d) => `🛡️ ${d.name}`)
-        .labelSize(1.2)
-        .labelDotRadius(0.7)
-        .labelColor(() => '#22c55e')
-        .labelAltitude(0.015);
+        .labelText((d) => (d && d.name ? `🛡️ ${d.name.replace(/(Government|Disaster|Emergency|Refuge|Center|Model)\s*/gi, '').trim()}` : ''))
+        .labelSize(0.55)
+        .labelDotRadius(0.28)
+        .labelColor(() => '#4ade80')
+        .labelAltitude(0.08)
+        .labelResolution(6);
 
       // 6. Cinematic Start: Zoomed Out in Space (Requirement 4)
       globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 0);
