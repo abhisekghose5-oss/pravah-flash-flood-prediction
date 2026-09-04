@@ -232,3 +232,117 @@ def get_all_reports() -> list[Dict[str, Any]]:
     return active_sos_reports
 
 
+# =============================================================================
+# Evacuation Safe Zones & Nearest Relief Shelter Telemetry
+# =============================================================================
+import math
+
+RELIEF_CAMPS: List[Dict[str, Any]] = [
+    {
+        "id": 1,
+        "name": "Shivaji Nagar Elevated Disaster Shelter",
+        "latitude": 18.5312,
+        "longitude": 73.8445,
+        "capacity": 650,
+        "type": "Elevated Shelter",
+    },
+    {
+        "id": 2,
+        "name": "Sinhagad Road Government Higher Secondary School",
+        "latitude": 18.4789,
+        "longitude": 73.8192,
+        "capacity": 500,
+        "type": "Government School",
+    },
+    {
+        "id": 3,
+        "name": "Lonavala High Ground Emergency Refuge Center",
+        "latitude": 18.7557,
+        "longitude": 73.4091,
+        "capacity": 1200,
+        "type": "Elevated Shelter",
+    },
+    {
+        "id": 4,
+        "name": "Panchganga Zilla Parishad Model School",
+        "latitude": 18.3842,
+        "longitude": 73.8567,
+        "capacity": 450,
+        "type": "Government School",
+    },
+]
+
+
+def calculate_nearest_camp(lat: float, lng: float) -> tuple[Dict[str, Any], float]:
+    """
+    Computes the shortest great-circle distance between a given GPS coordinate
+    and all registered relief camps using the spherical Haversine formula.
+    """
+    if not RELIEF_CAMPS:
+        raise ValueError("No relief camps are currently registered.")
+
+    earth_radius_km = 6371.0
+    user_lat_rad = math.radians(lat)
+    user_lng_rad = math.radians(lng)
+
+    closest_camp = None
+    min_dist_km = float("inf")
+
+    for camp in RELIEF_CAMPS:
+        camp_lat_rad = math.radians(camp["latitude"])
+        camp_lng_rad = math.radians(camp["longitude"])
+
+        dlat = camp_lat_rad - user_lat_rad
+        dlng = camp_lng_rad - user_lng_rad
+
+        a = (
+            math.sin(dlat / 2.0) ** 2
+            + math.cos(user_lat_rad)
+            * math.cos(camp_lat_rad)
+            * math.sin(dlng / 2.0) ** 2
+        )
+        c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+        dist_km = earth_radius_km * c
+
+        if dist_km < min_dist_km:
+            min_dist_km = dist_km
+            closest_camp = camp
+
+    return closest_camp, round(min_dist_km, 2)
+
+
+@app.get("/api/safe-zones", response_model=List[Dict[str, Any]], tags=["Evacuation"])
+def get_safe_zones() -> List[Dict[str, Any]]:
+    """
+    Retrieve the directory of all operational disaster relief shelters,
+    elevated refuges, and emergency staging schools.
+    """
+    return RELIEF_CAMPS
+
+
+@app.get("/api/evacuation-route", tags=["Evacuation"])
+def get_evacuation_route(
+    lat: float = Query(..., ge=-90.0, le=90.0, description="Current GPS Latitude"),
+    lng: float = Query(..., ge=-180.0, le=180.0, description="Current GPS Longitude"),
+) -> Dict[str, Any]:
+    """
+    Calculates the closest relief camp to the citizen's current GPS location
+    and returns routing telemetry and distance in kilometers.
+    """
+    try:
+        nearest_camp, distance_km = calculate_nearest_camp(lat, lng)
+        return {
+            "status": "success",
+            "user_location": {"latitude": lat, "longitude": lng},
+            "nearest_camp": nearest_camp,
+            "distance_km": distance_km,
+            "estimated_walk_time_mins": int(distance_km * 12),
+        }
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unable to calculate evacuation route: {str(exc)}",
+        )
+
+
+
