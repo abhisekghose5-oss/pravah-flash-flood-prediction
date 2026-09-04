@@ -68,6 +68,36 @@ def get_health() -> HealthResponse:
     )
 
 
+import urllib.request
+from datetime import datetime, timezone
+
+@app.get("/api/health", tags=["System"])
+def get_live_system_health() -> Dict[str, Any]:
+    """
+    Live diagnostic check verifying ML models in memory and Open-Meteo API connectivity.
+    """
+    models_loaded = bool(engine.available_models and len(engine.available_models) > 0)
+
+    data_api_reachable = False
+    try:
+        ping_url = "https://api.open-meteo.com/v1/forecast?latitude=18.5204&longitude=73.8567&daily=precipitation_sum&forecast_days=1"
+        req = urllib.request.Request(ping_url, headers={"User-Agent": "PRAVAH-HealthCheck/2.1"})
+        with urllib.request.urlopen(req, timeout=3.0) as resp:
+            data_api_reachable = (resp.status == 200)
+    except Exception:
+        data_api_reachable = False
+
+    return {
+        "status": "System Online",
+        "model_loaded": models_loaded,
+        "data_api_reachable": data_api_reachable,
+        "available_models": engine.available_models,
+        "total_catchments": len(engine.registered_gauges),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+
 @app.get("/api/v1/catchments", tags=["Geospatial"])
 def get_catchments_geojson() -> Any:
     """
