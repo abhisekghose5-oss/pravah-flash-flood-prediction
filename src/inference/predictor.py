@@ -141,13 +141,13 @@ class PravahInferenceEngine:
         """Load and index static catchment characteristics and station metadata."""
         if CHARACTERISTICS_PATH.exists():
             chars = pd.read_csv(CHARACTERISTICS_PATH)
-            chars = chars.assign(clean_gauge_id=chars["GaugeID"].map(clean_gauge_id))
+            chars = chars.copy().assign(clean_gauge_id=chars["GaugeID"].map(clean_gauge_id))
             self._static_characteristics = chars.set_index("clean_gauge_id")
             logger.info("Loaded static characteristics for %d catchments", len(self._static_characteristics))
 
         if METADATA_PATH.exists():
             meta = pd.read_csv(METADATA_PATH)
-            meta = meta.assign(clean_gauge_id=meta["GaugeID"].map(clean_gauge_id))
+            meta = meta.copy().assign(clean_gauge_id=meta["GaugeID"].map(clean_gauge_id))
             self._station_metadata = meta.set_index("clean_gauge_id")
             logger.info("Loaded station metadata for %d gauges", len(self._station_metadata))
 
