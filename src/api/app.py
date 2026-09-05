@@ -55,6 +55,18 @@ app.add_middleware(
 )
 
 
+@app.get("/", tags=["System"])
+def read_root() -> Dict[str, Any]:
+    """Base root endpoint confirming API status."""
+    return {
+        "status": "online",
+        "message": "Pravah API is running",
+        "docs": "/docs",
+        "health": "/api/health",
+        "version": "1.0.0",
+    }
+
+
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 def get_health() -> HealthResponse:
     """Return system health, loaded models, and registered catchments count."""
