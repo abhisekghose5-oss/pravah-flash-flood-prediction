@@ -9,6 +9,11 @@ from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from src.api.schemas import (
     HealthResponse,
     HistoricalDateResponse,
@@ -26,6 +31,52 @@ CATCHMENTS_GEOJSON = REPO_ROOT / "data" / "processed" / "target_catchments.geojs
 # Instantiate engine singleton
 engine = PravahInferenceEngine()
 
+# In-memory latest weather telemetry cache
+latest_weather_telemetry: Dict[str, Any] = {}
+
+def fetch_weather_data() -> None:
+    """
+    Automated background task fetching live precipitation from Open-Meteo
+    for the Maharashtra Western Ghats catchments every 15 minutes.
+    """
+    try:
+        logger.info("⏳ [Scheduler] Fetching live Open-Meteo precipitation data...")
+        url = "https://api.open-meteo.com/v1/forecast?latitude=17.2944&longitude=74.1903&daily=precipitation_sum&timezone=auto&past_days=10&forecast_days=1"
+        response = requests.get(url, headers={"User-Agent": "PRAVAH-Scheduler/2.0"}, timeout=6)
+        
+        if response.status_code == 200:
+            data = response.json()
+            daily_rain = data.get("daily", {}).get("precipitation_sum", [])
+            latest_weather_telemetry["station_target"] = "Karad (Western Ghats)"
+            latest_weather_telemetry["recent_rainfall_10d"] = daily_rain[-10:] if len(daily_rain) >= 10 else daily_rain
+            latest_weather_telemetry["last_updated_at"] = datetime.now(timezone.utc).isoformat()
+            latest_weather_telemetry["status"] = "success"
+            logger.info("✅ [Scheduler] Weather data updated successfully.")
+        else:
+            logger.warning("⚠️ [Scheduler] Open-Meteo API Error: %d", response.status_code)
+    except Exception as exc:
+        logger.error("❌ [Scheduler] Failed to fetch weather data: %s", exc)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Manage background scheduler and application lifecycle.
+    """
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(fetch_weather_data, "interval", minutes=15, id="open_meteo_poller")
+    scheduler.start()
+    logger.info("⏰ [APScheduler] Live 15-minute background poller started.")
+
+    # Immediate startup fetch so data is available on boot
+    fetch_weather_data()
+
+    yield  # FastAPI application executes here
+
+    scheduler.shutdown()
+    logger.info("🛑 [APScheduler] Background scheduler cleanly shut down.")
+
+
 app = FastAPI(
     title="PRAVAH — Flash-Flood Early Warning API",
     description=(
@@ -34,6 +85,7 @@ app = FastAPI(
         "for the Maharashtra Western Ghats."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Enable Production-Grade CORS for WebGL Dashboard (Port 3000) & APIs
@@ -106,6 +158,17 @@ def get_live_system_health() -> Dict[str, Any]:
         "available_models": engine.available_models,
         "total_catchments": len(engine.registered_gauges),
         "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@app.get("/api/weather/live", tags=["Weather"])
+def get_live_weather_telemetry() -> Dict[str, Any]:
+    """
+    Returns latest automated Open-Meteo telemetry polled by APScheduler background task.
+    """
+    return latest_weather_telemetry or {
+        "status": "initializing",
+        "message": "Scheduler polling initial telemetry.",
     }
 
 
