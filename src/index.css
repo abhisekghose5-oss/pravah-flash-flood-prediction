@@ -1,0 +1,164 @@
+﻿@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-deep: #060a12;
+    --bg-card: rgba(15, 23, 42, 0.85);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --cyan-glow: rgba(6, 182, 212, 0.35);
+    --red-glow: rgba(239, 68, 68, 0.4);
+  }
+
+  body {
+    background-color: #060a12;
+    color: #f1f5f9;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    selection-background-color: #06b6d4;
+    selection-color: #ffffff;
+  }
+
+  select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 8px;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.8);
+    cursor: pointer;
+  }
+}
+
+/* Custom Sleek Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.7);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.7);
+}
+
+/* Custom Range Sliders */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #1e293b;
+  border-radius: 9999px;
+  outline: none;
+  height: 6px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #22d3ee;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+  border: 2px solid #0f172a;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 1);
+}
+
+/* Leaflet Dark Custom Theme */
+.leaflet-container {
+  background: #060a12 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  color: #38bdf8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.2s ease !important;
+}
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+/* Leaflet Dark Tooltips */
+.leaflet-dark-tooltip {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  color: #f8fafc !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  padding: 8px 12px !important;
+  backdrop-filter: blur(8px);
+}
+.leaflet-dark-tooltip::before {
+  border-top-color: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* Leaflet Dark Popups */
+.pravah-dark-popup .leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(6, 182, 212, 0.15) !important;
+  backdrop-filter: blur(12px);
+  padding: 4px !important;
+}
+.pravah-dark-popup .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+.pravah-dark-popup .leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 8px !important;
+}
+.pravah-dark-popup .leaflet-popup-close-button:hover {
+  color: #ffffff !important;
+}
+
+/* Glowing Neon Elements */
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+}
+.glow-amber {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+}
+.glow-red {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+}
+
+/* Smooth Pulse Animation for Emergency Gauges */
+@keyframes emergency-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+.animate-emergency-pulse {
+  animation: emergency-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}

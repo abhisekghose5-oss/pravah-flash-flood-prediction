@@ -1,17 +1,20 @@
 import os
 import logging
 from typing import Optional
+from dotenv import load_dotenv
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+
+load_dotenv()
 
 logger = logging.getLogger("pravah.alerts")
 
 # -----------------------------------------------------------------------------
-# Twilio Configuration (Set via environment variables or replace placeholders)
+# Twilio Configuration (Loaded securely from .env via python-dotenv)
 # -----------------------------------------------------------------------------
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "YOUR_TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "YOUR_TWILIO_AUTH_TOKEN")
-TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
+TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+17372212163")
 
 
 def trigger_emergency_alert(

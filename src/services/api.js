@@ -340,9 +340,10 @@ const TIER_RECOMMENDATIONS = {
  * Helper to determine risk tier from probability
  */
 export function calculateRiskTier(probability) {
-  if (probability >= 0.85) return 'EMERGENCY';
-  if (probability >= 0.60) return 'WARNING';
-  if (probability >= 0.35) return 'ADVISORY';
+  const p = probability <= 1 ? probability * 100 : probability;
+  if (p > 75) return 'EMERGENCY';
+  if (p >= 50) return 'WARNING';
+  if (p >= 25) return 'ADVISORY';
   return 'NORMAL';
 }
 
@@ -412,53 +413,150 @@ export async function fetchFloodPrediction(params = {}) {
     date = new Date().toISOString().split('T')[0],
     simulation_rainfall,
     rainfall_inputs,
+    rainfall_history_10d,
+    onset_model = 'RandomForest',
+    active_model = 'XGBoost',
     data_source,
   } = params;
-
-  // Simulate network latency (180ms - 300ms) for realistic UX testing
-  await new Promise((resolve) => setTimeout(resolve, 220));
 
   const station = findStation(station_id);
   const targetDate = date || new Date().toISOString().split('T')[0];
   const timestamp = new Date(`${targetDate}T12:00:00Z`).toISOString();
 
-  let day1, day3Cum, day7Cum, probability, tier;
+  // Construct 10-day rainfall sequence
+  let tenDaySeries = [];
+  let day1 = 0;
+  let day3Cum = 0;
+  let day7Cum = 0;
 
-  if (rainfall_inputs) {
-    day1 = Math.max(0, Math.min(1000, Number(rainfall_inputs.day_1) || 0));
-    day3Cum = Math.max(day1, Math.min(1000, Number(rainfall_inputs.day_3_cum) || day1));
-    day7Cum = Math.max(day3Cum, Math.min(1000, Number(rainfall_inputs.day_7_cum) || day3Cum));
-
-    const score = (day1 * 0.45) + (day3Cum * 0.35) + (day7Cum * 0.20);
-    probability = Math.min(0.99, Math.max(0.04, parseFloat((score / 150.0).toFixed(2))));
-    tier = calculateRiskTier(probability);
+  if (Array.isArray(rainfall_history_10d) && rainfall_history_10d.length === 10) {
+    tenDaySeries = rainfall_history_10d.map((v) => Math.max(0, Number(v) || 0));
   } else if (Array.isArray(simulation_rainfall) && simulation_rainfall.length > 0) {
-    const cleanArr = simulation_rainfall.map((v) => Math.max(0, Number(v) || 0));
-    const n = cleanArr.length;
+    const raw = simulation_rainfall.map((v) => Math.max(0, Number(v) || 0));
+    while (raw.length < 10) raw.unshift(0);
+    tenDaySeries = raw.slice(-10);
+  } else if (rainfall_inputs) {
+    const d1 = Math.max(0, Number(rainfall_inputs.day_1) || 0);
+    const d3 = Math.max(d1, Number(rainfall_inputs.day_3_cum) || d1);
+    const d7 = Math.max(d3, Number(rainfall_inputs.day_7_cum) || d3);
+    const d2 = Math.max(0, (d3 - d1) * 0.55);
+    const d3_daily = Math.max(0, d3 - d1 - d2);
+    const rem = Math.max(0, d7 - d3);
+    tenDaySeries = [
+      rem * 0.1,
+      rem * 0.12,
+      rem * 0.15,
+      rem * 0.18,
+      rem * 0.22,
+      rem * 0.23,
+      d3_daily,
+      d2,
+      d1,
+      d1,
+    ].slice(-10).map((v) => parseFloat(v.toFixed(1)));
+  } else {
+    const d1 = station.base_rainfall.day_1;
+    const d3 = station.base_rainfall.day_3_cum;
+    const d7 = station.base_rainfall.day_7_cum;
+    const d2 = Math.max(0, (d3 - d1) * 0.55);
+    const d3_daily = Math.max(0, d3 - d1 - d2);
+    const rem = Math.max(0, d7 - d3);
+    tenDaySeries = [
+      rem * 0.1,
+      rem * 0.12,
+      rem * 0.15,
+      rem * 0.18,
+      rem * 0.22,
+      rem * 0.23,
+      d3_daily,
+      d2,
+      d1,
+      d1,
+    ].slice(-10).map((v) => parseFloat(v.toFixed(1)));
+  }
 
-    day1 = cleanArr[n - 1] || 0;
-    day3Cum = cleanArr.slice(Math.max(0, n - 3)).reduce((a, b) => a + b, 0);
-    day7Cum = cleanArr.slice(Math.max(0, n - 7)).reduce((a, b) => a + b, 0);
+  day1 = tenDaySeries[tenDaySeries.length - 1] || 0;
+  day3Cum = tenDaySeries.slice(-3).reduce((a, b) => a + b, 0);
+  day7Cum = tenDaySeries.slice(-7).reduce((a, b) => a + b, 0);
 
-    // Dynamic probability computation based on Western Ghats catchment thresholds
-    const score = (day1 * 0.45) + (day3Cum * 0.35) + (day7Cum * 0.20);
+  // Attempt live inference via FastAPI backend
+  let liveResult = null;
+  const gaugeId = station.legacy_gauge_id || station.station_id;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const resp = await fetch('/api/v1/predict/live', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gauge_id: String(gaugeId),
+        rainfall_history_10d: tenDaySeries,
+        onset_model: onset_model || 'RandomForest',
+        active_model: active_model || 'XGBoost',
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (resp.ok) {
+      liveResult = await resp.json();
+    }
+  } catch {
+    // Graceful fallback to calibrated local calculations
+  }
+
+  let probability, tier, taskA, taskB, recommendation, alertTitle;
+
+  if (liveResult && liveResult.status === 'success') {
+    taskA = {
+      model_used: liveResult.task_a_onset?.model_used || onset_model,
+      probability: liveResult.task_a_onset?.probability ?? 0.15,
+      threshold: liveResult.task_a_onset?.threshold ?? 0.2935,
+      is_flood_onset_predicted: liveResult.task_a_onset?.is_flood_onset_predicted ?? false,
+    };
+    taskB = {
+      model_used: liveResult.task_b_active?.model_used || active_model,
+      probability: liveResult.task_b_active?.probability ?? 0.15,
+      threshold: liveResult.task_b_active?.threshold ?? 0.35,
+      is_active_flood_predicted: liveResult.task_b_active?.is_active_flood_predicted ?? false,
+    };
+    tier = liveResult.alert_tier?.tier || calculateRiskTier(taskA.probability);
+    probability = Math.max(taskA.probability, taskB.probability);
+    recommendation =
+      liveResult.alert_tier?.recommendation ||
+      TIER_RECOMMENDATIONS[tier]?.recommendation;
+    alertTitle = `${tier}: Action Protocol — ${station.name} Station`;
+  } else {
+    // Local calibrated simulation
+    const score = day1 * 0.45 + day3Cum * 0.35 + day7Cum * 0.2;
     probability = Math.min(0.99, Math.max(0.04, parseFloat((score / 150.0).toFixed(2))));
     tier = calculateRiskTier(probability);
-  } else {
-    day1 = station.base_rainfall.day_1;
-    day3Cum = station.base_rainfall.day_3_cum;
-    day7Cum = station.base_rainfall.day_7_cum;
-    probability = station.default_probability;
-    tier = station.default_tier;
+
+    taskA = {
+      model_used: `task_a_onset_${onset_model}`,
+      probability: probability,
+      threshold: 0.2935,
+      is_flood_onset_predicted: probability >= 0.2935,
+    };
+    taskB = {
+      model_used: `task_b_active_${active_model}`,
+      probability: Math.min(0.99, Math.max(0.03, parseFloat((probability * 0.95).toFixed(2)))),
+      threshold: 0.35,
+      is_active_flood_predicted: probability >= 0.35,
+    };
+    const alertTemplate = TIER_RECOMMENDATIONS[tier] || TIER_RECOMMENDATIONS.NORMAL;
+    recommendation = alertTemplate.recommendation;
+    alertTitle = `${alertTemplate.title} — ${station.name} Station`;
   }
 
   const series = generateRainfallSeries(targetDate, day1, day3Cum, day7Cum);
-  const alertTemplate = TIER_RECOMMENDATIONS[tier];
 
   let resolvedDataSource = data_source;
   if (!resolvedDataSource) {
-    if (rainfall_inputs) resolvedDataSource = 'Synthetic Simulation (Manual Override)';
-    else if (Array.isArray(simulation_rainfall)) resolvedDataSource = 'Interactive Simulation Sandbox';
+    if (liveResult) resolvedDataSource = `FastAPI ML Inference (${onset_model} + ${active_model})`;
+    else if (rainfall_inputs) resolvedDataSource = 'Synthetic Simulation (Manual Override)';
+    else if (Array.isArray(simulation_rainfall) || Array.isArray(rainfall_history_10d))
+      resolvedDataSource = '10-Day Scenario Simulator';
     else resolvedDataSource = 'Open-Meteo Live API';
   }
 
@@ -474,14 +572,17 @@ export async function fetchFloodPrediction(params = {}) {
       day_3_cum: parseFloat(day3Cum.toFixed(1)),
       day_7_cum: parseFloat(day7Cum.toFixed(1)),
       series,
+      series_10d: tenDaySeries,
     },
     prediction: {
       probability,
       risk_tier: tier,
     },
+    task_a_onset: taskA,
+    task_b_active: taskB,
     alert: {
-      title: `${alertTemplate.title} — ${station.name} Station`,
-      recommendation: alertTemplate.recommendation,
+      title: alertTitle,
+      recommendation,
       issued_at: timestamp,
     },
   };

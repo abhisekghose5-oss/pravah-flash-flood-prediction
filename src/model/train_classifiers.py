@@ -7,9 +7,15 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    HAS_MATPLOTLIB = True
+except ImportError:
+    matplotlib = None
+    plt = None
+    HAS_MATPLOTLIB = False
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -236,14 +242,15 @@ def save_feature_importance(model: Pipeline, preprocessor: ColumnTransformer, mo
     out_path = OUTPUT_DIR / f"feature_importance_{task_name}_{model_name}.csv"
     top15.to_csv(out_path, index=False)
 
-    plt.figure(figsize=(10, 8))
-    plt.barh(top15["feature"].tolist()[::-1], top15["importance"].tolist()[::-1], color="steelblue")
-    plt.gca().invert_yaxis()
-    plt.title(f"Top 15 Feature Importances: {task_name} - {model_name}")
-    plt.xlabel("Importance")
-    plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / f"feature_importance_{task_name}_{model_name}.png", dpi=200)
-    plt.close()
+    if HAS_MATPLOTLIB and plt is not None:
+        plt.figure(figsize=(10, 8))
+        plt.barh(top15["feature"].tolist()[::-1], top15["importance"].tolist()[::-1], color="steelblue")
+        plt.gca().invert_yaxis()
+        plt.title(f"Top 15 Feature Importances: {task_name} - {model_name}")
+        plt.xlabel("Importance")
+        plt.tight_layout()
+        plt.savefig(OUTPUT_DIR / f"feature_importance_{task_name}_{model_name}.png", dpi=200)
+        plt.close()
     return top15
 
 

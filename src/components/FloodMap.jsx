@@ -175,14 +175,50 @@ export default function FloodMap({
   const tileLayerRef = useRef(null);
   const markersLayerRef = useRef(null);
   const radiiLayerRef = useRef(null);
+  const catchmentsLayerRef = useRef(null);
 
   // Component UI State
   const [activeTileKey, setActiveTileKey] = useState('cartoDark');
   const [showHazardRadii, setShowHazardRadii] = useState(true);
+  const [showCatchmentBoundaries, setShowCatchmentBoundaries] = useState(true);
+  const [catchmentsGeoJson, setCatchmentsGeoJson] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isTileMenuOpen, setIsTileMenuOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Automated background weather telemetry from FastAPI
+  const [weather, setWeather] = useState({ rainfall: null, status: 'simulating' });
+
+  useEffect(() => {
+    const fetchLiveWeather = async () => {
+      try {
+        const response = await fetch('/api/weather/latest');
+        if (response.ok) {
+          const data = await response.json();
+          setWeather(data);
+        }
+      } catch (err) {
+        console.error('FloodMap disconnected from backend weather:', err);
+        setWeather((prev) => ({ ...prev, status: 'simulating' }));
+      }
+    };
+
+    fetchLiveWeather();
+    const interval = setInterval(fetchLiveWeather, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch 20 Target Catchment GeoJSON boundaries
+  useEffect(() => {
+    fetch('/api/v1/catchments')
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error('Catchments GeoJSON HTTP error');
+      })
+      .then((data) => setCatchmentsGeoJson(data))
+      .catch((err) => console.warn('Could not load catchments GeoJSON:', err));
+  }, []);
 
   // Track station risk counts for legend
   const tierCounts = useMemo(() => {
@@ -237,11 +273,13 @@ export default function FloodMap({
         }).addTo(map);
 
         // Feature Layers
+        const catchmentsGroup = L.layerGroup().addTo(map);
         const radiiGroup = L.layerGroup().addTo(map);
         const markersGroup = L.layerGroup().addTo(map);
 
         mapInstanceRef.current = map;
         tileLayerRef.current = tileLayer;
+        catchmentsLayerRef.current = catchmentsGroup;
         radiiLayerRef.current = radiiGroup;
         markersLayerRef.current = markersGroup;
 
@@ -281,6 +319,82 @@ export default function FloodMap({
       maxZoom: tileConfig.maxZoom || 19,
     }).addTo(map);
   }, [activeTileKey]);
+
+  // 2B. Render Catchment GeoJSON Boundaries with Alert Tier Colors
+  useEffect(() => {
+    if (
+      !mapInstanceRef.current ||
+      !catchmentsLayerRef.current ||
+      typeof window === 'undefined' ||
+      !window.L
+    ) {
+      return;
+    }
+
+    const L = window.L;
+    const layerGroup = catchmentsLayerRef.current;
+    layerGroup.clearLayers();
+
+    if (!showCatchmentBoundaries || !catchmentsGeoJson) return;
+
+    try {
+      const geoLayer = L.geoJSON(catchmentsGeoJson, {
+        style: (feature) => {
+          const gid = String(feature?.properties?.GaugeID || feature?.properties?.gauge_id || '');
+          const st = stations.find(
+            (s) =>
+              s.station_id === gid ||
+              s.station_id?.endsWith(gid) ||
+              gid.endsWith(s.station_id?.split('_').pop())
+          );
+          const isSelected = st?.station_id === selectedStationId || gid === selectedStationId;
+          const prob = st?.probability ?? st?.default_probability ?? 0.2;
+          const risk = getRiskLevelInfo(prob);
+
+          return {
+            fillColor: risk.color,
+            fillOpacity: isSelected ? 0.55 : 0.25,
+            color: isSelected ? '#38bdf8' : risk.border || '#1e293b',
+            weight: isSelected ? 3.5 : 1.5,
+            dashArray: isSelected ? '5, 5' : null,
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const props = feature.properties || {};
+          const gid = String(props.GaugeID || props.gauge_id || '');
+          const st = stations.find(
+            (s) =>
+              s.station_id === gid ||
+              s.station_id?.endsWith(gid) ||
+              gid.endsWith(s.station_id?.split('_').pop())
+          );
+          const name = st?.name || props.station_name || `Catchment ${gid}`;
+          const river = st?.river || props.river || 'River Basin';
+          const danger = st?.danger_level_m || props.danger_level_m;
+
+          layer.bindTooltip(
+            `<div class="font-sans text-xs">
+              <strong class="text-white block">${name}</strong>
+              <span class="text-slate-300 block">River: ${river}</span>
+              ${danger ? `<span class="text-amber-300 block font-mono">Danger Level: ${danger} m</span>` : ''}
+              <span class="text-cyan-400 block text-[10px] mt-0.5">Click to inspect catchment</span>
+            </div>`,
+            { className: 'leaflet-dark-tooltip', sticky: true }
+          );
+
+          layer.on('click', () => {
+            if (st && onSelectStation) {
+              onSelectStation(st.station_id);
+            }
+          });
+        },
+      });
+
+      layerGroup.addLayer(geoLayer);
+    } catch (err) {
+      console.warn('Failed to render catchment polygons on map:', err);
+    }
+  }, [catchmentsGeoJson, showCatchmentBoundaries, selectedStationId, stations, onSelectStation]);
 
   // 3. Render Stations Markers & Circular Hazard Radii
   useEffect(() => {
@@ -466,18 +580,52 @@ export default function FloodMap({
     >
       {/* 1. Top Controls Overlay */}
       <div className="absolute top-3 left-3 right-3 z-[400] flex items-center justify-between pointer-events-none gap-2">
-        {/* Region & Telemetry Info Pill */}
-        <div className="pointer-events-auto bg-slate-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-medium text-slate-200 shadow-lg flex items-center gap-2">
-          <Compass className="w-4 h-4 text-cyan-400" />
-          <span className="hidden sm:inline">Maharashtra Western Ghats</span>
-          <span className="text-slate-500 hidden sm:inline">•</span>
-          <span className="text-cyan-300 font-mono text-[11px] font-bold">
-            {stations.length} Gauges Active
-          </span>
+        {/* Region & Live Weather Telemetry Badges */}
+        <div className="flex items-center gap-2">
+          <div className="pointer-events-auto bg-slate-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-medium text-slate-200 shadow-lg flex items-center gap-2">
+            <Compass className="w-4 h-4 text-cyan-400" />
+            <span className="hidden sm:inline">Maharashtra Western Ghats</span>
+            <span className="text-slate-500 hidden sm:inline">•</span>
+            <span className="text-cyan-300 font-mono text-[11px] font-bold">
+              {stations.length} Gauges Active
+            </span>
+          </div>
+
+          {/* Dynamic Weather & Scheduler Status Badge */}
+          <div className="pointer-events-auto bg-slate-950/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-slate-800 text-xs font-medium shadow-lg flex items-center gap-2">
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                weather.status === 'live'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                  : 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${weather.status === 'live' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+              {weather.status === 'live' ? 'LIVE DATA' : 'SIMULATING'}
+            </span>
+            <span className="text-slate-300 font-mono text-[11px]">
+              {weather.rainfall !== null ? `${weather.rainfall} mm/hr` : 'Syncing rain...'}
+            </span>
+          </div>
         </div>
 
         {/* Action Controls & Tile Switcher */}
         <div className="pointer-events-auto flex items-center space-x-1.5 bg-slate-950/90 backdrop-blur-md p-1 rounded-xl border border-slate-800 shadow-lg">
+          {/* Toggle Catchment Boundaries Overlay */}
+          <button
+            type="button"
+            onClick={() => setShowCatchmentBoundaries((prev) => !prev)}
+            title={showCatchmentBoundaries ? 'Hide Catchment Boundaries' : 'Show Catchment Boundaries'}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+              showCatchmentBoundaries
+                ? 'bg-cyan-600/30 text-cyan-300 border border-cyan-500/40'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Boundaries</span>
+          </button>
+
           {/* Toggle Hazard Radii Overlay */}
           <button
             type="button"

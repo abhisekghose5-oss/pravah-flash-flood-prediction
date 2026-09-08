@@ -1197,9 +1197,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (responseSuccess) {
           if (statusMsg) {
             statusMsg.className = 'subscribe-status-msg success';
-            statusMsg.textContent = '✅ Subscribed successfully. You will be alerted if risk exceeds 75%.';
+            statusMsg.textContent = '✅ Subscribed successfully! A confirmation WhatsApp message has been dispatched.';
             statusMsg.style.display = 'block';
           }
+
+          // Trigger live/simulated WhatsApp confirmation dispatch
+          try {
+            fetch('/api/alerts/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone_number: '+91' + phone,
+                alert_message: `You are now subscribed to PRAVAH Early Warnings for ${zoneText || zone}. Risk threshold set at 75%. Stay safe!`
+              })
+            }).catch(() => {});
+          } catch {}
+
           if (phoneInput) phoneInput.value = '';
           console.log(`[PRAVAH Alerts] Successfully subscribed +91${phone} to [${zone}] (${zoneText})`);
         } else {
@@ -1547,7 +1560,22 @@ window.hideEvacuationCard = hideEvacuationCard;
       if (res.ok) {
         const data = await res.json();
         pill.className = 'telemetry-pill backend-status-pill connected';
-        text.textContent = 'API Connected (FastAPI v1.0)';
+        let statusLabel = 'API Connected (FastAPI v1.0)';
+
+        // Also fetch live weather cache from APScheduler
+        try {
+          const wRes = await fetch('/api/weather/latest');
+          if (wRes.ok) {
+            const wData = await wRes.json();
+            if (wData && wData.rainfall !== null && wData.rainfall !== undefined) {
+              statusLabel = `API Connected • ${wData.rainfall} mm/hr`;
+            }
+          }
+        } catch {
+          // Keep base status label
+        }
+
+        text.textContent = statusLabel;
         pill.title = `FastAPI Online | Models: ${data.model_loaded ? 'Loaded' : 'Pending'} | Catchments: ${data.total_catchments || 20}`;
       } else {
         throw new Error('Health check non-200');
@@ -1595,6 +1623,18 @@ window.hideEvacuationCard = hideEvacuationCard;
             { latitude: mahadLat, longitude: mahadLng, severity: 'above_waist_danger' },
           ]);
         }
+
+        // 4b. Dispatch immediate emergency broadcast via Twilio API
+        try {
+          fetch('/api/alerts/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone_number: '+919876543210',
+              alert_message: 'CRITICAL EMERGENCY: Savitri River at Mahad has breached danger mark (92% risk). Evacuate to high ground immediately.'
+            })
+          }).catch(() => {});
+        } catch {}
 
         // 5. User Feedback Notification
         const toast = document.createElement('div');

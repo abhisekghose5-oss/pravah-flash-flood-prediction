@@ -81,6 +81,10 @@ export default function App() {
   // Provenance & Offline Resilience
   const [lastFetched, setLastFetched] = useState(() => new Date().toISOString());
   const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [selectedModels, setSelectedModels] = useState({
+    onset: 'RandomForest',
+    active: 'XGBoost',
+  });
 
   // Filter & Mobile Navigation
   const [searchQuery, setSearchQuery] = useState('');
@@ -147,11 +151,18 @@ export default function App() {
       const stationId = options.stationId || selectedStationId;
       const targetDate = options.date || selectedDate;
       const mode = options.mode || activeMode;
+      const onset = options.onsetModel || selectedModels.onset;
+      const active = options.activeModel || selectedModels.active;
+      if (options.onsetModel || options.activeModel) {
+        setSelectedModels({ onset, active });
+      }
+
       const targetStation =
         WESTERN_GHATS_STATIONS.find((s) => s.station_id === stationId) ||
         WESTERN_GHATS_STATIONS[0];
 
       let inputs = options.rainfallInputs;
+      let tenDayHist = options.rainfall_history_10d;
       let provenanceSource =
         mode === 'live'
           ? 'Open-Meteo Live API'
@@ -163,6 +174,7 @@ export default function App() {
           const liveMeteo = await fetchLiveOpenMeteoRainfall(targetStation.lat, targetStation.lng);
           if (liveMeteo?.success && liveMeteo.rainfall) {
             inputs = liveMeteo.rainfall;
+            tenDayHist = liveMeteo.series_10d;
             provenanceSource = 'Open-Meteo Live API';
             setIsOfflineMode(false);
           } else {
@@ -183,6 +195,9 @@ export default function App() {
           station_id: stationId,
           date: targetDate,
           rainfall_inputs: inputs,
+          rainfall_history_10d: tenDayHist,
+          onset_model: onset,
+          active_model: active,
           data_source: provenanceSource,
         });
         setRiskData(result);

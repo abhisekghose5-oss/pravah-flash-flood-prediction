@@ -52,16 +52,43 @@ export default function ControlPanel({
 }) {
   const isLive = mode === 'live';
 
+  const PRESET_SCENARIOS = {
+    dry: {
+      label: 'Dry Season',
+      series_10d: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+    moderate: {
+      label: 'Moderate Monsoon',
+      series_10d: [10, 15, 20, 30, 25, 40, 45, 35, 25, 35],
+    },
+    heavy: {
+      label: 'Heavy Storm Surge',
+      series_10d: [20, 35, 55, 80, 110, 130, 140, 115, 90, 105],
+    },
+    deluge: {
+      label: 'August 2019 Deluge',
+      series_10d: [45, 85, 130, 190, 250, 280, 260, 210, 180, 220],
+    },
+  };
+
+  // 10-Day Daily Rainfall Sequence (Day T-10 to Day T-1)
+  const [dailyRainfall10d, setDailyRainfall10d] = useState([
+    10, 15, 20, 30, 25, 40, 45, 35, 25, 35,
+  ]);
+  const [simulationView, setSimulationView] = useState('aggregates'); // 'aggregates' | 'daily10'
+
   // Manual Simulation Rainfall Inputs (mm)
   const [rainfallInputs, setRainfallInputs] = useState({
-    day_1: 45,
-    day_3_cum: 125,
-    day_7_cum: 240,
+    day_1: 35,
+    day_3_cum: 95,
+    day_7_cum: 235,
   });
 
   // Validation state
   const [validationError, setValidationError] = useState('');
   const [activePreset, setActivePreset] = useState('moderate');
+  const [onsetModel, setOnsetModel] = useState('RandomForest');
+  const [activeModel, setActiveModel] = useState('XGBoost');
 
   // Find currently selected station record
   const currentStation = useMemo(() => {
@@ -74,11 +101,30 @@ export default function ControlPanel({
   // Synchronize initial simulation inputs when station changes
   useEffect(() => {
     if (currentStation && currentStation.base_rainfall) {
+      const d1 = currentStation.base_rainfall.day_1 || 35;
+      const d3 = currentStation.base_rainfall.day_3_cum || 90;
+      const d7 = currentStation.base_rainfall.day_7_cum || 180;
       setRainfallInputs({
-        day_1: currentStation.base_rainfall.day_1 || 35,
-        day_3_cum: currentStation.base_rainfall.day_3_cum || 90,
-        day_7_cum: currentStation.base_rainfall.day_7_cum || 180,
+        day_1: d1,
+        day_3_cum: d3,
+        day_7_cum: d7,
       });
+      // Distribute into 10-day series
+      const d2 = Math.max(0, (d3 - d1) * 0.55);
+      const d3_daily = Math.max(0, d3 - d1 - d2);
+      const rem = Math.max(0, d7 - d3);
+      setDailyRainfall10d([
+        Math.round(rem * 0.1),
+        Math.round(rem * 0.12),
+        Math.round(rem * 0.15),
+        Math.round(rem * 0.18),
+        Math.round(rem * 0.22),
+        Math.round(rem * 0.23),
+        Math.round(d3_daily),
+        Math.round(d2),
+        Math.round(d1),
+        Math.round(d1),
+      ]);
     }
   }, [currentStation?.station_id]);
 
@@ -104,7 +150,7 @@ export default function ControlPanel({
     return '';
   };
 
-  // Handle manual input change with validation
+  // Handle manual 3-tier input change with validation
   const handleInputChange = (field, rawValue) => {
     const value = Math.max(0, Number(rawValue) || 0);
     const updated = { ...rainfallInputs, [field]: value };
@@ -121,30 +167,46 @@ export default function ControlPanel({
     setRainfallInputs(updated);
     setActivePreset('custom');
     setValidationError(validateInputs(updated));
+
+    // Also update 10-day series ending values
+    setDailyRainfall10d((prev) => {
+      const copy = [...prev];
+      copy[9] = updated.day_1;
+      return copy;
+    });
+  };
+
+  // Handle individual daily change in the 10-day sequence
+  const handleDailyChange = (index, rawValue) => {
+    const val = Math.max(0, Math.min(500, Number(rawValue) || 0));
+    const next10 = [...dailyRainfall10d];
+    next10[index] = val;
+    setDailyRainfall10d(next10);
+    setActivePreset('custom');
+
+    // Recalculate aggregates
+    const d1 = next10[9] || 0;
+    const d3 = next10.slice(-3).reduce((a, b) => a + b, 0);
+    const d7 = next10.slice(-7).reduce((a, b) => a + b, 0);
+    const updatedAggregates = { day_1: d1, day_3_cum: d3, day_7_cum: d7 };
+    setRainfallInputs(updatedAggregates);
+    setValidationError(validateInputs(updatedAggregates));
   };
 
   // Quick Simulation Preset Handler
-  const handleApplyPreset = (preset) => {
-    setActivePreset(preset);
-    let vals;
-    switch (preset) {
-      case 'lull':
-        vals = { day_1: 8, day_3_cum: 22, day_7_cum: 48 };
-        break;
-      case 'moderate':
-        vals = { day_1: 45, day_3_cum: 110, day_7_cum: 195 };
-        break;
-      case 'heavy':
-        vals = { day_1: 85, day_3_cum: 185, day_7_cum: 320 };
-        break;
-      case 'cloudburst':
-        vals = { day_1: 155, day_3_cum: 290, day_7_cum: 480 };
-        break;
-      default:
-        vals = { day_1: 45, day_3_cum: 110, day_7_cum: 195 };
+  const handleApplyPreset = (presetKey) => {
+    setActivePreset(presetKey);
+    const preset = PRESET_SCENARIOS[presetKey];
+    if (preset) {
+      const arr = [...preset.series_10d];
+      setDailyRainfall10d(arr);
+      const d1 = arr[9] || 0;
+      const d3 = arr.slice(-3).reduce((a, b) => a + b, 0);
+      const d7 = arr.slice(-7).reduce((a, b) => a + b, 0);
+      const vals = { day_1: d1, day_3_cum: d3, day_7_cum: d7 };
+      setRainfallInputs(vals);
+      setValidationError(validateInputs(vals));
     }
-    setRainfallInputs(vals);
-    setValidationError(validateInputs(vals));
   };
 
   // Form submission / Primary CTA execution
@@ -165,7 +227,10 @@ export default function ControlPanel({
         stationId: selectedStationId,
         date: selectedDate,
         mode,
+        onsetModel,
+        activeModel,
         rainfallInputs: !isLive ? rainfallInputs : undefined,
+        rainfall_history_10d: !isLive ? dailyRainfall10d : undefined,
       });
     }
   };
@@ -330,6 +395,41 @@ export default function ControlPanel({
         </div>
       </div>
 
+      {/* 3B. Active ML Models Selector */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <span>Task A: Onset Model</span>
+          </label>
+          <select
+            value={onsetModel}
+            onChange={(e) => setOnsetModel(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500 cursor-pointer"
+          >
+            <option value="RandomForest">RandomForest (AUC: 0.86)</option>
+            <option value="XGBoost">XGBoost (AUC: 0.88)</option>
+            <option value="LightGBM">LightGBM (AUC: 0.89)</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <Activity className="w-3 h-3 text-amber-400" />
+            <span>Task B: Active State Model</span>
+          </label>
+          <select
+            value={activeModel}
+            onChange={(e) => setActiveModel(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-700/60 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-500 cursor-pointer"
+          >
+            <option value="XGBoost">XGBoost (AUC: 0.91)</option>
+            <option value="LightGBM">LightGBM (AUC: 0.90)</option>
+            <option value="RandomForest">RandomForest (AUC: 0.87)</option>
+          </select>
+        </div>
+      </div>
+
       {/* 4. Mode-Dependent Settings Section */}
       {isLive ? (
         /* Mode A: Live Weather Status Card */
@@ -361,12 +461,12 @@ export default function ControlPanel({
             </span>
 
             {/* Quick Presets */}
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {[
-                { id: 'lull', label: 'Dry/Lull' },
-                { id: 'moderate', label: 'Moderate' },
-                { id: 'heavy', label: 'Heavy' },
-                { id: 'cloudburst', label: 'Cloudburst' },
+                { id: 'dry', label: 'Dry Season' },
+                { id: 'moderate', label: 'Moderate Monsoon' },
+                { id: 'heavy', label: 'Heavy Storm Surge' },
+                { id: 'deluge', label: 'August 2019 Extreme Deluge' },
               ].map((p) => (
                 <button
                   key={p.id}
@@ -384,83 +484,159 @@ export default function ControlPanel({
             </div>
           </div>
 
-          {/* Rainfall Sliders Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Input 1: 1-Day Rainfall */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-slate-400">1-Day (T-1):</span>
-                <span className="text-cyan-400 font-bold">{rainfallInputs.day_1} mm</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="300"
-                step="1"
-                value={rainfallInputs.day_1}
-                onChange={(e) => handleInputChange('day_1', e.target.value)}
-                className="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1000"
-                value={rainfallInputs.day_1}
-                onChange={(e) => handleInputChange('day_1', e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            {/* Input 2: 3-Day Cumulative */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-slate-400">3-Day Cum:</span>
-                <span className="text-blue-400 font-bold">{rainfallInputs.day_3_cum} mm</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="600"
-                step="2"
-                value={rainfallInputs.day_3_cum}
-                onChange={(e) => handleInputChange('day_3_cum', e.target.value)}
-                className="w-full accent-blue-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1000"
-                value={rainfallInputs.day_3_cum}
-                onChange={(e) => handleInputChange('day_3_cum', e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Input 3: 7-Day Cumulative */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-slate-400">7-Day Cum:</span>
-                <span className="text-indigo-400 font-bold">{rainfallInputs.day_7_cum} mm</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1000"
-                step="5"
-                value={rainfallInputs.day_7_cum}
-                onChange={(e) => handleInputChange('day_7_cum', e.target.value)}
-                className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
-              />
-              <input
-                type="number"
-                min="0"
-                max="1000"
-                value={rainfallInputs.day_7_cum}
-                onChange={(e) => handleInputChange('day_7_cum', e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"
-              />
+          {/* Sub-view switcher: Aggregates vs 10-Day Daily Simulator */}
+          <div className="flex items-center justify-between bg-slate-900/90 p-1 rounded-lg border border-slate-800 text-xs">
+            <span className="text-[11px] font-semibold text-slate-400 px-2">
+              Input Mode:
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setSimulationView('aggregates')}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
+                  simulationView === 'aggregates'
+                    ? 'bg-slate-800 text-cyan-300 border border-slate-700 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                3-Tier Aggregates
+              </button>
+              <button
+                type="button"
+                onClick={() => setSimulationView('daily10')}
+                className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
+                  simulationView === 'daily10'
+                    ? 'bg-slate-800 text-amber-300 border border-slate-700 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                10-Day Daily Simulator
+              </button>
             </div>
           </div>
+
+          {simulationView === 'aggregates' ? (
+            /* Rainfall Sliders Grid: 1-Day, 3-Day, 7-Day */
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Input 1: 1-Day Rainfall */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-slate-400">1-Day (T-1):</span>
+                  <span className="text-cyan-400 font-bold">{rainfallInputs.day_1} mm</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="300"
+                  step="1"
+                  value={rainfallInputs.day_1}
+                  onChange={(e) => handleInputChange('day_1', e.target.value)}
+                  className="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={rainfallInputs.day_1}
+                  onChange={(e) => handleInputChange('day_1', e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              {/* Input 2: 3-Day Cumulative */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-slate-400">3-Day Cum:</span>
+                  <span className="text-blue-400 font-bold">{rainfallInputs.day_3_cum} mm</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="600"
+                  step="2"
+                  value={rainfallInputs.day_3_cum}
+                  onChange={(e) => handleInputChange('day_3_cum', e.target.value)}
+                  className="w-full accent-blue-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={rainfallInputs.day_3_cum}
+                  onChange={(e) => handleInputChange('day_3_cum', e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Input 3: 7-Day Cumulative */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-slate-400">7-Day Cum:</span>
+                  <span className="text-indigo-400 font-bold">{rainfallInputs.day_7_cum} mm</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1000"
+                  step="5"
+                  value={rainfallInputs.day_7_cum}
+                  onChange={(e) => handleInputChange('day_7_cum', e.target.value)}
+                  className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={rainfallInputs.day_7_cum}
+                  onChange={(e) => handleInputChange('day_7_cum', e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+            </div>
+          ) : (
+            /* 10-Day Daily Scenario Matrix */
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-[11px] text-slate-400">
+                <span>Daily Rainfall Horizon (P_T-10 ... P_T-1 mm):</span>
+                <span className="font-mono text-amber-300">
+                  10-Day Sum: {dailyRainfall10d.reduce((a, b) => a + b, 0)} mm
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {dailyRainfall10d.map((val, idx) => {
+                  const dayOffset = 10 - idx;
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-slate-900 border border-slate-800 rounded-lg p-2 flex flex-col gap-1"
+                    >
+                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                        <span>T-{dayOffset}</span>
+                        <span className="text-cyan-300 font-bold">{val} mm</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="250"
+                        step="1"
+                        value={val}
+                        onChange={(e) => handleDailyChange(idx, e.target.value)}
+                        className="w-full accent-amber-500 cursor-pointer h-1 bg-slate-800 rounded"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        max="500"
+                        value={val}
+                        onChange={(e) => handleDailyChange(idx, e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded px-1.5 py-0.5 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-amber-500 text-center"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

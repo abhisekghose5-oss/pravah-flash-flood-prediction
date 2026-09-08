@@ -197,7 +197,120 @@ export default function RiskCard({
           {/* Model Provenance Note */}
           <div className="flex items-center gap-1.5 pt-1 text-[11px] text-slate-400 font-mono bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-800">
             <Cpu className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="truncate">{modelProvenance}</span>
+            <span className="truncate">{prediction?.data_source || modelProvenance}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2B. Task A & Task B ML Model Probability Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Task A: 1-Day Ahead Flood Onset Probability */}
+        <div className="bg-slate-950/80 border border-cyan-800/40 rounded-xl p-3.5 flex flex-col justify-between gap-2 shadow-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400" />
+              <span className="text-xs font-bold text-slate-200">
+                Task A: 1-Day-Ahead Onset
+              </span>
+            </div>
+            <span className="text-[10px] font-mono font-bold bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 px-2 py-0.5 rounded">
+              {prediction?.task_a_onset?.model_used?.replace('task_a_onset_', '') || 'RandomForest'}
+            </span>
+          </div>
+
+          <div className="flex items-baseline justify-between mt-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-black font-mono text-cyan-400">
+                {Math.round(
+                  (prediction?.task_a_onset?.probability ?? probability) * 100
+                )}%
+              </span>
+              <span className="text-[11px] text-slate-400">onset risk</span>
+            </div>
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                (prediction?.task_a_onset?.is_flood_onset_predicted ?? probability >= 0.2935)
+                  ? 'bg-red-500/20 text-red-300 border-red-500/50'
+                  : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+              }`}
+            >
+              {(prediction?.task_a_onset?.is_flood_onset_predicted ?? probability >= 0.2935)
+                ? 'Onset Predicted'
+                : 'Low Onset Risk'}
+            </span>
+          </div>
+
+          <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div
+              className={`h-full rounded-full ${
+                (prediction?.task_a_onset?.is_flood_onset_predicted ?? probability >= 0.2935)
+                  ? 'bg-red-500'
+                  : 'bg-cyan-400'
+              }`}
+              style={{
+                width: `${Math.min(
+                  100,
+                  Math.round(
+                    (prediction?.task_a_onset?.probability ?? probability) * 100
+                  )
+                )}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Task B: Active Flood-State Probability */}
+        <div className="bg-slate-950/80 border border-amber-800/40 rounded-xl p-3.5 flex flex-col justify-between gap-2 shadow-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="text-xs font-bold text-slate-200">
+                Task B: Active Flood State
+              </span>
+            </div>
+            <span className="text-[10px] font-mono font-bold bg-amber-950/60 border border-amber-800/60 text-amber-300 px-2 py-0.5 rounded">
+              {prediction?.task_b_active?.model_used?.replace('task_b_active_', '') || 'XGBoost'}
+            </span>
+          </div>
+
+          <div className="flex items-baseline justify-between mt-1">
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-black font-mono text-amber-400">
+                {Math.round(
+                  (prediction?.task_b_active?.probability ?? (probability * 0.95)) * 100
+                )}%
+              </span>
+              <span className="text-[11px] text-slate-400">inundation prob</span>
+            </div>
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                (prediction?.task_b_active?.is_active_flood_predicted ?? probability >= 0.35)
+                  ? 'bg-red-500/20 text-red-300 border-red-500/50'
+                  : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+              }`}
+            >
+              {(prediction?.task_b_active?.is_active_flood_predicted ?? probability >= 0.35)
+                ? 'Active Inundation'
+                : 'Flow Normal'}
+            </span>
+          </div>
+
+          <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+            <div
+              className={`h-full rounded-full ${
+                (prediction?.task_b_active?.is_active_flood_predicted ?? probability >= 0.35)
+                  ? 'bg-red-500'
+                  : 'bg-amber-400'
+              }`}
+              style={{
+                width: `${Math.min(
+                  100,
+                  Math.round(
+                    (prediction?.task_b_active?.probability ?? (probability * 0.95)) * 100
+                  )
+                )}%`,
+              }}
+            />
           </div>
         </div>
       </div>

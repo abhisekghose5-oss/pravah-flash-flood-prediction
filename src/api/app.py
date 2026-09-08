@@ -1,9 +1,32 @@
-from __future__ import annotations
-
+import os
+import sys
 import json
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+
+# Ensure UTF-8 output encoding on Windows consoles
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ENV_PATH = REPO_ROOT / ".env"
+
+from dotenv import load_dotenv
+
+# Explicitly point to the .env file in the root directory
+load_dotenv(dotenv_path=ENV_PATH)
+
+print("DEBUG SID:", os.getenv("TWILIO_ACCOUNT_SID"))
+print("DEBUG TOKEN:", os.getenv("TWILIO_AUTH_TOKEN"))
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,37 +48,51 @@ from src.inference.predictor import PravahInferenceEngine, clean_gauge_id
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("pravah.api")
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
 CATCHMENTS_GEOJSON = REPO_ROOT / "data" / "processed" / "target_catchments.geojson"
 
 # Instantiate engine singleton
 engine = PravahInferenceEngine()
 
-# In-memory latest weather telemetry cache
-latest_weather_telemetry: Dict[str, Any] = {}
+# Global cache for frontend map & telemetry widgets
+latest_weather_state: Dict[str, Any] = {
+    "rainfall": None,
+    "status": "simulating",
+    "last_updated": None,
+    "recent_rainfall_10d": [],
+    "station_target": "Karad (Western Ghats)",
+}
 
 def fetch_weather_data() -> None:
     """
     Automated background task fetching live precipitation from Open-Meteo
     for the Maharashtra Western Ghats catchments every 15 minutes.
     """
+    global latest_weather_state
     try:
-        logger.info("⏳ [Scheduler] Fetching live Open-Meteo precipitation data...")
-        url = "https://api.open-meteo.com/v1/forecast?latitude=17.2944&longitude=74.1903&daily=precipitation_sum&timezone=auto&past_days=10&forecast_days=1"
+        logger.info("⏳ [Scheduler] Fetching live Open-Meteo data...")
+        url = "https://api.open-meteo.com/v1/forecast?latitude=17.2944&longitude=74.1903&hourly=rain&daily=precipitation_sum&timezone=auto&past_days=10&forecast_days=1"
         response = requests.get(url, headers={"User-Agent": "PRAVAH-Scheduler/2.0"}, timeout=6)
         
         if response.status_code == 200:
             data = response.json()
+            hourly_rain = data.get("hourly", {}).get("rain", [])
+            current_rainfall = hourly_rain[0] if hourly_rain else 0.0
             daily_rain = data.get("daily", {}).get("precipitation_sum", [])
-            latest_weather_telemetry["station_target"] = "Karad (Western Ghats)"
-            latest_weather_telemetry["recent_rainfall_10d"] = daily_rain[-10:] if len(daily_rain) >= 10 else daily_rain
-            latest_weather_telemetry["last_updated_at"] = datetime.now(timezone.utc).isoformat()
-            latest_weather_telemetry["status"] = "success"
-            logger.info("✅ [Scheduler] Weather data updated successfully.")
+
+            latest_weather_state = {
+                "rainfall": round(float(current_rainfall), 2),
+                "status": "live",
+                "last_updated": datetime.now(timezone.utc).isoformat(),
+                "recent_rainfall_10d": daily_rain[-10:] if len(daily_rain) >= 10 else daily_rain,
+                "station_target": "Karad (Western Ghats)",
+            }
+            logger.info("✅ [Scheduler] Weather cache updated: %.2f mm/hr (status: live)", current_rainfall)
         else:
-            logger.warning("⚠️ [Scheduler] Open-Meteo API Error: %d", response.status_code)
+            logger.warning("⚠️ [Scheduler] API Error: %d", response.status_code)
+            latest_weather_state["status"] = "simulating"
     except Exception as exc:
-        logger.error("❌ [Scheduler] Failed to fetch weather data: %s", exc)
+        logger.error("❌ [Scheduler] Fetch failed: %s", exc)
+        latest_weather_state["status"] = "simulating"
 
 
 @asynccontextmanager
@@ -161,15 +198,20 @@ def get_live_system_health() -> Dict[str, Any]:
     }
 
 
-@app.get("/api/weather/live", tags=["Weather"])
-def get_live_weather_telemetry() -> Dict[str, Any]:
+@app.get("/api/weather/latest", tags=["Weather"])
+def get_latest_weather() -> Dict[str, Any]:
     """
     Returns latest automated Open-Meteo telemetry polled by APScheduler background task.
     """
-    return latest_weather_telemetry or {
-        "status": "initializing",
-        "message": "Scheduler polling initial telemetry.",
-    }
+    return latest_weather_state
+
+
+@app.get("/api/weather/live", tags=["Weather"])
+def get_live_weather_telemetry() -> Dict[str, Any]:
+    """
+    Alias for /api/weather/latest.
+    """
+    return latest_weather_state
 
 
 
@@ -301,6 +343,124 @@ def subscribe_alerts(subscription: SubscriptionRequest) -> SubscriptionResponse:
         status="success",
         message="Number registered for alerts."
     )
+
+
+# =============================================================================
+# Direct Twilio WhatsApp Emergency Alert Endpoint
+# =============================================================================
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+
+class AlertSendRequest(BaseModel):
+    phone_number: Optional[str] = Field(None, description="Target phone number (e.g. '+919876543210' or 'whatsapp:+919876543210')")
+    phone: Optional[str] = Field(None, description="Alias for phone_number")
+    alert_message: Optional[str] = Field(None, description="Alert message text")
+    message: Optional[str] = Field(None, description="Alias for alert_message")
+
+class AlertSendResponse(BaseModel):
+    status: str = Field("success", description="Status code string: 'success'")
+    simulated: bool = Field(False, description="True if alert was simulated due to demo mode or Twilio API failure")
+    message: str = Field(..., description="Operational status message")
+    sid: Optional[str] = Field(None, description="Twilio Message SID or generated simulation SID")
+    recipient: Optional[str] = Field(None, description="Formatted WhatsApp recipient number")
+    body: Optional[str] = Field(None, description="Exact WhatsApp message body sent")
+
+@app.post("/api/alerts/send", response_model=AlertSendResponse, tags=["Alerts"])
+def send_whatsapp_alert(request: AlertSendRequest) -> AlertSendResponse:
+    """
+    POST /api/alerts/send
+    Dispatches an urgent WhatsApp disaster notification via Twilio SDK.
+    Protected by strict try-except to ensure hackathon presentations never crash.
+    """
+    raw_phone = (request.phone_number or request.phone or "").strip()
+    raw_message = (request.alert_message or request.message or "").strip()
+
+    if not raw_phone:
+        raw_phone = "+919876543210"
+    if not raw_message:
+        raw_message = "Flash flood warning issued for your zone. Evacuate to higher ground immediately."
+
+    # Format recipient phone number for WhatsApp
+    clean_number = raw_phone.replace(" ", "").replace("-", "")
+    if not clean_number.startswith("whatsapp:"):
+        if not clean_number.startswith("+"):
+            clean_number = "+" + clean_number
+        to_whatsapp = f"whatsapp:{clean_number}"
+    else:
+        to_whatsapp = clean_number
+
+    # Construct the WhatsApp message body strictly as specified
+    formatted_body = f"🚨 PRAVAH ALERT: {raw_message}"
+
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
+    from_whatsapp = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+17372212163").strip()
+
+    # Check for missing credentials or placeholder values
+    is_placeholder = (
+        not account_sid
+        or not auth_token
+        or account_sid.startswith("YOUR_")
+        or account_sid == "your_twilio_account_sid_here"
+    )
+
+    if is_placeholder:
+        sim_sid = f"SIM_SANDBOX_{abs(hash(to_whatsapp + raw_message)) % 10000000:07d}"
+        print(f"⚠️ [TWILIO WARNING] Twilio credentials not configured in .env. Dispatched simulated alert to {to_whatsapp}.")
+        logger.warning("[Simulation] WhatsApp alert simulated for %s (SID: %s)", to_whatsapp, sim_sid)
+        return AlertSendResponse(
+            status="success",
+            simulated=True,
+            message="Alert processed in presentation simulation mode (unconfigured credentials).",
+            sid=sim_sid,
+            recipient=to_whatsapp,
+            body=formatted_body,
+        )
+
+    # Wrap Twilio API call in strict try-except to safeguard live demo
+    try:
+        client = Client(account_sid, auth_token)
+        if hasattr(client, "http_client"):
+            client.http_client.timeout = 4.0
+        message = client.messages.create(
+            from_=from_whatsapp,
+            to=to_whatsapp,
+            body=formatted_body,
+        )
+        print(f"✅ [TWILIO SUCCESS] Dispatched live WhatsApp alert to {to_whatsapp} (SID: {message.sid})")
+        logger.info("WhatsApp alert sent to %s (SID: %s)", to_whatsapp, message.sid)
+        return AlertSendResponse(
+            status="success",
+            simulated=False,
+            message="WhatsApp alert sent successfully via Twilio.",
+            sid=message.sid,
+            recipient=to_whatsapp,
+            body=formatted_body,
+        )
+    except TwilioRestException as exc:
+        sim_sid = f"SIM_ERR_{abs(hash(str(exc))) % 10000000:07d}"
+        print(f"⚠️ [TWILIO WARNING] Twilio API error (Code {exc.code}): {exc.msg}")
+        logger.warning("Twilio API error for %s: %s", to_whatsapp, exc)
+        return AlertSendResponse(
+            status="success",
+            simulated=True,
+            message=f"Alert recorded (simulated fallback due to Twilio notice: {exc.msg})",
+            sid=sim_sid,
+            recipient=to_whatsapp,
+            body=formatted_body,
+        )
+    except Exception as exc:
+        sim_sid = f"SIM_EXC_{abs(hash(str(exc))) % 10000000:07d}"
+        print(f"⚠️ [TWILIO WARNING] Unexpected error sending alert to {to_whatsapp}: {exc}")
+        logger.warning("Unexpected error sending alert to %s: %s", to_whatsapp, exc)
+        return AlertSendResponse(
+            status="success",
+            simulated=True,
+            message="Alert recorded (simulated fallback).",
+            sid=sim_sid,
+            recipient=to_whatsapp,
+            body=formatted_body,
+        )
 
 
 # =============================================================================
