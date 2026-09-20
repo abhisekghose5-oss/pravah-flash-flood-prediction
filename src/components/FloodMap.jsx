@@ -110,6 +110,18 @@ export function getRiskLevelInfo(prob) {
   };
 }
 
+const AWAITING_RISK_LEVEL_INFO = {
+  tier: 'AWAITING',
+  label: 'Awaiting prediction',
+  color: '#64748b',
+  border: '#475569',
+  badgeClass: 'bg-slate-500/20 text-slate-400 border-slate-500/40',
+  dotClass: 'bg-slate-500',
+  pulseColor: 'rgba(100, 116, 139, 0.2)',
+  hazardRadiusMeters: 5500,
+  fillOpacity: 0.1,
+};
+
 /**
  * Ensures Leaflet CSS and JS are loaded into the document runtime.
  */
@@ -154,6 +166,8 @@ function loadLeafletAssets() {
  *
  * @param {Object} props
  * @param {Array} [props.stations] Array of station objects (defaults to WESTERN_GHATS_STATIONS)
+ * @param {Object} [props.prediction] Current selected-station prediction shown in the detail panel
+ * @param {Object} [props.predictionCache] Current predictions keyed by station ID
  * @param {string} [props.selectedStationId] Active selected station identifier
  * @param {(stationId: string) => void} [props.onSelectStation] Callback when a station marker is clicked
  * @param {number} [props.centerLat=18.5204] Initial map center latitude (Maharashtra Western Ghats)
@@ -163,6 +177,8 @@ function loadLeafletAssets() {
  */
 export default function FloodMap({
   stations = WESTERN_GHATS_STATIONS,
+  prediction = null,
+  predictionCache = {},
   selectedStationId = 'MH_GAK_12',
   onSelectStation,
   centerLat = 18.5204,
@@ -416,10 +432,11 @@ export default function FloodMap({
     radiiGroup.clearLayers();
 
     stations.forEach((station) => {
-      const prob = station.probability ?? station.default_probability ?? 0.2;
-      const risk = getRiskLevelInfo(prob);
+      const stationPrediction = predictionCache[station.station_id];
+      const prob = stationPrediction?.prediction?.probability;
+      const risk = stationPrediction ? getRiskLevelInfo(prob) : AWAITING_RISK_LEVEL_INFO;
       const isSelected = station.station_id === selectedStationId;
-      const probDisplay = Math.round((prob <= 1 ? prob * 100 : prob));
+      const probDisplay = prob == null ? '—' : Math.round(prob <= 1 ? prob * 100 : prob);
 
       // 3A. Circular Hazard Radius Overlay
       if (showHazardRadii) {
@@ -551,7 +568,7 @@ export default function FloodMap({
 
       marker.addTo(markersGroup);
     });
-  }, [stations, selectedStationId, showHazardRadii, onSelectStation]);
+  }, [stations, predictionCache, selectedStationId, showHazardRadii, onSelectStation]);
 
   // 4. Center map smoothly on selected station
   useEffect(() => {

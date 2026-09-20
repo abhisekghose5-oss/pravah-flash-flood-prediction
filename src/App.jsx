@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -85,6 +85,9 @@ export default function App() {
     onset: 'RandomForest',
     active: 'XGBoost',
   });
+  const [predictionCache, setPredictionCache] = useState({});
+  const predictionCacheRef = useRef(new Map());
+  const predictionInFlightRef = useRef(new Map());
 
   // Filter & Mobile Navigation
   const [searchQuery, setSearchQuery] = useState('');
@@ -131,17 +134,103 @@ export default function App() {
 
   // Synchronized dynamic stations reflecting in-flight simulation on the map
   const dynamicStations = useMemo(() => {
-    return WESTERN_GHATS_STATIONS.map((st) => {
-      if (st.station_id === selectedStationId && riskData) {
-        return {
-          ...st,
-          probability: riskData.prediction.probability,
-          risk_tier: riskData.prediction.risk_tier,
-        };
-      }
-      return st;
-    });
+    return WESTERN_GHATS_STATIONS;
   }, [selectedStationId, riskData]);
+
+  const buildPredictionCacheKey = useCallback(
+    ({ stationId, mode, date, onsetModel, activeModel, rainfallInputs, rainfallHistory }) =>
+      JSON.stringify({
+        stationId,
+        mode,
+        date,
+        onsetModel,
+        activeModel,
+        rainfallInputs: rainfallInputs || null,
+        rainfallHistory: rainfallHistory || null,
+      }),
+    []
+  );
+
+  const getCachedPrediction = useCallback(async (cacheKey, request) => {
+    const cachedPrediction = predictionCacheRef.current.get(cacheKey);
+    if (cachedPrediction) return cachedPrediction;
+
+    const inFlightPrediction = predictionInFlightRef.current.get(cacheKey);
+    if (inFlightPrediction) return inFlightPrediction;
+
+    const predictionPromise = fetchFloodPrediction(request)
+      .then((prediction) => {
+        predictionCacheRef.current.set(cacheKey, prediction);
+        return prediction;
+      })
+      .finally(() => {
+        predictionInFlightRef.current.delete(cacheKey);
+      });
+
+    predictionInFlightRef.current.set(cacheKey, predictionPromise);
+    return predictionPromise;
+  }, []);
+
+  const runStationPredictionBatch = useCallback(
+    async ({ stationIds, mode, date, onsetModel, activeModel, rainfallInputs, rainfallHistory }) => {
+      const predictions = {};
+      let nextStationIndex = 0;
+
+      const processNextStation = async () => {
+        while (nextStationIndex < stationIds.length) {
+          const stationId = stationIds[nextStationIndex++];
+          const station = WESTERN_GHATS_STATIONS.find((item) => item.station_id === stationId);
+          if (!station) continue;
+
+          try {
+            let stationRainfallInputs = rainfallInputs;
+            let stationRainfallHistory = rainfallHistory;
+
+            if (mode === 'live') {
+              const liveMeteo = await fetchLiveOpenMeteoRainfall(station.lat, station.lng);
+              if (!liveMeteo?.success || !liveMeteo.rainfall) continue;
+              stationRainfallInputs = liveMeteo.rainfall;
+              stationRainfallHistory = liveMeteo.series_10d;
+            }
+
+            const cacheKey = buildPredictionCacheKey({
+              stationId,
+              mode,
+              date,
+              onsetModel,
+              activeModel,
+              rainfallInputs: stationRainfallInputs,
+              rainfallHistory: stationRainfallHistory,
+            });
+            const prediction = await getCachedPrediction(cacheKey, {
+              station_id: stationId,
+              date,
+              rainfall_inputs: stationRainfallInputs,
+              rainfall_history_10d: stationRainfallHistory,
+              onset_model: onsetModel,
+              active_model: activeModel,
+              data_source: mode === 'live' ? 'Open-Meteo Live API' : 'Synthetic Simulation (Manual Override)',
+            });
+
+            predictions[stationId] = prediction;
+          } catch (err) {
+            console.warn(`Prediction batch skipped ${stationId}:`, err);
+          }
+        }
+      };
+
+      await Promise.all(
+        Array.from({ length: Math.min(4, stationIds.length) }, () => processNextStation())
+      );
+
+      if (Object.keys(predictions).length > 0) {
+        setPredictionCache((previous) => ({ ...previous, ...predictions }));
+      }
+
+      return predictions;
+    },
+    [buildPredictionCacheKey, getCachedPrediction]
+  );
 
   // 2. Resilient Risk Inference Runner (Offline-Safe)
   const runRiskInference = useCallback(
@@ -191,7 +280,16 @@ export default function App() {
 
       // Execute prediction through API service layer
       try {
-        const result = await fetchFloodPrediction({
+        const selectedCacheKey = buildPredictionCacheKey({
+          stationId,
+          mode,
+          date: targetDate,
+          onsetModel: onset,
+          activeModel: active,
+          rainfallInputs: inputs,
+          rainfallHistory: tenDayHist,
+        });
+        const result = await getCachedPrediction(selectedCacheKey, {
           station_id: stationId,
           date: targetDate,
           rainfall_inputs: inputs,
@@ -201,6 +299,20 @@ export default function App() {
           data_source: provenanceSource,
         });
         setRiskData(result);
+        setPredictionCache((previous) => ({ ...previous, [stationId]: result }));
+        if (options.batch !== false) {
+          await runStationPredictionBatch({
+          stationIds: WESTERN_GHATS_STATIONS.filter((station) => station.station_id !== stationId).map(
+            (station) => station.station_id
+          ),
+          mode,
+          date: targetDate,
+          onsetModel: onset,
+          activeModel: active,
+          rainfallInputs: inputs,
+          rainfallHistory: tenDayHist,
+          });
+        }
         setLastFetched(new Date().toISOString());
       } catch (err) {
         console.error('Inference error encountered, generating resilient fallback prediction:', err);
@@ -234,7 +346,15 @@ export default function App() {
         setIsLoading(false);
       }
     },
-    [selectedStationId, selectedDate, activeMode]
+    [
+      selectedStationId,
+      selectedDate,
+      activeMode,
+      selectedModels,
+      buildPredictionCacheKey,
+      getCachedPrediction,
+      runStationPredictionBatch,
+    ]
   );
 
   // Initial load and station/date sync
@@ -246,7 +366,7 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, [selectedStationId, selectedDate, activeMode]);
+  }, [selectedDate, activeMode]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-white">
@@ -328,7 +448,8 @@ export default function App() {
             selectedStationId={selectedStationId}
             onSelectStation={(id) => {
               setSelectedStationId(id);
-              runRiskInference({ stationId: id });
+              if (predictionCache[id]) setRiskData(predictionCache[id]);
+              else runRiskInference({ stationId: id, batch: false });
               setMobileTab('intelligence');
             }}
             selectedDate={selectedDate}
@@ -389,15 +510,25 @@ export default function App() {
             <div className="overflow-y-auto space-y-2 mt-2.5 pr-1 custom-scrollbar">
               {filteredStations.map((station) => {
                 const isSelected = station.station_id === selectedStationId;
-                const sTier = station.default_tier;
-                const style = TIER_CHIP_STYLES[sTier] || TIER_CHIP_STYLES.NORMAL;
+                const stationPrediction = predictionCache[station.station_id];
+                const currentProbability = stationPrediction?.prediction?.probability;
+                const sTier = currentProbability == null
+                  ? 'AWAITING'
+                  : calculateRiskTier(currentProbability);
+                const style = TIER_CHIP_STYLES[sTier] || {
+                  badge: 'bg-slate-500/15 border-slate-500/50 text-slate-400',
+                  dot: 'bg-slate-500',
+                  ring: 'ring-slate-500/30',
+                  progress: 'bg-slate-500',
+                };
 
                 return (
                   <div
                     key={station.station_id}
                     onClick={() => {
                       setSelectedStationId(station.station_id);
-                      runRiskInference({ stationId: station.station_id });
+                      if (predictionCache[station.station_id]) setRiskData(predictionCache[station.station_id]);
+                      else runRiskInference({ stationId: station.station_id, batch: false });
                       setMobileTab('intelligence');
                     }}
                     role="button"
@@ -405,7 +536,8 @@ export default function App() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         setSelectedStationId(station.station_id);
-                        runRiskInference({ stationId: station.station_id });
+                        if (predictionCache[station.station_id]) setRiskData(predictionCache[station.station_id]);
+                        else runRiskInference({ stationId: station.station_id, batch: false });
                         setMobileTab('intelligence');
                       }
                     }}
@@ -438,7 +570,9 @@ export default function App() {
                         {station.river} • {station.district}
                       </span>
                       <span className="font-mono text-slate-300 font-medium">
-                        {station.base_rainfall.day_1} mm/24h
+                        {stationPrediction?.rainfall?.day_1 != null
+                          ? `${stationPrediction.rainfall.day_1} mm/24h`
+                          : '— mm/24h'}
                       </span>
                     </div>
 
@@ -446,7 +580,11 @@ export default function App() {
                     <div className="mt-2 w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
                       <div
                         className={`h-full rounded-full ${style.progress}`}
-                        style={{ width: `${Math.round(station.default_probability * 100)}%` }}
+                        style={{
+                          width: currentProbability == null
+                            ? '0%'
+                            : `${Math.round(currentProbability <= 1 ? currentProbability * 100 : currentProbability)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -482,10 +620,13 @@ export default function App() {
           <div className="min-h-[440px] lg:min-h-[480px] w-full flex flex-col">
             <FloodMap
               stations={dynamicStations}
+              prediction={riskData}
+              predictionCache={predictionCache}
               selectedStationId={selectedStationId}
               onSelectStation={(id) => {
                 setSelectedStationId(id);
-                runRiskInference({ stationId: id });
+                if (predictionCache[id]) setRiskData(predictionCache[id]);
+                else runRiskInference({ stationId: id, batch: false });
               }}
               centerLat={18.5204}
               centerLng={73.8567}
