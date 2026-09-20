@@ -53,6 +53,16 @@
 
 **PRAVAH** (*Prediction, Risk Analysis, and Vulnerability Assessment in Hydrology*) is an advanced, hybrid early-warning intelligence platform developed for the **Smart India Hackathon (SIH) 2026**. Designed specifically for the topographically complex, landslide-prone, steep-gradient catchments of the **Maharashtra Western Ghats**, PRAVAH continuously monitors **20 high-risk river basins and Central Water Commission (CWC) gauge stations**.
 
+### Northeast India data section
+
+Northeast source data is kept separately under `data/raw/northeast/` and is registered in `data/metadata/northeast/dataset_manifest.json`. Normalize the supplied Assam rainfall and water-level files with:
+
+```bash
+python -m src.data.ingest_northeast
+```
+
+The command writes source-preserving observation tables to `data/processed/northeast/`. These observations are linked to the project data layer, but they are not training-ready until verified flood-event labels, gauge-linked catchment polygons, and static catchment features are added. The existing Maharashtra artifacts and models remain unchanged.
+
 By synergizing **57 years of daily gridded meteorological archives (1964–2020)** from the India Meteorological Department (IMD), **107 physical morphometric, soil, and land-use parameters** from INDOFLOODS, and **real-time Open-Meteo Doppler radar telemetry**, PRAVAH delivers high-precision, sub-catchment flash flood onset forecasts with actionable lead times.
 
 ```text

@@ -1,0 +1,73 @@
+{
+  "region": "Northeast India",
+  "states": [
+    "Arunachal Pradesh",
+    "Assam",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Sikkim",
+    "Tripura"
+  ],
+  "status": "raw_sources_ingested_pending_labels_and_catchments",
+  "source_files": {
+    "rainfall": [
+      "data/raw/northeast/rainfall/rainfall_districtwise_daily_imd.csv",
+      "data/raw/northeast/rainfall/rainfall_statewise_daily_imd.csv",
+      "data/raw/northeast/rainfall/rainfall_manual_daily_assam_as_1991_2020.csv",
+      "data/raw/northeast/rainfall/rainfall_manual_daily_assam_as_2021_2025.csv",
+      "data/raw/northeast/rainfall/rainfall_manual_daily_assam_as_2026_2030.csv"
+    ],
+    "water_level": [
+      "data/raw/northeast/water_level/rwl_tel_hr_assam_999_2021_2025.csv",
+      "data/raw/northeast/water_level/rwl_tel_hr_assam_999_2026_2030.csv"
+    ],
+    "flood_events": [
+      "data/raw/northeast/flood_events/india_flood_inventory_v3/India_Flood_Inventory_v3.csv",
+      "data/raw/northeast/flood_events/india_flood_inventory_v3/District_FloodImpact.csv",
+      "data/raw/northeast/flood_events/india_flood_inventory_v3/District_FloodedArea.csv"
+    ],
+    "external": [
+      "data/raw/northeast/external/11275211.zip",
+      "data/raw/northeast/external/Flood_Hazard_Zonation_Atlas_Assam_1998_2023.pdf"
+    ],
+    "pending_required": [
+      "data/raw/northeast/flood_events/",
+      "data/raw/northeast/catchments/",
+      "data/raw/northeast/static_features/"
+    ]
+  },
+  "normalized_outputs": [
+    "data/processed/northeast/rainfall_observations.csv",
+    "data/processed/northeast/water_level_observations.csv",
+    "data/processed/northeast/station_catalog.csv",
+    "data/processed/northeast/daily_observation_features.csv",
+    "data/processed/northeast/quality_summary.json",
+    "data/processed/northeast/northeast_candidate_catchments.geojson",
+    "data/processed/northeast/northeast_candidate_static_features.csv"
+  ],
+  "missing_for_training": [
+    "verified_gauge_specific_catchment_polygons",
+    "complete_static_catchment_features",
+    "verified_flood_event_labels",
+    "geographically_held_out_test_gauges"
+  ],
+  "flood_event_inventory_limitations": [
+    "India_Flood_Inventory_v3 has no usable latitude or longitude in the supplied file",
+    "The inventory is not linked to Northeast water-level stations",
+    "District impact tables are context data, not station-day prediction labels"
+  ],
+  "external_source_registry": "data/metadata/northeast/external_sources.md",
+  "target_columns": [
+    "target_onset",
+    "target_active"
+  ],
+  "candidate_catchment_source": {
+    "source": "HydroBASINS v1c Asia level 12",
+    "raw_file": "data/raw/northeast/catchments/hybas_as_lev12_v1c.zip",
+    "output": "data/processed/northeast/northeast_candidate_catchments.geojson",
+    "station_matches": 46,
+    "status": "candidate_point_matched_requires_gauge_specific_verification"
+  }
+}

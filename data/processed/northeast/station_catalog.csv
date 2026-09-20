@@ -1,0 +1,47 @@
+StationID,Station,State,District,Latitude,Longitude,first_observation,last_observation,observation_count,observation_types
+AWRMI Office Campus,AWRMI Office Campus,Assam,Kamrup Metropolitan,26.10269444,91.79509722,2013-02-18 08:30:00,2022-10-26 08:30:00,1045,rainfall
+Baghmari Tea State,Baghmari Tea State,Assam,SONITPUR,26.75116111,93.2286,2010-05-08 08:30:00,2023-04-28 08:30:00,1221,rainfall
+Bahari High School,Bahari High School,Assam,BARPETA,26.25377778,91.13723611,2015-03-27 08:30:00,2019-01-30 08:30:00,379,rainfall
+Balbala GP Office Campus,Balbala GP Office Campus,Assam,GOALPARA,26.06944444,90.59777778,2016-03-20 08:30:00,2023-09-27 08:30:00,793,rainfall
+Barnadi GD Site,Barnadi GD Site,Assam,DARRANG,26.38,91.18,2017-01-10 08:30:00,2023-05-28 08:30:00,388,rainfall
+Barpeta  E & D Office,Barpeta  E & D Office,Assam,BARPETA,26.32472222,91.00055556,2015-03-27 08:30:00,2023-07-30 08:30:00,855,rainfall
+Barpeta Road Inv. WR Divn,Barpeta Road Inv. WR Divn ,Assam,BARPETA,26.49222222,90.96777778,2015-03-03 08:30:00,2023-06-30 08:30:00,774,rainfall
+Basbari E&D Colony,Basbari E&D Colony,Assam,Baksa,26.60388889,90.995,2015-03-06 08:30:00,2023-07-29 08:30:00,955,rainfall
+Basugaon ENDQ,Basugaon ENDQ,Assam,Chirang,26.45944444,90.42083333,2014-04-18 08:30:00,2023-09-25 08:30:00,1073,rainfall
+Beki,Beki,Assam,BARPETA,26.49833333,90.91916667,2015-03-27 08:30:00,2023-07-30 08:30:00,941,rainfall
+Bengtal State Dispensary,Bengtal State Dispensary,Assam,Chirang,26.63305556,90.47638889,2015-03-27 08:30:00,2023-07-30 08:30:00,1061,rainfall
+Bessamora,Bessamora,Assam,Majuli,26.88638889,94.2625,2014-01-01 08:00:00,2015-06-05 08:30:00,367,rainfall
+Bhabanipur PHE,Bhabanipur PHE,Assam,BARPETA,26.46527778,91.06888889,2015-03-27 08:30:00,2023-07-30 08:30:00,844,rainfall
+Bijni,Bijni,Assam,Chirang,26.49246389,90.70283333,2015-03-05 08:30:00,2015-08-31 08:30:00,56,rainfall
+Birjhara Tea Garden,Birjhara Tea Garden,Assam,BONGAIGAON,26.46794722,90.58263056,2018-09-02 08:30:00,2018-12-29 08:30:00,29,rainfall
+Boko Circle Office,Boko Circle Office,Assam,KAMRUP,25.97583333,91.23055556,2016-02-21 08:30:00,2023-09-25 08:30:00,983,rainfall
+Chapar PHC,Chapar PHC,Assam,DHUBRI,26.26972222,90.44444444,2014-06-05 08:30:00,2023-09-25 08:30:00,1051,rainfall
+Chief Eng Office Campus,Chief Eng Office Campus,Assam,Kamrup Metropolitan,26.18444444,91.77166667,2015-02-22 08:30:00,2023-09-27 08:30:00,954,rainfall
+Deosri F Vill,Deosri F Vill,Assam,Chirang,26.77976389,90.46309722,2015-03-04 08:30:00,2023-07-30 08:30:00,968,rainfall
+Dhansiri GD Site,Dhansiri GD Site,Assam,GOLAGHAT,26.70305556,93.68722222,2008-01-12 08:30:00,2023-04-30 08:30:00,1193,rainfall
+Dotma R/G Site,Dotma R/G Site,Assam,KOKRAJHAR,26.465625,90.14675556,2015-02-20 08:30:00,2023-09-24 08:30:00,996,rainfall
+Golokganj RG Site,Golokganj RG Site,Assam,DHUBRI,26.10876944,89.83068333,2014-06-05 08:30:00,2023-09-26 08:30:00,1081,rainfall
+Hatisar F. Vill,Hatisar F. Vill,Assam,Chirang,26.84343333,90.494925,2015-03-04 08:30:00,2022-12-27 08:30:00,963,rainfall
+Irrg. Divn Off. Bongaigaon,Irrg. Divn Off. Bongaigaon,Assam,BONGAIGAON,26.48756667,90.54334722,2017-02-21 08:30:00,2023-12-14 08:30:00,789,rainfall
+Kachugaon,Kachugaon,Assam,KOKRAJHAR,26.57998889,91.06064167,2015-02-20 08:30:00,2023-09-26 08:30:00,1012,rainfall
+Khagrabari,Khagrabari,Assam,BONGAIGAON,26.55531667,90.56510833,2015-01-10 08:30:00,2016-12-03 08:30:00,188,rainfall
+Kokilamukh,Kokilamukh,Assam,JORHAT,26.82111111,94.16611111,2004-01-13 08:30:00,2023-06-29 08:30:00,2170,rainfall
+Kokrajhar Circuit House,Kokrajhar Circuit House,Assam,KOKRAJHAR,26.40048056,90.25979444,2015-02-22 08:30:00,2023-09-27 08:30:00,970,rainfall
+Kulsi Forest Office,Kulsi Forest Office,Assam,KAMRUP,25.96760833,91.42063889,2015-02-22 08:30:00,2023-09-25 08:30:00,988,rainfall
+Manikpur DFO Compound,Manikpur DFO Compound,Assam,BONGAIGAON,26.47232222,90.80025,2015-03-05 08:30:00,2023-12-14 08:30:00,1073,rainfall
+Mathanguri,Mathanguri,Assam,Baksa,26.78089722,90.95995278,2017-02-21 08:30:00,2023-07-29 08:30:00,737,rainfall
+NH15 Crossing Dhansirighat,NH15 Crossing Dhansirighat,Assam,Udalguri,26.69583333,92.25777778,2022-02-26 17:00:00,2025-06-28 03:00:00,16498,water_level
+NH15 Crossing Fakirpara Tangni,NH15 Crossing Fakirpara Tangni,Assam,DARRANG,26.50833333,92.11638889,2022-01-01 20:00:00,2026-09-18 23:00:00,37182,water_level
+NH17 Crossing Boko,NH17 Crossing Boko,Assam,Kamrup Metropolitan,25.9775,91.23416667,2022-02-25 18:00:00,2025-05-07 09:30:00,25254,water_level
+Nalbari Office Campus,Nalbari Office Campus,Assam,NALBARI,26.18437778,91.77171111,2015-02-15 08:30:00,2023-09-22 08:30:00,912,rainfall
+Panbari R/G Site,Panbari R/G Site,Assam,BONGAIGAON,26.59611111,90.83,2015-03-28 08:30:00,2023-07-31 08:30:00,855,rainfall
+Pandu R/G Site,Pandu R/G Site,Assam,Kamrup Metropolitan,26.16739444,91.67155556,2015-02-22 08:30:00,2023-09-26 08:30:00,871,rainfall
+Patacharkuchi PWD,Patacharkuchi PWD,Assam,BARPETA,26.50704444,91.23466111,2016-03-04 08:30:00,2023-09-24 08:30:00,833,rainfall
+Rajabari,Rajabari,Assam,JORHAT,26.74111111,94.22444444,2004-01-14 08:30:00,2023-06-29 08:30:00,2018,rainfall
+Roumari State Dispensary,Roumari State Dispensary,Assam,KAMRUP,26.52406389,90.564,2015-03-27 08:30:00,2023-07-30 08:30:00,899,rainfall
+Rupahighat v/d Compound,Rupahighat v/d Compound,Assam,BARPETA,26.66707222,91.10216111,2015-03-27 08:30:00,2023-07-17 08:30:00,849,rainfall
+Sarukhetri High School,Sarukhetri High School,Assam,BARPETA,26.35099167,91.21987222,2016-01-21 08:30:00,2023-09-27 08:30:00,761,rainfall
+Saudatari v/d Compound,Saudatari v/d Compound,Assam,BARPETA,26.58230278,91.09580278,2015-03-27 08:30:00,2023-07-17 08:30:00,866,rainfall
+Silghat,Silghat,Assam,NAGAON,26.59722222,92.92472222,2001-01-12 08:30:00,2023-06-30 08:30:00,1617,rainfall
+Srijongram,Srijongram,Assam,BONGAIGAON,26.38948889,90.72836389,2014-03-25 08:30:00,2023-10-15 08:30:00,911,rainfall
+Ukiam,Ukiam,Assam,KAMRUP,25.85020556,91.33743056,2015-02-20 08:30:00,2023-09-30 08:30:00,1000,rainfall

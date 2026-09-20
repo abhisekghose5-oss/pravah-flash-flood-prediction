@@ -1,0 +1,24 @@
+{
+  "region": "Northeast India",
+  "rainfall_observations": 39289,
+  "water_level_observations": 78934,
+  "rainfall_stations": 43,
+  "water_level_stations": 3,
+  "rainfall_missing_values": 0,
+  "water_level_missing_values": 1844,
+  "water_level_duplicate_station_timestamps": 16356,
+  "rainfall_date_range": [
+    "2001-01-12",
+    "2023-12-14"
+  ],
+  "water_level_date_range": [
+    "2022-01-01",
+    "2026-09-18"
+  ],
+  "training_blockers": [
+    "verified_flood_event_labels",
+    "gauge_linked_catchment_polygons",
+    "static_catchment_features",
+    "warning_and_danger_levels"
+  ]
+}

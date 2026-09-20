@@ -220,6 +220,10 @@ __marimo__/
 data/raw/imd_rainfall/
 data/processed/master_daily_grid_with_rainfall.csv
 
+# Large Northeast source downloads; keep generated candidate outputs and source registry tracked.
+data/raw/northeast/catchments/hybas_as_lev12_v1c.zip
+data/raw/northeast/catchments/hydrobasins_as_level12/
+
 # Node & Frontend
 node_modules/
 dist/
