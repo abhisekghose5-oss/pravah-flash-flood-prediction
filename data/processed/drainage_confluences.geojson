@@ -1,0 +1,205 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.187,
+          17.2885
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-01",
+        "confluence_name": "Karad Confluence",
+        "primary_river": "Krishna",
+        "tributary_river": "Koyna",
+        "basin": "Krishna",
+        "district": "Satara",
+        "latitude": 17.2885,
+        "longitude": 74.187,
+        "catchment_gauge_id": 684,
+        "confluence_angle_degrees": 68.0,
+        "backwater_hazard_risk": "EXTREME",
+        "historical_flash_flood_events": 18,
+        "notes": "Preeti Sangam; massive reverse swell during simultaneous dam discharges"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.605,
+          16.684
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-02",
+        "confluence_name": "Kurundwad Confluence",
+        "primary_river": "Krishna",
+        "tributary_river": "Panchganga",
+        "basin": "Krishna",
+        "district": "Kolhapur",
+        "latitude": 16.684,
+        "longitude": 74.605,
+        "catchment_gauge_id": 678,
+        "confluence_angle_degrees": 75.0,
+        "backwater_hazard_risk": "EXTREME",
+        "historical_flash_flood_events": 22,
+        "notes": "Narsobawadi confluence; high chronic submergence zone in Kolhapur-Sangli"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.542,
+          16.851
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-03",
+        "confluence_name": "Haripur Sangam",
+        "primary_river": "Krishna",
+        "tributary_river": "Varna",
+        "basin": "Krishna",
+        "district": "Sangli",
+        "latitude": 16.851,
+        "longitude": 74.542,
+        "catchment_gauge_id": 681,
+        "confluence_angle_degrees": 62.0,
+        "backwater_hazard_risk": "HIGH",
+        "historical_flash_flood_events": 15,
+        "notes": "Upstream backwater inundates Sangli city riverfront and agriculture"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.465,
+          18.094
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-04",
+        "confluence_name": "Mahad Sangam",
+        "primary_river": "Savitri",
+        "tributary_river": "Kal",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Raigad",
+        "latitude": 18.094,
+        "longitude": 73.465,
+        "catchment_gauge_id": 602,
+        "confluence_angle_degrees": 82.0,
+        "backwater_hazard_risk": "EXTREME",
+        "historical_flash_flood_events": 12,
+        "notes": "Tidal bottleneck; flash flood waters encounter Arabian Sea high tide"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.861,
+          18.5285
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-05",
+        "confluence_name": "Sangam Bridge Pune",
+        "primary_river": "Mula",
+        "tributary_river": "Mutha",
+        "basin": "Krishna",
+        "district": "Pune",
+        "latitude": 18.5285,
+        "longitude": 73.861,
+        "catchment_gauge_id": 640,
+        "confluence_angle_degrees": 54.0,
+        "backwater_hazard_risk": "HIGH",
+        "historical_flash_flood_events": 9,
+        "notes": "Sangamwadi confluence; backwater swells across central Pune during dam release"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.012,
+          17.915
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-06",
+        "confluence_name": "Sarati Nira Confluence",
+        "primary_river": "Bhima",
+        "tributary_river": "Nira",
+        "basin": "Krishna",
+        "district": "Solapur",
+        "latitude": 17.915,
+        "longitude": 75.012,
+        "catchment_gauge_id": 682,
+        "confluence_angle_degrees": 58.0,
+        "backwater_hazard_risk": "HIGH",
+        "historical_flash_flood_events": 8,
+        "notes": "Convergence of Nira basin runoff and upper Bhima discharge"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.138,
+          19.242
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-07",
+        "confluence_name": "Kalyan Confluence",
+        "primary_river": "Ulhas",
+        "tributary_river": "Waldhuni",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Thane",
+        "latitude": 19.242,
+        "longitude": 73.138,
+        "catchment_gauge_id": 668,
+        "confluence_angle_degrees": 85.0,
+        "backwater_hazard_risk": "HIGH",
+        "historical_flash_flood_events": 11,
+        "notes": "Urban bottleneck in Kalyan-Dombivli belt with high industrial runoff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.142,
+          17.975
+        ]
+      },
+      "properties": {
+        "confluence_id": "CONF-08",
+        "confluence_name": "Narsingpur Confluence",
+        "primary_river": "Bhima",
+        "tributary_river": "Sina",
+        "basin": "Krishna",
+        "district": "Solapur",
+        "latitude": 17.975,
+        "longitude": 75.142,
+        "catchment_gauge_id": 642,
+        "confluence_angle_degrees": 65.0,
+        "backwater_hazard_risk": "MODERATE",
+        "historical_flash_flood_events": 6,
+        "notes": "Major downstream drainage convergence before entering Ujani backwaters"
+      }
+    }
+  ]
+}

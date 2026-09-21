@@ -1,0 +1,304 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7108,
+          19.6014
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-01",
+        "feature_name": "Kalsubai Peak",
+        "feature_type": "Peak",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Ahmednagar",
+        "state": "Maharashtra",
+        "latitude": 19.6014,
+        "longitude": 73.7108,
+        "elevation_m": 1646.0,
+        "slope_risk_tier": "Extreme Steep Slope",
+        "notes": "Highest peak in Maharashtra; severe orographic lifting trigger"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.6586,
+          17.9237
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-02",
+        "feature_name": "Mahabaleshwar Plateau",
+        "feature_type": "Peak / High Tableland",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "latitude": 17.9237,
+        "longitude": 73.6586,
+        "elevation_m": 1438.0,
+        "slope_risk_tier": "High Orographic Catchment",
+        "notes": "Rainfall epicenter (5000+ mm/monsoon); headwaters of Krishna & Koyna"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7786,
+          19.3872
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-03",
+        "feature_name": "Harishchandragad (Konkan Kada)",
+        "feature_type": "Peak / Cliff",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Ahmednagar",
+        "state": "Maharashtra",
+        "latitude": 19.3872,
+        "longitude": 73.7786,
+        "elevation_m": 1422.0,
+        "slope_risk_tier": "Extreme Vertical Escarpment",
+        "notes": "Direct vertical drop into Konkan; triggers hyper-velocity runoff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.6225,
+          18.2764
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-04",
+        "feature_name": "Torna Fort Peak",
+        "feature_type": "Peak",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.2764,
+        "longitude": 73.6225,
+        "elevation_m": 1403.0,
+        "slope_risk_tier": "High Steep Slope",
+        "notes": "Overlooks Velvandi / Gunjawani flash flood corridors"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7558,
+          18.3663
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-05",
+        "feature_name": "Sinhagad Ridge",
+        "feature_type": "Ridge",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.3663,
+        "longitude": 73.7558,
+        "elevation_m": 1312.0,
+        "slope_risk_tier": "High Steep Slope",
+        "notes": "Separates Khadakwasla and Panshet drainage sub-basins"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.4414,
+          18.2356
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-06",
+        "feature_name": "Raigad Fort Mountain",
+        "feature_type": "Peak",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Raigad",
+        "state": "Maharashtra",
+        "latitude": 18.2356,
+        "longitude": 73.4414,
+        "elevation_m": 820.0,
+        "slope_risk_tier": "Very Steep Escarpment",
+        "notes": "Overlooks Mahad flash flood basin and Savitri headwaters"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.2679,
+          18.9865
+        ]
+      },
+      "properties": {
+        "feature_id": "PEAK-07",
+        "feature_name": "Matheran Tableland",
+        "feature_type": "High Tableland",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Raigad",
+        "state": "Maharashtra",
+        "latitude": 18.9865,
+        "longitude": 73.2679,
+        "elevation_m": 800.0,
+        "slope_risk_tier": "Steep Escarpment",
+        "notes": "Drainage source for Ulhas and Patalganga rivers"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.4285,
+          18.4682
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-01",
+        "feature_name": "Tamhini Ghat",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Pune / Raigad",
+        "state": "Maharashtra",
+        "latitude": 18.4682,
+        "longitude": 73.4285,
+        "elevation_m": 620.0,
+        "slope_risk_tier": "High Landslide & Flash Flood Risk",
+        "notes": "Key corridor between Pune and Mangaon/Mahad"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.342,
+          18.775
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-02",
+        "feature_name": "Bhor Ghat (Khandala)",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Pune / Raigad",
+        "state": "Maharashtra",
+        "latitude": 18.775,
+        "longitude": 73.342,
+        "elevation_m": 550.0,
+        "slope_risk_tier": "High Runoff Concentration",
+        "notes": "Connects Deccan plateau to Mumbai-MMR coastal plain"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.578,
+          18.156
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-03",
+        "feature_name": "Varandha Ghat",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Pune / Raigad",
+        "state": "Maharashtra",
+        "latitude": 18.156,
+        "longitude": 73.578,
+        "elevation_m": 680.0,
+        "slope_risk_tier": "Extreme Flash Flood Corridor",
+        "notes": "Traverses high-gradient descent to Mahad / Savitri valley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.805,
+          16.965
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-04",
+        "feature_name": "Amba Ghat",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Kolhapur / Ratnagiri",
+        "state": "Maharashtra",
+        "latitude": 16.965,
+        "longitude": 73.805,
+        "elevation_m": 610.0,
+        "slope_risk_tier": "High Monsoon Torrent Risk",
+        "notes": "Vital link between Kolhapur and coastal Konkan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.689,
+          17.412
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-05",
+        "feature_name": "Kumbharli Ghat",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Satara / Ratnagiri",
+        "state": "Maharashtra",
+        "latitude": 17.412,
+        "longitude": 73.689,
+        "elevation_m": 640.0,
+        "slope_risk_tier": "High Steep Gradient",
+        "notes": "Direct passage from Koynanagar to Chiplun / Vashishti valley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.498,
+          19.689
+        ]
+      },
+      "properties": {
+        "feature_id": "PASS-06",
+        "feature_name": "Kasara Ghat (Thal Ghat)",
+        "feature_type": "Mountain Pass",
+        "mountain_range": "Western Ghats (Sahyadri)",
+        "district": "Thane / Nashik",
+        "state": "Maharashtra",
+        "latitude": 19.689,
+        "longitude": 73.498,
+        "elevation_m": 580.0,
+        "slope_risk_tier": "High Gradient Monsoon Channel",
+        "notes": "North-western passage to upper Godavari catchment"
+      }
+    }
+  ]
+}

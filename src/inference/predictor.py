@@ -20,6 +20,10 @@ METADATA_PATH = PROCESSED_DIR / "target_metadata.csv"
 CATCHMENTS_GEOJSON = PROCESSED_DIR / "target_catchments.geojson"
 MASTER_GRID_PATH = PROCESSED_DIR / "master_daily_grid_splits.parquet"
 METRICS_PATH = PROCESSED_DIR / "model_evaluation_metrics.json"
+SOIL_PATH = PROCESSED_DIR / "soil_hydrology_features.csv"
+RIVER_LEVEL_PATH = PROCESSED_DIR / "river_level_telemetry.csv"
+DAMS_PATH = PROCESSED_DIR / "dams_reservoirs.csv"
+TERRAIN_PATH = PROCESSED_DIR / "mountain_terrain_features.csv"
 
 NE_PROCESSED_DIR = REPO_ROOT / "data" / "processed" / "northeast"
 NE_STATION_CATALOG_PATH = NE_PROCESSED_DIR / "station_catalog.csv"
@@ -140,6 +144,10 @@ class PravahInferenceEngine:
         self._station_metadata: Optional[pd.DataFrame] = None
         self._master_grid: Optional[pd.DataFrame] = None
         self._metrics_summary: Optional[Dict[str, Any]] = None
+        self._soil_data: Optional[pd.DataFrame] = None
+        self._river_level_data: Optional[pd.DataFrame] = None
+        self._dams_data: Optional[pd.DataFrame] = None
+        self._terrain_data: Optional[pd.DataFrame] = None
 
         # Northeast State Containers
         self._ne_station_catalog: Optional[pd.DataFrame] = None
@@ -196,6 +204,25 @@ class PravahInferenceEngine:
                     self._ne_metrics = json.load(fh)
             except Exception as e:
                 logger.warning("Failed to load NE metrics: %s", e)
+        if SOIL_PATH.exists():
+            soil = pd.read_csv(SOIL_PATH)
+            soil = soil.assign(clean_gauge_id=soil["GaugeID"].map(clean_gauge_id))
+            self._soil_data = soil.set_index("clean_gauge_id")
+
+        if RIVER_LEVEL_PATH.exists():
+            rlevel = pd.read_csv(RIVER_LEVEL_PATH)
+            rlevel = rlevel.assign(clean_gauge_id=rlevel["GaugeID"].map(clean_gauge_id))
+            self._river_level_data = rlevel
+
+        if DAMS_PATH.exists():
+            dams = pd.read_csv(DAMS_PATH)
+            dams = dams.assign(clean_gauge_id=dams["downstream_gauge_id"].map(clean_gauge_id))
+            self._dams_data = dams
+
+        if TERRAIN_PATH.exists():
+            terr = pd.read_csv(TERRAIN_PATH)
+            terr = terr.assign(clean_gauge_id=terr["GaugeID"].map(clean_gauge_id))
+            self._terrain_data = terr.set_index("clean_gauge_id")
 
     def _load_models(self) -> None:
         """Load serialized .joblib models and their threshold metadata."""
@@ -464,6 +491,62 @@ class PravahInferenceEngine:
         }
         return res
 
+    def get_hydrological_context(self, gauge_id: Union[str, int]) -> Dict[str, Any]:
+        """Retrieve enriched physical context: soil, river stage, upstream dam, terrain."""
+        gid = clean_gauge_id(gauge_id)
+        ctx: Dict[str, Any] = {}
+
+        if self._soil_data is not None and gid in self._soil_data.index:
+            row = self._soil_data.loc[gid]
+            ctx["soil"] = {
+                "soil_order": str(row.get("soil_order", "")),
+                "soil_texture": str(row.get("soil_texture_class", "")),
+                "ksat_mm_hr": float(row.get("saturated_hydraulic_conductivity_ksat_mm_hr", 0.0)),
+                "hydrologic_group": str(row.get("hydrologic_soil_group", "")),
+                "scs_curve_number": int(row.get("scs_curve_number_cn2", 0)),
+                "available_water_capacity_mm_m": float(row.get("available_water_capacity_awc_mm_m", 0.0)),
+            }
+
+        if self._river_level_data is not None:
+            matches = self._river_level_data[self._river_level_data["clean_gauge_id"] == gid]
+            if not matches.empty:
+                latest = matches.iloc[-1]
+                ctx["river_stage"] = {
+                    "water_level_m": float(latest.get("water_level_m", 0.0)),
+                    "warning_level_m": float(latest.get("warning_level_m", 0.0)),
+                    "danger_level_m": float(latest.get("danger_level_m", 0.0)),
+                    "freeboard_remaining_m": float(latest.get("freeboard_remaining_m", 0.0)),
+                    "stage_status": str(latest.get("stage_status", "NORMAL")),
+                    "discharge_cumecs": float(latest.get("discharge_cumecs", 0.0)),
+                    "rate_of_rise_m_hr": float(latest.get("rate_of_rise_m_hr", 0.0)),
+                }
+
+        if self._dams_data is not None:
+            matches = self._dams_data[self._dams_data["clean_gauge_id"] == gid]
+            if not matches.empty:
+                dam = matches.iloc[0]
+                ctx["upstream_dam"] = {
+                    "dam_name": str(dam.get("dam_name", "")),
+                    "storage_pct": float(dam.get("current_storage_pct", 0.0)),
+                    "spillway_outflow_cumecs": float(dam.get("spillway_outflow_cumecs", 0.0)),
+                    "gate_status": str(dam.get("gate_opening_status", "")),
+                    "distance_km": float(dam.get("distance_to_downstream_gauge_km", 0.0)),
+                    "travel_time_hrs": float(dam.get("emergency_release_travel_time_hrs", 0.0)),
+                }
+
+        if self._terrain_data is not None and gid in self._terrain_data.index:
+            row = self._terrain_data.loc[gid]
+            ctx["terrain"] = {
+                "mean_elevation_m": float(row.get("mean_elevation_m", 0.0)),
+                "catchment_relief_m": float(row.get("catchment_relief_m", 0.0)),
+                "mean_slope_deg": float(row.get("mean_slope_degrees", 0.0)),
+                "steep_slope_area_fraction": float(row.get("steep_slope_area_fraction", 0.0)),
+                "twi": float(row.get("topographic_wetness_index_twi", 0.0)),
+                "dominant_relief_type": str(row.get("dominant_relief_type", "")),
+            }
+
+        return ctx
+
     def predict_live(
         self,
         gauge_id: Union[str, int],
@@ -585,6 +668,7 @@ class PravahInferenceEngine:
                 "rain_7d_max_mm": round(antecedent["rain_7d_max"], 2),
                 "dry_days_in_3d": int(antecedent["rain_dry_days_3d"]),
             },
+            "hydrological_context": self.get_hydrological_context(gid),
         }
 
     def predict_historical_date(

@@ -1,0 +1,25 @@
+id,name,category,district,state,nearby_catchment_gauge_id,latitude,longitude,elevation_amsl_m,capacity_persons,has_medical_facility,has_potable_water,has_emergency_power_backup,has_helipad_access,nodal_officer_contact,accessibility_status
+1,Shivaji Nagar Elevated Disaster Shelter,Elevated Shelter,Pune,Maharashtra,640,18.5312,73.8445,568.0,650,1,1,1,0,+91-20-25501111,HIGH_GROUND_SAFE
+2,Sinhagad Road Government Higher Secondary School,Government School,Pune,Maharashtra,640,18.4789,73.8192,572.0,500,1,1,1,0,+91-20-24330200,HIGH_GROUND_SAFE
+3,Lonavala High Ground Emergency Refuge Center,Elevated Shelter,Pune,Maharashtra,668,18.7557,73.4091,635.0,1200,1,1,1,1,+91-2114-273030,ELEVATED_STAGING
+4,Panchganga Zilla Parishad Model School,Government School,Kolhapur,Maharashtra,643,16.7142,74.2567,554.0,450,1,1,0,0,+91-231-2651234,HIGH_GROUND_SAFE
+5,Karad Government Polytechnic High Ground Base,Government College,Satara,Maharashtra,684,17.2980,74.1950,578.0,850,1,1,1,1,+91-2164-222456,ELEVATED_STAGING
+6,Mahad Tehsil Elevated Multipurpose Cyclone/Flood Shelter,Elevated Shelter,Raigad,Maharashtra,602,18.0985,73.4720,24.0,750,1,1,1,0,+91-2145-222123,HIGH_GROUND_SAFE
+7,Chiplun DBJ College Elevated Campus,Government College,Ratnagiri,Maharashtra,596,17.5280,73.5180,32.0,1100,1,1,1,1,+91-2355-252088,HIGH_GROUND_SAFE
+8,Nagothane Community Health Center Emergency Refuge,Hospital/Refuge,Raigad,Maharashtra,646,18.5280,73.1620,18.0,400,1,1,1,0,+91-2144-232100,HIGH_GROUND_SAFE
+9,Pen High School Ground & Indoor Hall,Government School,Raigad,Maharashtra,648,18.7420,73.1180,22.0,550,1,1,0,0,+91-2143-252200,HIGH_GROUND_SAFE
+10,Badlapur East Zilla Parishad High Ground Refuge,Government School,Thane,Maharashtra,668,19.1680,73.2620,28.0,600,1,1,1,0,+91-251-2690123,HIGH_GROUND_SAFE
+11,Kalyan-Dombivli Municipal Sports Complex,Sports Stadium,Thane,Maharashtra,668,19.2210,73.1340,30.0,1500,1,1,1,1,+91-251-2200100,ELEVATED_STAGING
+12,Satara Chhatrapati Shivaji College Hall,Government College,Satara,Maharashtra,654,17.6890,74.0040,685.0,900,1,1,1,1,+91-2162-234500,HIGH_GROUND_SAFE
+13,Sangli Miraj Government Medical College Ground,Hospital/Medical Campus,Sangli,Maharashtra,681,16.8350,74.6420,558.0,1350,1,1,1,1,+91-233-2232000,ELEVATED_STAGING
+14,Kurundwad Municipal Council High Ground Hall,Civic Hall,Kolhapur,Maharashtra,678,16.6910,74.6120,548.0,480,1,1,0,0,+91-2322-244100,HIGH_GROUND_SAFE
+15,Nashik Golf Club Elevated Relief Staging Base,High-Ground Complex,Nashik,Maharashtra,645,19.9880,73.7740,582.0,1400,1,1,1,1,+91-253-2578500,ELEVATED_STAGING
+16,Kopergaon Shirdi Sai Trust Multi-Hall Shelter,Civic Hall,Ahmednagar,Maharashtra,635,19.8920,74.4750,512.0,1600,1,1,1,1,+91-2423-258500,ELEVATED_STAGING
+17,Daund Railway High School Ground Refuge,Government School,Pune,Maharashtra,640,18.4650,74.5880,518.0,520,1,1,0,0,+91-2117-262100,HIGH_GROUND_SAFE
+18,Solapur District Sports Stadium Elevated Pavilion,Sports Stadium,Solapur,Maharashtra,612,17.6650,75.9120,470.0,1800,1,1,1,1,+91-217-2740300,ELEVATED_STAGING
+19,Indapur Tehsil High Ground Relief Center,Government Refuge,Pune,Maharashtra,642,18.1180,75.0250,520.0,700,1,1,1,0,+91-2111-223100,HIGH_GROUND_SAFE
+20,Koynanagar Earthquake & Disaster Resistant Refuge,Specialized Refuge,Satara,Maharashtra,654,17.4080,73.7590,660.0,650,1,1,1,1,+91-2167-244200,ELEVATED_STAGING
+21,Igatpuri High Altitude Relief Camp,Government School,Nashik,Maharashtra,585,19.6980,73.5650,605.0,750,1,1,1,0,+91-2553-244100,HIGH_GROUND_SAFE
+22,Guwahati Cotton University Elevated Refuge,University Campus,Kamrup Metropolitan,Assam,NE-01,26.1890,91.7520,58.0,2000,1,1,1,1,+91-361-2735100,ELEVATED_STAGING
+23,Dibrugarh DHSK College Safe Evacuation Hall,College Campus,Dibrugarh,Assam,NE-02,27.4820,94.9210,112.0,1200,1,1,1,0,+91-373-2321500,HIGH_GROUND_SAFE
+24,Silchar Assam University Sports Complex Refuge,University Complex,Cachar,Assam,NE-03,24.6850,92.7510,48.0,1500,1,1,1,1,+91-3842-270800,ELEVATED_STAGING

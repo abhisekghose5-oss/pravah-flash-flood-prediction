@@ -1,0 +1,14 @@
+feature_id,feature_name,feature_type,mountain_range,district,state,latitude,longitude,elevation_m,slope_risk_tier,notes
+PEAK-01,Kalsubai Peak,Peak,Western Ghats (Sahyadri),Ahmednagar,Maharashtra,19.6014,73.7108,1646.0,Extreme Steep Slope,Highest peak in Maharashtra; severe orographic lifting trigger
+PEAK-02,Mahabaleshwar Plateau,Peak / High Tableland,Western Ghats (Sahyadri),Satara,Maharashtra,17.9237,73.6586,1438.0,High Orographic Catchment,Rainfall epicenter (5000+ mm/monsoon); headwaters of Krishna & Koyna
+PEAK-03,Harishchandragad (Konkan Kada),Peak / Cliff,Western Ghats (Sahyadri),Ahmednagar,Maharashtra,19.3872,73.7786,1422.0,Extreme Vertical Escarpment,Direct vertical drop into Konkan; triggers hyper-velocity runoff
+PEAK-04,Torna Fort Peak,Peak,Western Ghats (Sahyadri),Pune,Maharashtra,18.2764,73.6225,1403.0,High Steep Slope,Overlooks Velvandi / Gunjawani flash flood corridors
+PEAK-05,Sinhagad Ridge,Ridge,Western Ghats (Sahyadri),Pune,Maharashtra,18.3663,73.7558,1312.0,High Steep Slope,Separates Khadakwasla and Panshet drainage sub-basins
+PEAK-06,Raigad Fort Mountain,Peak,Western Ghats (Sahyadri),Raigad,Maharashtra,18.2356,73.4414,820.0,Very Steep Escarpment,Overlooks Mahad flash flood basin and Savitri headwaters
+PEAK-07,Matheran Tableland,High Tableland,Western Ghats (Sahyadri),Raigad,Maharashtra,18.9865,73.2679,800.0,Steep Escarpment,Drainage source for Ulhas and Patalganga rivers
+PASS-01,Tamhini Ghat,Mountain Pass,Western Ghats (Sahyadri),Pune / Raigad,Maharashtra,18.4682,73.4285,620.0,High Landslide & Flash Flood Risk,Key corridor between Pune and Mangaon/Mahad
+PASS-02,Bhor Ghat (Khandala),Mountain Pass,Western Ghats (Sahyadri),Pune / Raigad,Maharashtra,18.7750,73.3420,550.0,High Runoff Concentration,Connects Deccan plateau to Mumbai-MMR coastal plain
+PASS-03,Varandha Ghat,Mountain Pass,Western Ghats (Sahyadri),Pune / Raigad,Maharashtra,18.1560,73.5780,680.0,Extreme Flash Flood Corridor,Traverses high-gradient descent to Mahad / Savitri valley
+PASS-04,Amba Ghat,Mountain Pass,Western Ghats (Sahyadri),Kolhapur / Ratnagiri,Maharashtra,16.9650,73.8050,610.0,High Monsoon Torrent Risk,Vital link between Kolhapur and coastal Konkan
+PASS-05,Kumbharli Ghat,Mountain Pass,Western Ghats (Sahyadri),Satara / Ratnagiri,Maharashtra,17.4120,73.6890,640.0,High Steep Gradient,Direct passage from Koynanagar to Chiplun / Vashishti valley
+PASS-06,Kasara Ghat (Thal Ghat),Mountain Pass,Western Ghats (Sahyadri),Thane / Nashik,Maharashtra,19.6890,73.4980,580.0,High Gradient Monsoon Channel,North-western passage to upper Godavari catchment

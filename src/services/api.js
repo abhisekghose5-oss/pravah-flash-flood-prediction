@@ -840,3 +840,116 @@ export async function fetchAllStations(date = new Date().toISOString().split('T'
     danger_level_m: s.danger_level_m,
   }));
 }
+
+/**
+ * Fetch major dams and reservoirs GeoJSON with storage & spillway status
+ */
+export async function fetchDams() {
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/dams');
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend dams endpoint unavailable:', err.message);
+  }
+  return { type: 'FeatureCollection', features: [] };
+}
+
+/**
+ * Fetch river water level telemetry and freeboard margins
+ */
+export async function fetchRiverLevels(gaugeId = null) {
+  try {
+    const url = gaugeId
+      ? `http://localhost:8000/api/v1/river-levels?gauge_id=${gaugeId}`
+      : 'http://localhost:8000/api/v1/river-levels';
+    const res = await fetch(url);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend river-levels endpoint unavailable:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Fetch catchment terrain and slope steepness profiles
+ */
+export async function fetchTerrainData(gaugeId = null) {
+  try {
+    const url = gaugeId
+      ? `http://localhost:8000/api/v1/terrain?gauge_id=${gaugeId}`
+      : 'http://localhost:8000/api/v1/terrain';
+    const res = await fetch(url);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend terrain endpoint unavailable:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Fetch mountain peaks and ghat passes GeoJSON
+ */
+export async function fetchMountainPeaksAndPasses() {
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/terrain/peaks-passes');
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend peaks-passes endpoint unavailable:', err.message);
+  }
+  return { type: 'FeatureCollection', features: [] };
+}
+
+/**
+ * Fetch soil hydrology and infiltration profiles
+ */
+export async function fetchSoilProfiles(gaugeId = null) {
+  try {
+    const url = gaugeId
+      ? `http://localhost:8000/api/v1/soil?gauge_id=${gaugeId}`
+      : 'http://localhost:8000/api/v1/soil';
+    const res = await fetch(url);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend soil endpoint unavailable:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Fetch river confluences and bottleneck points
+ */
+export async function fetchRiverConfluences() {
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/confluences');
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend confluences endpoint unavailable:', err.message);
+  }
+  return { type: 'FeatureCollection', features: [] };
+}
+
+/**
+ * Fetch verified safe evacuation shelters directory
+ */
+export async function fetchSafeZones() {
+  try {
+    const res = await fetch('http://localhost:8000/api/safe-zones');
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend safe-zones endpoint unavailable:', err.message);
+  }
+  return [];
+}
+
+/**
+ * Fetch disaster response units (NDRF, SDRF, Coast Guard, DEOCs)
+ */
+export async function fetchDisasterResponseUnits() {
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/disaster-response');
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('Backend disaster-response endpoint unavailable:', err.message);
+  }
+  return [];
+}

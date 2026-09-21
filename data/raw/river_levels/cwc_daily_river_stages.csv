@@ -1,0 +1,41 @@
+GaugeID,Station,River_Name,Basin,date,water_level_m,warning_level_m,danger_level_m,high_flood_level_hfl_m,freeboard_remaining_m,stage_status,discharge_cumecs,rate_of_rise_m_hr,backwater_effect_risk
+585,Ozerkheda,Damanganga/ Wagh,West flowing rivers from Tapi to Tadri,2026-09-20,86.45,88.0,90.0,91.85,3.55,NORMAL,245.0,0.08,0
+585,Ozerkheda,Damanganga/ Wagh,West flowing rivers from Tapi to Tadri,2026-09-21,87.80,88.0,90.0,91.85,2.20,APPROACHING_WARNING,410.0,0.18,0
+589,Arjunwad (seasonal),Krishna,Krishna,2026-09-20,538.60,539.2,540.7,542.45,2.10,APPROACHING_WARNING,1850.0,0.15,1
+589,Arjunwad (seasonal),Krishna,Krishna,2026-09-21,539.85,539.2,540.7,542.45,0.85,ABOVE_WARNING,2420.0,0.22,1
+596,Niivali,Bav,West flowing rivers from Tapi of Tadri,2026-09-20,8.20,9.4,11.0,12.30,2.80,NORMAL,120.0,0.05,0
+596,Niivali,Bav,West flowing rivers from Tapi of Tadri,2026-09-21,9.65,9.4,11.0,12.30,1.35,ABOVE_WARNING,280.0,0.25,0
+602,Mahad,Savitri,West flowing rivers from Tapi of Tadri,2026-09-20,9.40,10.0,11.0,13.20,1.60,APPROACHING_WARNING,580.0,0.20,1
+602,Mahad,Savitri,West flowing rivers from Tapi of Tadri,2026-09-21,10.85,10.0,11.0,13.20,0.15,ABOVE_WARNING,1120.0,0.35,1
+612,Takli,Krishna/Bhima,Krishna,2026-09-20,417.80,419.0,420.5,422.10,2.70,NORMAL,1450.0,0.06,0
+612,Takli,Krishna/Bhima,Krishna,2026-09-21,419.35,419.0,420.5,422.10,1.15,ABOVE_WARNING,2350.0,0.14,0
+626,Ujani dam,Krishna,Krishna,2026-09-20,495.90,496.83,497.58,499.20,1.68,APPROACHING_WARNING,1600.0,0.10,0
+626,Ujani dam,Krishna,Krishna,2026-09-21,497.10,496.83,497.58,499.20,0.48,ABOVE_WARNING,2850.0,0.18,0
+635,Kopergaon,Godavari,Godavari,2026-09-20,489.50,490.9,493.68,495.80,4.18,NORMAL,620.0,0.07,0
+635,Kopergaon,Godavari,Godavari,2026-09-21,491.20,490.9,493.68,495.80,2.48,ABOVE_WARNING,1280.0,0.19,0
+640,Dhond,Krishna/Bhima,Krishna,2026-09-20,502.80,504.0,505.0,506.70,2.20,NORMAL,980.0,0.10,0
+640,Dhond,Krishna/Bhima,Krishna,2026-09-21,504.30,504.0,505.0,506.70,0.70,ABOVE_WARNING,1940.0,0.22,0
+642,Narsingpur,Krishna/Bhima,Krishna,2026-09-20,457.60,458.403,459.033,460.50,1.433,APPROACHING_WARNING,1120.0,0.12,0
+642,Narsingpur,Krishna/Bhima,Krishna,2026-09-21,458.85,458.403,459.033,460.50,0.183,ABOVE_WARNING,2180.0,0.20,0
+643,Terwad (seasonal),Krishna/ Panchganga,Krishna,2026-09-20,533.20,534.0,536.0,538.50,2.80,APPROACHING_WARNING,890.0,0.14,1
+643,Terwad (seasonal),Krishna/ Panchganga,Krishna,2026-09-21,535.40,534.0,536.0,538.50,0.60,ABOVE_WARNING,1780.0,0.28,1
+645,Nasik,Godavari,Godavari,2026-09-20,556.80,558.1,559.6,561.40,2.80,NORMAL,320.0,0.06,0
+645,Nasik,Godavari,Godavari,2026-09-21,558.45,558.1,559.6,561.40,1.15,ABOVE_WARNING,740.0,0.21,0
+646,Nagothane,Amba,West flowing rivers from Tapi of Tadri,2026-09-20,7.10,8.0,9.0,10.60,1.90,APPROACHING_WARNING,160.0,0.12,1
+646,Nagothane,Amba,West flowing rivers from Tapi of Tadri,2026-09-21,8.60,8.0,9.0,10.60,0.40,ABOVE_WARNING,390.0,0.31,1
+648,Pen,Bhogeswari,West flowing rivers from Tapi of Tadri,2026-09-20,11.50,12.295,13.0,14.40,1.50,APPROACHING_WARNING,95.0,0.11,1
+648,Pen,Bhogeswari,West flowing rivers from Tapi of Tadri,2026-09-21,12.65,12.295,13.0,14.40,0.35,ABOVE_WARNING,240.0,0.26,1
+654,Warunji,Krishna/Koyna,Krishna,2026-09-20,561.90,562.8,565.2,568.10,3.30,APPROACHING_WARNING,820.0,0.12,0
+654,Warunji,Krishna/Koyna,Krishna,2026-09-21,563.80,562.8,565.2,568.10,1.40,ABOVE_WARNING,1650.0,0.25,0
+656,Nandre,Yerala,Krishna,2026-09-20,538.90,540.17,542.21,544.10,3.31,NORMAL,280.0,0.08,0
+656,Nandre,Yerala,Krishna,2026-09-21,540.60,540.17,542.21,544.10,1.61,ABOVE_WARNING,620.0,0.18,0
+668,Badlapur,Ulhas,West flowing rivers from Tapi of Tadri,2026-09-20,15.20,16.5,17.5,19.20,2.30,NORMAL,340.0,0.12,0
+668,Badlapur,Ulhas,West flowing rivers from Tapi of Tadri,2026-09-21,16.90,16.5,17.5,19.20,0.60,ABOVE_WARNING,860.0,0.32,0
+678,Kurundwad,Krishna,Krishna,2026-09-20,534.50,535.64,537.16,539.80,2.66,APPROACHING_WARNING,1950.0,0.15,1
+678,Kurundwad,Krishna,Krishna,2026-09-21,536.40,535.64,537.16,539.80,0.76,ABOVE_WARNING,3120.0,0.26,1
+681,Samdoli (seasonal),Krishna/Varna,Krishna,2026-09-20,540.80,541.95,543.15,545.20,2.35,APPROACHING_WARNING,740.0,0.14,0
+681,Samdoli (seasonal),Krishna/Varna,Krishna,2026-09-21,542.50,541.95,543.15,545.20,0.65,ABOVE_WARNING,1540.0,0.27,0
+682,Sarati,Krishna/Bhima/ Nira,Krishna,2026-09-20,473.10,474.128,475.128,476.90,2.028,APPROACHING_WARNING,680.0,0.10,0
+682,Sarati,Krishna/Bhima/ Nira,Krishna,2026-09-21,474.60,474.128,475.128,476.90,0.528,ABOVE_WARNING,1420.0,0.22,0
+684,Karad,Krishna,Krishna,2026-09-20,562.10,563.41,567.04,570.40,4.94,APPROACHING_WARNING,1250.0,0.15,1
+684,Karad,Krishna,Krishna,2026-09-21,564.80,563.41,567.04,570.40,2.24,ABOVE_WARNING,2890.0,0.30,1

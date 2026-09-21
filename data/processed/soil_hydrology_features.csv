@@ -1,0 +1,24 @@
+GaugeID,Station,Basin,soil_order,soil_texture_class,sand_pct,silt_pct,clay_pct,saturated_hydraulic_conductivity_ksat_mm_hr,available_water_capacity_awc_mm_m,bulk_density_g_cm3,topsoil_organic_carbon_pct,hydrologic_soil_group,scs_curve_number_cn2,topsoil_depth_cm,horton_decay_rate_k_hr
+585,Ozerkheda,West flowing rivers from Tapi to Tadri,Leptosols,Gravelly sandy clay loam,52.4,18.6,29.0,14.5,95.0,1.48,1.12,C,79,45.0,1.85
+589,Arjunwad (seasonal),Krishna,Vertisols,Deep black clay,18.2,28.4,53.4,2.8,165.0,1.35,0.78,D,86,120.0,0.85
+596,Niivali,West flowing rivers from Tapi of Tadri,Leptosols,Lateritic gravelly loam,48.0,22.0,30.0,18.2,85.0,1.42,1.65,B,74,38.0,2.1
+602,Mahad,West flowing rivers from Tapi of Tadri,Leptosols,Coastal alluvial silty clay,22.5,38.5,39.0,5.4,140.0,1.38,1.45,C,82,65.0,1.25
+612,Takli,Krishna,Vertisols,Medium black clay loam,24.0,32.0,44.0,3.6,155.0,1.32,0.82,D,85,110.0,0.95
+626,Ujani dam,Krishna,Vertisols,Deep cracking montmorillonite clay,15.0,27.0,58.0,2.1,175.0,1.36,0.72,D,88,140.0,0.78
+635,Kopergaon,Godavari,Vertisols,Silty clay loam,20.5,36.5,43.0,4.2,150.0,1.34,0.85,C,81,105.0,1.15
+640,Dhond,Krishna,Vertisols,Black cotton heavy clay,19.0,29.0,52.0,3.0,160.0,1.35,0.75,D,85,115.0,0.9
+642,Narsingpur,Krishna,Vertisols,Deep black clay,17.5,30.5,52.0,2.9,162.0,1.35,0.8,D,86,125.0,0.88
+643,Terwad (seasonal),Krishna,Vertisols,Alluvial clay loam,23.0,33.0,44.0,4.5,148.0,1.33,0.92,C,80,95.0,1.2
+645,Nasik,Godavari,Vertisols,Weathered basalt clay loam,28.0,34.0,38.0,6.8,135.0,1.37,1.05,C,78,80.0,1.4
+646,Nagothane,West flowing rivers from Tapi of Tadri,Leptosols,Konkan lateritic loam,45.0,25.0,30.0,16.5,90.0,1.44,1.55,B,73,42.0,2.05
+648,Pen,West flowing rivers from Tapi of Tadri,Leptosols,Coastal alluvial clay,25.0,35.0,40.0,6.2,130.0,1.39,1.35,C,81,60.0,1.3
+654,Warunji,Krishna,Leptosols,Ghat escarpment rocky loam,46.5,24.5,29.0,17.0,88.0,1.45,1.7,B,72,35.0,2.25
+656,Nandre,Krishna,Vertisols,Medium black clay loam,26.0,31.0,43.0,4.0,152.0,1.33,0.84,D,84,100.0,1.05
+668,Badlapur,West flowing rivers from Tapi of Tadri,Leptosols,Foothill gravelly clay loam,36.0,28.0,36.0,9.5,115.0,1.41,1.28,C,77,55.0,1.6
+678,Kurundwad,Krishna,Vertisols,Deep fertile black clay,16.5,29.5,54.0,2.5,168.0,1.34,0.88,D,87,130.0,0.82
+681,Samdoli (seasonal),Krishna,Vertisols,Riverine heavy clay,18.0,28.0,54.0,2.7,166.0,1.35,0.86,D,86,128.0,0.84
+682,Sarati,Krishna,Vertisols,Black cotton clay loam,22.0,32.0,46.0,3.8,154.0,1.33,0.79,D,85,108.0,1.0
+684,Karad,Krishna,Leptosols,Confluence alluvial sandy loam,42.0,28.0,30.0,15.0,98.0,1.43,1.4,B,73,50.0,1.95
+NE-01,Guwahati DC Court,Brahmaputra,Fluvisols,Brahmaputra alluvial silt loam,18.0,54.0,28.0,12.0,180.0,1.28,1.85,B,70,150.0,1.75
+NE-02,Dibrugarh,Brahmaputra,Fluvisols,Upper Assam sandy silt loam,24.0,52.0,24.0,14.5,170.0,1.26,1.92,B,68,160.0,1.9
+NE-03,Silchar,Barak,Fluvisols,Barak valley silty clay loam,16.0,46.0,38.0,6.5,160.0,1.32,1.65,C,79,135.0,1.35

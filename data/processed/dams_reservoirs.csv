@@ -1,0 +1,21 @@
+dam_id,dam_name,river,basin,district,state,latitude,longitude,gross_storage_capacity_mcm,full_reservoir_level_frl_m,crest_level_m,live_storage_capacity_mcm,current_storage_pct,inflow_cumecs,spillway_outflow_cumecs,gate_opening_status,downstream_gauge_id,distance_to_downstream_gauge_km,flood_cushion_remaining_pct,emergency_release_travel_time_hrs
+DAM-01,Koyna Dam,Koyna,Krishna,Satara,Maharashtra,17.3995,73.7486,2797.4,657.91,649.0,2650.0,89.5,1450.0,750.0,4 Gates Open 1.5m,654,42.5,10.5,3.2
+DAM-02,Radhanagari Dam,Bhogawati,Krishna,Kolhapur,Maharashtra,16.411,73.993,236.8,548.64,542.5,219.0,94.2,620.0,480.0,Automatic Gates Tripped,643,58.0,5.8,4.5
+DAM-03,Khadakwasla Dam,Mutha,Krishna,Pune,Maharashtra,18.4419,73.7633,86.0,582.47,576.0,56.0,88.4,450.0,380.0,6 Gates Open 1.0m,640,68.0,11.6,5.0
+DAM-04,Panshet Dam,Ambi,Krishna,Pune,Maharashtra,18.3756,73.619,303.0,636.42,628.0,294.0,91.0,510.0,280.0,Radial Gates Active,640,79.0,9.0,6.2
+DAM-05,Varasgaon Dam,Mose,Krishna,Pune,Maharashtra,18.398,73.593,374.0,638.0,629.5,362.0,92.5,580.0,320.0,Radial Gates Active,640,82.0,7.5,6.5
+DAM-06,Mulshi Dam,Mula,Krishna,Pune,Maharashtra,18.528,73.498,572.0,607.16,601.0,523.0,87.0,690.0,410.0,Spillway Crest Flow,640,94.0,13.0,7.0
+DAM-07,Pawana Dam,Pawana,Krishna,Pune,Maharashtra,18.665,73.489,271.0,612.95,606.0,241.0,86.5,410.0,210.0,2 Gates Open,640,88.0,13.5,6.8
+DAM-08,Bhatghar Dam,Velvandi,Krishna,Pune,Maharashtra,18.172,73.856,672.0,623.28,615.0,666.0,90.2,720.0,460.0,Automatic Siphon Open,682,74.0,9.8,5.4
+DAM-09,Veer Dam,Nira,Krishna,Pune,Maharashtra,18.148,74.098,266.0,579.5,573.0,266.0,93.0,890.0,620.0,Radial Gates Full Open,682,51.0,7.0,3.8
+DAM-10,Dhom Dam,Krishna,Krishna,Satara,Maharashtra,17.989,73.829,382.0,746.76,738.0,331.0,85.2,520.0,310.0,3 Gates Open 1.0m,684,62.0,14.8,4.6
+DAM-11,Kanher Dam,Venna,Krishna,Satara,Maharashtra,17.742,73.916,286.0,690.0,682.0,272.0,88.0,440.0,260.0,2 Gates Open 1.0m,684,48.0,12.0,3.5
+DAM-12,Ujani Dam,Bhima,Krishna,Solapur,Maharashtra,18.075,75.118,3170.0,496.83,491.0,1517.0,96.0,3400.0,2800.0,16 Gates Open 2.0m,612,78.0,4.0,5.8
+DAM-13,Tillari Dam,Tillari,West flowing rivers from Tapi of Tadri,Kolhapur,Maharashtra,15.756,74.248,462.0,113.3,105.0,447.0,84.0,380.0,190.0,Spillway Active,596,65.0,16.0,4.8
+DAM-14,Upper Vaitarna Dam,Vaitarna,West flowing rivers from Tapi of Tadri,Nashik,Maharashtra,19.789,73.542,331.0,603.5,597.0,329.0,89.0,540.0,310.0,Radial Gates Active,585,46.0,11.0,3.6
+DAM-15,Bhatsa Dam,Bhatsa,West flowing rivers from Tapi of Tadri,Thane,Maharashtra,19.521,73.421,976.0,142.07,135.0,942.0,93.5,1120.0,780.0,5 Gates Open 1.5m,668,34.0,6.5,2.6
+DAM-16,Barvi Dam,Barvi,West flowing rivers from Tapi of Tadri,Thane,Maharashtra,19.192,73.342,338.0,72.6,68.0,335.0,95.0,640.0,490.0,Radial Gates Full Open,668,14.5,5.0,1.2
+DAM-17,Middle Vaitarna Dam,Vaitarna,West flowing rivers from Tapi of Tadri,Thane,Maharashtra,19.702,73.432,455.0,285.0,277.0,449.0,91.2,780.0,520.0,Crest Spillway Open,668,52.0,8.8,3.9
+DAM-18,Temghar Dam,Mutha,Krishna,Pune,Maharashtra,18.529,73.541,107.0,705.0,698.0,97.0,82.5,290.0,140.0,Controlled Sluice Open,640,84.0,17.5,6.4
+DAM-NE01,Karbi Langpi Dam,Borpani,Brahmaputra,Karbi Anglong,Assam,25.968,92.521,128.0,315.0,305.0,115.0,88.0,420.0,280.0,Radial Spillway Open,NE-01,72.0,12.0,5.2
+DAM-NE02,Subansiri Lower,Subansiri,Brahmaputra,Dhemaji,Assam,27.553,94.262,1365.0,205.0,195.0,626.0,76.5,2800.0,1650.0,Spillway Regulated,NE-02,55.0,23.5,4.0
