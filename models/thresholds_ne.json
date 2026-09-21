@@ -1,0 +1,12 @@
+{
+  "task_a_onset_ne": {
+    "LightGBM": 0.05,
+    "XGBoost": 0.05,
+    "RandomForest": 0.05
+  },
+  "task_b_active_ne": {
+    "LightGBM": 0.463,
+    "XGBoost": 0.49,
+    "RandomForest": 0.474
+  }
+}

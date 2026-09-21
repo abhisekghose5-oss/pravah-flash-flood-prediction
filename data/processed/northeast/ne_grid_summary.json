@@ -1,0 +1,18 @@
+{
+  "total_rows": 140039,
+  "total_stations": 46,
+  "columns_count": 140,
+  "date_range": [
+    "2001-01-12T00:00:00",
+    "2026-09-18T00:00:00"
+  ],
+  "splits": {
+    "train": 99843,
+    "val": 28654,
+    "test": 11542
+  },
+  "task_a_onset_positives": 3454,
+  "task_b_active_positives": 29454,
+  "task_a_onset_rate_percent": 2.4665,
+  "task_b_active_rate_percent": 21.0327
+}
