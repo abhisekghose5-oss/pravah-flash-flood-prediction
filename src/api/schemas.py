@@ -17,11 +17,13 @@ except ImportError:
 
 
 class LivePredictionRequest(BaseModel):
-    gauge_id: str = Field(..., description="Target gauge ID (e.g. '684' or 'INDOFLOODS-gauge-684')", example="684")
+    gauge_id: Optional[str] = Field(None, description="Target gauge ID (e.g. '684' or 'INDOFLOODS-gauge-684')", examples=["684"])
+    station_id: Optional[str] = Field(None, description="Alternative alias for gauge_id or Northeast station name", examples=["Beki"])
+    region: Optional[str] = Field("maharashtra", description="Target region ('maharashtra' or 'NE' / 'northeast')", examples=["maharashtra"])
     rainfall_history_10d: List[float] = Field(
         ...,
         description="10 daily rainfall amounts (mm) in chronological order: [P_{T-10}, ..., P_{T-1}]",
-        example=[0.0, 2.5, 8.0, 15.2, 45.0, 92.5, 110.0, 35.0, 12.0, 28.4]
+        examples=[[0.0, 2.5, 8.0, 15.2, 45.0, 92.5, 110.0, 35.0, 12.0, 28.4]]
     )
     onset_model: Optional[str] = Field("RandomForest", description="Classifier for Onset (RandomForest / XGBoost / LightGBM)")
     active_model: Optional[str] = Field("XGBoost", description="Classifier for Active State (XGBoost / LightGBM / RandomForest)")
@@ -63,15 +65,23 @@ class LivePredictionRequest(BaseModel):
 
 
 class StationInfoSchema(BaseModel):
+    model_config = {"extra": "allow"}
+
     gauge_id: str
     full_gauge_id: str
     station_name: str
+    name: Optional[str] = None
     river: str
     basin: str
+    lat: Optional[float] = None
+    lng: Optional[float] = None
     latitude: float
     longitude: float
-    warning_level_m: float
-    danger_level_m: float
+    warning_level_m: float = 0.0
+    danger_level_m: float = 0.0
+    state: Optional[str] = "Maharashtra"
+    district: Optional[str] = None
+    region: Optional[str] = "Maharashtra"
 
 
 class AlertTierSchema(BaseModel):

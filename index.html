@@ -44,13 +44,25 @@
         <div class="brand-subtitle">
           <span>Flash Flood Early Warning System</span>
           <span>•</span>
-          <span>Maharashtra Western Ghats</span>
+          <span id="activeRegionSubtitleLabel">Maharashtra Western Ghats</span>
         </div>
       </div>
     </div>
 
     <!-- Header Live Telemetry & Counter Status -->
     <div class="header-telemetry">
+      <!-- Region Selector Switch (Western Ghats vs Northeast India) -->
+      <div class="region-switcher-pill" id="headerRegionSwitcher" role="group" aria-label="Region Selector">
+        <button type="button" class="region-switch-btn active" id="btnRegionMaharashtra" data-region="maharashtra" title="Focus Maharashtra Western Ghats">
+          <span class="region-dot"></span>
+          <span>Western Ghats</span>
+        </button>
+        <button type="button" class="region-switch-btn" id="btnRegionNortheast" data-region="northeast" title="Focus Brahmaputra Basin & Northeast India">
+          <span class="region-dot"></span>
+          <span>Brahmaputra (NE)</span>
+        </button>
+      </div>
+
       <div class="telemetry-pill">
         <span class="telemetry-dot"></span>
         <span>Sensor Feed Live</span>
@@ -64,13 +76,13 @@
 
       <div class="status-counters">
         <div class="counter-tag emergency">
-          <span>2 EMERGENCY</span>
+          <span id="counterEmergency">2 EMERGENCY</span>
         </div>
         <div class="counter-tag warning">
-          <span>4 WARNING</span>
+          <span id="counterWarning">4 WARNING</span>
         </div>
         <div class="counter-tag advisory">
-          <span>6 ADVISORY</span>
+          <span id="counterAdvisory">6 ADVISORY</span>
         </div>
       </div>
 
@@ -92,13 +104,13 @@
         <span>Alerts</span>
       </button>
 
-      <!-- Sleek Live Weather & Nowcast Navigation Button -->
-      <a href="weather.html" target="_blank" class="nav-weather-btn magnetic" title="Launch Advanced Weather Forecasting & Doppler Nowcasting">
+      <!-- Live Weather Navigation Button -->
+      <a href="weather.html" target="_blank" class="nav-weather-btn magnetic" title="Launch Advanced Weather Forecasting">
         <svg class="weather-icon-pulse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path>
           <polyline points="13 11 9 17 15 17 11 23"></polyline>
         </svg>
-        <span>Live Weather &amp; Nowcast</span>
+        <span>Live Weather</span>
         <span class="weather-radar-badge">LIVE</span>
       </a>
 
@@ -146,7 +158,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
             </svg>
-            <span>Doppler Nowcasting</span>
+            <span>Live Weather</span>
           </a>
         </div>
       </div>
@@ -671,7 +683,7 @@
 
           <div class="globe-coords-readout">
             <span class="coords-label">FOCUS REGION:</span>
-            <span class="coords-val">18.5204° N, 73.8567° E (Western Ghats)</span>
+            <span class="coords-val" id="globeCoordsVal">18.5204° N, 73.8567° E (Western Ghats)</span>
           </div>
         </div>
 
@@ -751,9 +763,13 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               <span>Zoom Out</span>
             </button>
-            <button id="globeResetGhatsBtn" type="button" class="btn btn-ctrl btn-ctrl-accent" title="Reset to Western Ghats">
+            <button id="globeResetGhatsBtn" type="button" class="btn btn-ctrl btn-ctrl-accent active" title="Reset to Western Ghats">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-              <span>Reset to Western Ghats</span>
+              <span>Western Ghats</span>
+            </button>
+            <button id="globeJumpNortheastBtn" type="button" class="btn btn-ctrl btn-ctrl-accent" title="Jump to Northeast India">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+              <span>Brahmaputra (NE)</span>
             </button>
           </div>
         </div>
@@ -1293,6 +1309,28 @@
           <input type="text" id="sosLandmarkInput" class="sos-form-input" placeholder="e.g., Near Karad bridge, culvert overflowing..." maxlength="120" />
         </div>
 
+        <!-- Photo Upload (optional) — Append-only addition -->
+        <div class="sos-form-group sos-photo-group">
+          <label class="sos-form-label">Flood Scene Photo <span style="opacity:0.55; font-size:0.75rem;">(Optional — max 10 MB)</span></label>
+          <div class="sos-photo-upload-wrap">
+            <input type="file" id="sosPhotoInput" accept="image/*" capture="environment" style="display:none;" />
+            <button type="button" id="sosPhotoTriggerBtn" class="btn-sos-photo magnetic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="4"></circle>
+                <path d="M9 2h6l2 3H7z"></path>
+                <rect x="2" y="5" width="20" height="16" rx="3"></rect>
+              </svg>
+              <span id="sosPhotoLabel">📷 Attach / Capture Photo</span>
+            </button>
+            <button type="button" id="sosPhotoClearBtn" class="btn-sos-photo-clear" style="display:none;" title="Remove photo">✕ Remove</button>
+          </div>
+          <!-- Live thumbnail preview -->
+          <div id="sosPhotoPreview" style="display:none; margin-top:8px; position:relative;">
+            <img id="sosPhotoThumb" src="" alt="Preview" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid rgba(6,182,212,0.35); object-fit:cover;" />
+            <div id="sosPhotoMeta" style="font-size:0.7rem; color:rgba(255,255,255,0.5); margin-top:4px;"></div>
+          </div>
+        </div>
+
         <!-- Submit Button -->
         <button type="submit" id="btnSubmitSosReport" class="btn btn-sos-submit magnetic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1305,6 +1343,54 @@
         <!-- Status Notification -->
         <div id="sosStatusMsg" class="sos-status-box" style="display: none;" role="status" aria-live="polite"></div>
       </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- QA / DEV TOOLS OVERLAY PANEL (Northeast Verification & Simulation)        -->
+  <!-- ========================================================================= -->
+  <div id="qaDevToolsFloating" class="qa-devtools-floating">
+    <button type="button" id="btnToggleQaPanel" class="btn-qa-toggle magnetic" title="Open QA & Verification DevTools">
+      <span class="qa-pulse-beacon"></span>
+      <span class="qa-icon">🛠️</span>
+      <span class="qa-text">NE Verification QA</span>
+    </button>
+    <div id="qaDevPanel" class="qa-dev-panel glass-panel" style="display: none;">
+      <div class="qa-panel-header">
+        <div class="qa-panel-title">
+          <span class="qa-dot"></span>
+          <span>Northeast Early Warning QA</span>
+        </div>
+        <button type="button" id="btnCloseQaPanel" class="qa-close-btn" aria-label="Close QA Panel">&times;</button>
+      </div>
+      <div class="qa-panel-body">
+        <div class="qa-health-row">
+          <span class="qa-label">API Health (NE Models):</span>
+          <span id="qaNeApiBadge" class="qa-status-tag pending">PENDING</span>
+        </div>
+        <div class="qa-health-row">
+          <span class="qa-label">Open-Meteo AI Stream:</span>
+          <span id="qaOpenMeteoBadge" class="qa-status-tag pass">LIVE (0.0 mm/hr)</span>
+        </div>
+        <div class="qa-btn-grid">
+          <button type="button" id="btnQaVerifyNeApi" class="btn-qa-action">
+            <span>⚡ Verify /api/v1/predict?region=NE</span>
+          </button>
+          <button type="button" id="btnQaLiveOriginalPrediction" class="btn-qa-action">
+            <span>🧠 Run Original ML Inference (Dual-Task)</span>
+          </button>
+          <button type="button" id="btnQaTestOpenMeteo" class="btn-qa-action">
+            <span>🌐 Test Open-Meteo AI Forecast Ingest</span>
+          </button>
+          <button type="button" id="btnQaInjectNeCloudburst" class="btn-qa-action btn-qa-danger">
+            <span>🚨 Inject Severe Beki Cloudburst</span>
+          </button>
+          <button type="button" id="btnQaTestEvacRouting" class="btn-qa-action">
+            <span>📍 Test NE Evacuation Routing</span>
+          </button>
+        </div>
+        <div id="qaConsoleLog" class="qa-console-log">Ready for QA verification...</div>
+      </div>
     </div>
   </div>
 

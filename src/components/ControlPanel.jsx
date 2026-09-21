@@ -48,6 +48,8 @@ export default function ControlPanel({
   lastFetchedTimestamp,
   dataSource,
   stations = WESTERN_GHATS_STATIONS,
+  activeRegion = 'maharashtra',
+  onRegionChange,
   className = '',
 }) {
   const isLive = mode === 'live';
@@ -68,6 +70,10 @@ export default function ControlPanel({
     deluge: {
       label: 'August 2019 Deluge',
       series_10d: [45, 85, 130, 190, 250, 280, 260, 210, 180, 220],
+    },
+    ne_cloudburst: {
+      label: 'NE Cloudburst (Cherrapunji/Beki)',
+      series_10d: [25, 40, 65, 95, 140, 185, 220, 280, 310, 340],
     },
   };
 
@@ -336,17 +342,28 @@ export default function ControlPanel({
         </div>
       </div>
 
-      {/* 3. Primary Input Form Grid: Station Selector + Date Picker */}
+      {/* 3. Primary Input Form Grid: Region Selector + Station Selector + Date Picker */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-        {/* Station Selector Dropdown */}
+        {/* Region & Catchment Selector Group */}
         <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="station-select"
-            className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"
-          >
-            <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Target Gauge Station (20 Western Ghats)</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="station-select"
+              className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"
+            >
+              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Target Gauge Station ({activeRegion === 'northeast' ? 'Assam / NE' : 'Western Ghats'})</span>
+            </label>
+            {onRegionChange && (
+              <button
+                type="button"
+                onClick={() => onRegionChange(activeRegion === 'northeast' ? 'maharashtra' : 'northeast')}
+                className="text-[10px] font-mono text-cyan-400 hover:underline flex items-center gap-1"
+              >
+                <span>Switch to {activeRegion === 'northeast' ? 'Maharashtra' : 'Northeast'}</span>
+              </button>
+            )}
+          </div>
           <select
             id="station-select"
             value={selectedStationId}
@@ -360,7 +377,7 @@ export default function ControlPanel({
             ))}
           </select>
           <span className="text-[10px] text-slate-500 font-mono px-1">
-            Lat: {currentStation.lat?.toFixed(3)}°N • Lng: {currentStation.lng?.toFixed(3)}°E • Basin: {currentStation.basin}
+            Lat: {currentStation?.lat?.toFixed(3)}°N • Lng: {currentStation?.lng?.toFixed(3)}°E • Basin: {currentStation?.basin}
           </span>
         </div>
 
@@ -467,6 +484,7 @@ export default function ControlPanel({
                 { id: 'moderate', label: 'Moderate Monsoon' },
                 { id: 'heavy', label: 'Heavy Storm Surge' },
                 { id: 'deluge', label: 'August 2019 Extreme Deluge' },
+                { id: 'ne_cloudburst', label: 'NE Cloudburst (Beki)' },
               ].map((p) => (
                 <button
                   key={p.id}

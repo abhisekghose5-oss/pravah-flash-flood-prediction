@@ -6,6 +6,8 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Compass,
+  MapPin,
   Radio,
   RefreshCw,
   SlidersHorizontal,
@@ -18,6 +20,8 @@ import {
  * @param {Object} props
  * @param {'live' | 'simulation'} [props.mode='live'] Current operating mode
  * @param {(mode: 'live' | 'simulation') => void} props.onModeChange Callback when mode changes
+ * @param {'maharashtra' | 'northeast'} [props.activeRegion='maharashtra'] Current active region
+ * @param {(region: 'maharashtra' | 'northeast') => void} [props.onRegionChange] Callback when region changes
  * @param {string} [props.selectedDate] Current date (used in simulation mode)
  * @param {(date: string) => void} [props.onDateChange] Callback when date changes in simulation mode
  * @param {{ emergency?: number, warning?: number, advisory?: number, normal?: number }} [props.stats]
@@ -27,6 +31,8 @@ import {
 export default function Header({
   mode = 'live',
   onModeChange,
+  activeRegion = 'maharashtra',
+  onRegionChange,
   selectedDate = new Date().toISOString().split('T')[0],
   onDateChange,
   stats = { emergency: 2, warning: 5, advisory: 6, normal: 7 },
@@ -62,7 +68,9 @@ export default function Header({
             <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
               <span>Flash-Flood Early Warning System</span>
               <span className="text-slate-600">•</span>
-              <span className="text-slate-300">Maharashtra Western Ghats</span>
+              <span className={`font-semibold ${activeRegion === 'northeast' ? 'text-emerald-300' : 'text-cyan-300'}`}>
+                {activeRegion === 'northeast' ? 'Brahmaputra Basin (Northeast)' : 'Maharashtra Western Ghats'}
+              </span>
             </p>
           </div>
         </div>
@@ -101,8 +109,39 @@ export default function Header({
         </div>
 
         {/* Right: Operational Mode Switcher & Controls */}
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           
+          {/* Region Switcher Segmented Control */}
+          <div className="bg-slate-900/90 p-1 rounded-xl border border-slate-800 flex items-center space-x-1">
+            <button
+              type="button"
+              onClick={() => onRegionChange && onRegionChange('maharashtra')}
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+                activeRegion === 'maharashtra'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+              title="Western Ghats Corridor (Maharashtra)"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Western Ghats (MH)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onRegionChange && onRegionChange('northeast')}
+              className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+                activeRegion === 'northeast'
+                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+              title="Brahmaputra Basin & Hills (Northeast)"
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>Brahmaputra (NE)</span>
+            </button>
+          </div>
+
           {/* Mode Switcher Segmented Control */}
           <div className="bg-slate-900/90 p-1 rounded-xl border border-slate-800 flex items-center space-x-1">
             <button
@@ -174,6 +213,18 @@ export default function Header({
           <span className="font-medium text-[11px]">
             {isLive ? 'Live Telemetry' : 'Simulation Mode'}
           </span>
+          <span className="text-slate-600">•</span>
+          <button
+            type="button"
+            onClick={() => onRegionChange && onRegionChange(activeRegion === 'northeast' ? 'maharashtra' : 'northeast')}
+            className={`font-semibold text-[11px] px-1.5 py-0.5 rounded border ${
+              activeRegion === 'northeast'
+                ? 'bg-emerald-950/80 border-emerald-600/60 text-emerald-300'
+                : 'bg-blue-950/80 border-blue-600/60 text-blue-300'
+            }`}
+          >
+            {activeRegion === 'northeast' ? 'NE (Brahmaputra)' : 'MH (Western Ghats)'}
+          </button>
         </div>
         <div className="flex items-center space-x-2 font-mono text-[11px]">
           <span className="text-red-400 font-bold">{stats.emergency} Emer</span>

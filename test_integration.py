@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from typing import Any, Dict
 
@@ -57,6 +58,19 @@ class UnifiedClient:
         return requests.post(f"{self.base_url}{path}", json=json, timeout=timeout)
 
 
+try:
+    import pytest
+    @pytest.fixture(scope="module")
+    def client() -> UnifiedClient:
+        return UnifiedClient("http://localhost:8000")
+except ImportError:
+    pass
+
+
+def _is_pytest() -> bool:
+    return "PYTEST_CURRENT_TEST" in os.environ
+
+
 def print_banner(text: str) -> None:
     print(f"\n{CYAN}{BOLD}{'=' * 78}")
     print(f" {text}")
@@ -78,9 +92,11 @@ def test_system_health(client: UnifiedClient) -> bool:
 
         assert data.get("model_loaded") is True, "Models not loaded in memory!"
         print(f"  {GREEN}✓ Health Diagnostic: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Health Diagnostic Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 
@@ -117,9 +133,11 @@ def test_live_prediction_loop(client: UnifiedClient) -> bool:
         assert tier in {"NORMAL", "ADVISORY", "WARNING", "EMERGENCY"}, f"Invalid alert tier: {tier}"
 
         print(f"  {GREEN}✓ End-to-End ML Inference Loop: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Prediction Loop Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 
@@ -143,9 +161,11 @@ def test_citizen_sos_pipeline(client: UnifiedClient) -> bool:
         print(f"  • SOS Logged ID        : #{post_resp.json().get('report_id')}")
         print(f"  • Active Reports Count : {len(reports)} live ground-truth beacons")
         print(f"  {GREEN}✓ Citizen SOS Telemetry Loop: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Citizen SOS Test Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 
@@ -164,9 +184,11 @@ def test_evacuation_routing(client: UnifiedClient) -> bool:
 
         assert dist is not None and dist >= 0.0, "Invalid distance calculated!"
         print(f"  {GREEN}✓ Evacuation Safe-Zone Routing: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Evacuation Routing Test Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 
@@ -183,9 +205,11 @@ def test_weather_cache(client: UnifiedClient) -> bool:
 
         assert "status" in data, "Missing 'status' in weather state"
         print(f"  {GREEN}✓ Weather Telemetry Cache: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Weather Telemetry Test Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 
@@ -208,9 +232,11 @@ def test_twilio_alerts(client: UnifiedClient) -> bool:
         assert data.get("status") == "success", "Alert response status is not success"
         assert "🚨 PRAVAH ALERT:" in data.get("body", ""), "Missing expected PRAVAH prefix in alert body"
         print(f"  {GREEN}✓ Twilio Emergency Alert Dispatch: PASSED{RESET}\n")
-        return True
+        return None if _is_pytest() else True
     except Exception as exc:
         print(f"  {RED}✗ Twilio Alert Test Failed: {exc}{RESET}\n")
+        if _is_pytest():
+            raise
         return False
 
 

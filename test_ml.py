@@ -206,6 +206,13 @@ def run_model_diagnostic(model_path: Path) -> bool:
     return True
 
 
+def test_ml_pipeline_diagnostic() -> None:
+    """Automated Pytest wrapper for PRAVAH ML Pipeline Diagnostic."""
+    target_model = DEFAULT_MODEL_PATH if DEFAULT_MODEL_PATH.exists() else ALT_MODEL_PATH
+    assert target_model.exists(), f"Target model not found at {target_model}"
+    assert run_model_diagnostic(target_model), "ML pipeline diagnostic stress-test failed"
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PRAVAH ML Diagnostic Test")
     parser.add_argument(

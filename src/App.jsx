@@ -25,10 +25,12 @@ import FloodMap from './components/FloodMap';
 import AlertBanner from './components/AlertBanner';
 import RiskCard from './components/RiskCard';
 import RainfallChart from './components/RainfallChart';
+import RegionDebugPanel from './components/RegionDebugPanel';
 import {
   fetchFloodPrediction,
   fetchLiveOpenMeteoRainfall,
   WESTERN_GHATS_STATIONS,
+  NORTHEAST_STATIONS,
   calculateRiskTier,
 } from './services/api';
 
@@ -72,11 +74,17 @@ const TIER_CHIP_STYLES = {
  */
 export default function App() {
   // 1. Master State Management
+  const [activeRegion, setActiveRegion] = useState('maharashtra'); // 'maharashtra' | 'northeast'
   const [selectedStationId, setSelectedStationId] = useState('MH_GAK_12'); // Karad default
   const [riskData, setRiskData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('live'); // 'live' | 'simulation'
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+
+  // Active Station Catalog based on activeRegion
+  const activeStationList = useMemo(() => {
+    return activeRegion === 'northeast' ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
+  }, [activeRegion]);
 
   // Provenance & Offline Resilience
   const [lastFetched, setLastFetched] = useState(() => new Date().toISOString());
@@ -89,6 +97,97 @@ export default function App() {
   const predictionCacheRef = useRef(new Map());
   const predictionInFlightRef = useRef(new Map());
 
+  // Active Emergency Alerts Stream (Live alerts + simulated NE alerts)
+  const [activeAlerts, setActiveAlerts] = useState([
+    {
+      id: 'INIT_MH_01',
+      station_id: 'MH_GAK_17',
+      station_name: 'Mahad',
+      region: 'Maharashtra',
+      tier: 'EMERGENCY',
+      probability: 0.91,
+      timestamp: new Date().toISOString(),
+      message: 'Savitri River stage approaching critical danger stage. High-ground evacuation directive active.',
+    },
+  ]);
+
+  // Quick-Travel Map Center Override
+  const [mapCenterOverride, setMapCenterOverride] = useState(null);
+
+  // Mock Alert Injection Handler (Step 4 Verification)
+  const handleInjectMockAlert = useCallback((alertPayload) => {
+    const targetStationId = alertPayload.station_id || 'NE_AS_01';
+
+    // 1. Switch region to Northeast and select station
+    setActiveRegion('northeast');
+    setSelectedStationId(targetStationId);
+
+    // 2. Synthesize updated risk prediction in predictionCache
+    const mockPrediction = {
+      station_id: targetStationId,
+      catchment_name: `${alertPayload.station_name || 'Beki'} (${alertPayload.river || 'Beki / Manas'})`,
+      lat: 26.4983,
+      lng: 90.9192,
+      timestamp: alertPayload.timestamp || new Date().toISOString(),
+      data_source: 'Simulated WebSocket Ingestion (Mock Alert)',
+      rainfall: {
+        day_1: alertPayload.rainfall_1d || 185.0,
+        day_3_cum: 360.0,
+        day_7_cum: 580.0,
+        series: [25, 40, 65, 95, 140, 185, 220, 280, 310, 340],
+        series_10d: [25, 40, 65, 95, 140, 185, 220, 280, 310, 340],
+      },
+      prediction: {
+        probability: alertPayload.onset_probability || 0.88,
+        risk_tier: 'EMERGENCY',
+      },
+      task_a_onset: {
+        model_used: 'XGBoost Calibrated NE v1.0',
+        probability: alertPayload.onset_probability || 0.88,
+        threshold: 0.05,
+        is_flood_onset_predicted: true,
+      },
+      task_b_active: {
+        model_used: 'XGBoost Calibrated NE v1.0',
+        probability: alertPayload.active_probability || 0.74,
+        threshold: 0.49,
+        is_active_flood_predicted: true,
+      },
+      alert: {
+        title: `EMERGENCY: Immediate Flash-Flood Directive — ${alertPayload.station_name || 'Beki'} Station`,
+        recommendation: alertPayload.recommendation || 'Activate emergency SDRF rescue protocols.',
+        issued_at: alertPayload.timestamp || new Date().toISOString(),
+      },
+    };
+
+    // Update prediction cache immutably for the target station, leaving Maharashtra completely untouched!
+    setPredictionCache((prev) => ({
+      ...prev,
+      [targetStationId]: mockPrediction,
+    }));
+    setRiskData(mockPrediction);
+
+    // 3. Append to Active Warnings Ticker
+    setActiveAlerts((prev) => [
+      {
+        id: `ALERT_${Date.now()}`,
+        station_id: targetStationId,
+        station_name: alertPayload.station_name || 'Beki',
+        region: alertPayload.region || 'Northeast',
+        tier: alertPayload.tier || 'EMERGENCY',
+        probability: alertPayload.onset_probability || 0.88,
+        timestamp: alertPayload.timestamp || new Date().toISOString(),
+        message: alertPayload.recommendation || 'SEVERE flood onset detected in catchment.',
+      },
+      ...prev.slice(0, 4),
+    ]);
+
+    // 4. Smoothly Pan map to Northeast
+    setMapCenterOverride({ lat: 26.20, lng: 92.93, zoom: 7 });
+
+    console.log('[PRAVAH State] Injected mock alert for Northeast without modifying Maharashtra baseline.');
+  }, []);
+
   // Filter & Mobile Navigation
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilterTier, setSelectedFilterTier] = useState('ALL');
@@ -97,15 +196,15 @@ export default function App() {
   // Selected Station Record from Catalog
   const selectedStation = useMemo(() => {
     return (
-      WESTERN_GHATS_STATIONS.find((s) => s.station_id === selectedStationId) ||
-      WESTERN_GHATS_STATIONS[0]
+      activeStationList.find((s) => s.station_id === selectedStationId) ||
+      activeStationList[0]
     );
-  }, [selectedStationId]);
+  }, [activeStationList, selectedStationId]);
 
   // Filtered station cards for Left Sidebar
   const filteredStations = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return WESTERN_GHATS_STATIONS.filter((s) => {
+    return activeStationList.filter((s) => {
       const matchQuery =
         s.name.toLowerCase().includes(q) ||
         s.station_id.toLowerCase().includes(q) ||
@@ -118,24 +217,27 @@ export default function App() {
 
       return matchQuery && matchTier;
     });
-  }, [searchQuery, selectedFilterTier]);
+  }, [activeStationList, searchQuery, selectedFilterTier]);
 
   // Overall Statistics for Navigation Header
   const stats = useMemo(() => {
     const counts = { emergency: 0, warning: 0, advisory: 0, normal: 0 };
-    WESTERN_GHATS_STATIONS.forEach((s) => {
-      if (s.default_tier === 'EMERGENCY') counts.emergency++;
-      else if (s.default_tier === 'WARNING') counts.warning++;
-      else if (s.default_tier === 'ADVISORY') counts.advisory++;
+    activeStationList.forEach((s) => {
+      const cached = predictionCache[s.station_id];
+      const prob = cached?.prediction?.probability;
+      const sTier = prob != null ? calculateRiskTier(prob) : s.default_tier;
+      if (sTier === 'EMERGENCY') counts.emergency++;
+      else if (sTier === 'WARNING') counts.warning++;
+      else if (sTier === 'ADVISORY') counts.advisory++;
       else counts.normal++;
     });
     return counts;
-  }, []);
+  }, [activeStationList, predictionCache]);
 
   // Synchronized dynamic stations reflecting in-flight simulation on the map
   const dynamicStations = useMemo(() => {
-    return WESTERN_GHATS_STATIONS;
-  }, [selectedStationId, riskData]);
+    return activeStationList;
+  }, [activeStationList]);
 
   const buildPredictionCacheKey = useCallback(
     ({ stationId, mode, date, onsetModel, activeModel, rainfallInputs, rainfallHistory }) =>
@@ -172,14 +274,16 @@ export default function App() {
   }, []);
 
   const runStationPredictionBatch = useCallback(
-    async ({ stationIds, mode, date, onsetModel, activeModel, rainfallInputs, rainfallHistory }) => {
+    async ({ stationIds, mode, date, onsetModel, activeModel, rainfallInputs, rainfallHistory, region }) => {
       const predictions = {};
       let nextStationIndex = 0;
+      const targetRegion = region || activeRegion;
+      const currentStations = targetRegion === 'northeast' ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
 
       const processNextStation = async () => {
         while (nextStationIndex < stationIds.length) {
           const stationId = stationIds[nextStationIndex++];
-          const station = WESTERN_GHATS_STATIONS.find((item) => item.station_id === stationId);
+          const station = currentStations.find((item) => item.station_id === stationId);
           if (!station) continue;
 
           try {
@@ -229,7 +333,7 @@ export default function App() {
 
       return predictions;
     },
-    [buildPredictionCacheKey, getCachedPrediction]
+    [activeRegion, buildPredictionCacheKey, getCachedPrediction]
   );
 
   // 2. Resilient Risk Inference Runner (Offline-Safe)
@@ -237,6 +341,8 @@ export default function App() {
     async (options = {}) => {
       setIsLoading(true);
 
+      const region = options.region || activeRegion;
+      const currentStations = region === 'northeast' ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
       const stationId = options.stationId || selectedStationId;
       const targetDate = options.date || selectedDate;
       const mode = options.mode || activeMode;
@@ -247,8 +353,8 @@ export default function App() {
       }
 
       const targetStation =
-        WESTERN_GHATS_STATIONS.find((s) => s.station_id === stationId) ||
-        WESTERN_GHATS_STATIONS[0];
+        currentStations.find((s) => s.station_id === stationId) ||
+        currentStations[0];
 
       let inputs = options.rainfallInputs;
       let tenDayHist = options.rainfall_history_10d;
@@ -302,15 +408,16 @@ export default function App() {
         setPredictionCache((previous) => ({ ...previous, [stationId]: result }));
         if (options.batch !== false) {
           await runStationPredictionBatch({
-          stationIds: WESTERN_GHATS_STATIONS.filter((station) => station.station_id !== stationId).map(
-            (station) => station.station_id
-          ),
-          mode,
-          date: targetDate,
-          onsetModel: onset,
-          activeModel: active,
-          rainfallInputs: inputs,
-          rainfallHistory: tenDayHist,
+            stationIds: currentStations.filter((station) => station.station_id !== stationId).map(
+              (station) => station.station_id
+            ),
+            mode,
+            date: targetDate,
+            onsetModel: onset,
+            activeModel: active,
+            rainfallInputs: inputs,
+            rainfallHistory: tenDayHist,
+            region,
           });
         }
         setLastFetched(new Date().toISOString());
@@ -347,6 +454,7 @@ export default function App() {
       }
     },
     [
+      activeRegion,
       selectedStationId,
       selectedDate,
       activeMode,
@@ -355,6 +463,31 @@ export default function App() {
       getCachedPrediction,
       runStationPredictionBatch,
     ]
+  );
+
+  // Switch Active Geographic Region
+  const handleRegionChange = useCallback(
+    (newRegion) => {
+      if (newRegion === activeRegion) return;
+      setActiveRegion(newRegion);
+      const defaultStationId = newRegion === 'northeast' ? 'NE_AS_01' : 'MH_GAK_12';
+      setSelectedStationId(defaultStationId);
+
+      const defaultOnset = newRegion === 'northeast' ? 'XGBoost' : 'RandomForest';
+      setSelectedModels((prev) => ({ ...prev, onset: defaultOnset }));
+
+      runRiskInference({
+        stationId: defaultStationId,
+        region: newRegion,
+        onsetModel: defaultOnset,
+        batch: true,
+      });
+
+      if (typeof window !== 'undefined' && window.PRAVAH_GLOBE?.switchRegion) {
+        window.PRAVAH_GLOBE.switchRegion(newRegion);
+      }
+    },
+    [activeRegion, runRiskInference]
   );
 
   // Initial load and station/date sync
@@ -366,7 +499,7 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, [selectedDate, activeMode]);
+  }, [selectedDate, activeMode, activeRegion]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-white">
@@ -378,6 +511,8 @@ export default function App() {
           setActiveMode(m);
           runRiskInference({ mode: m });
         }}
+        activeRegion={activeRegion}
+        onRegionChange={handleRegionChange}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
         stats={stats}
@@ -391,7 +526,9 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <WifiOff className="w-3.5 h-3.5 text-amber-400" />
             <span className="font-semibold">
-              Live Network Disconnected: Operating with Calibrated Maharashtra Offline Hydrological Cache.
+              {activeRegion === 'northeast'
+                ? 'Live Network Disconnected: Operating with Calibrated Brahmaputra Offline Hydrological Cache.'
+                : 'Live Network Disconnected: Operating with Calibrated Maharashtra Offline Hydrological Cache.'}
             </span>
           </div>
           <button
@@ -462,9 +599,59 @@ export default function App() {
             isLoading={isLoading}
             lastFetchedTimestamp={lastFetched}
             dataSource={riskData?.data_source}
-            stations={WESTERN_GHATS_STATIONS}
+            stations={activeStationList}
+            activeRegion={activeRegion}
+            onRegionChange={(reg) => {
+              setActiveRegion(reg);
+              setMapCenterOverride(null);
+            }}
             onCheckRisk={(params) => runRiskInference(params)}
           />
+
+          {/* Active Warnings Live Ticker */}
+          {activeAlerts.length > 0 && (
+            <div className="bg-slate-900/90 rounded-2xl border border-red-900/50 p-3 shadow-lg flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  <span>ACTIVE WARNING TICKER</span>
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-950/80 text-red-300 border border-red-800/60">
+                  {activeAlerts.length} LIVE ALERTS
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {activeAlerts.slice(0, 2).map((a) => (
+                  <div
+                    key={a.id}
+                    onClick={() => {
+                      if (a.region?.toLowerCase().includes('north') && activeRegion !== 'northeast') {
+                        setActiveRegion('northeast');
+                      } else if (!a.region?.toLowerCase().includes('north') && activeRegion !== 'maharashtra') {
+                        setActiveRegion('maharashtra');
+                      }
+                      setSelectedStationId(a.station_id);
+                    }}
+                    className="p-2 rounded-xl bg-slate-950/80 border border-red-900/40 hover:border-red-500/60 cursor-pointer transition text-left"
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <strong className="text-white flex items-center gap-1">
+                        <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
+                        <span>{a.station_name}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">({a.region})</span>
+                      </strong>
+                      <span className="font-mono text-red-400 font-bold text-[11px]">
+                        {Math.round(a.probability * 100)}% RISK
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1 line-clamp-2">
+                      {a.message}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Station Quick Search & Filter Panel */}
           <div className="bg-slate-900/90 rounded-2xl border border-slate-800 p-3.5 shadow-lg flex flex-col gap-3">
@@ -472,7 +659,11 @@ export default function App() {
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Filter 20 Western Ghats gauges..."
+                placeholder={
+                  activeRegion === 'northeast'
+                    ? 'Filter 10 Brahmaputra / Assam gauges...'
+                    : 'Filter 20 Western Ghats gauges...'
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition"
@@ -503,7 +694,7 @@ export default function App() {
             <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 px-1 text-xs text-slate-400 font-medium">
               <span>Registered River Gauges</span>
               <span className="font-mono text-[11px] text-cyan-400">
-                {filteredStations.length} / 20 Monitoring
+                {filteredStations.length} / {activeStationList.length} Monitoring
               </span>
             </div>
 
@@ -628,9 +819,14 @@ export default function App() {
                 if (predictionCache[id]) setRiskData(predictionCache[id]);
                 else runRiskInference({ stationId: id, batch: false });
               }}
-              centerLat={18.5204}
-              centerLng={73.8567}
-              zoom={8}
+              centerLat={mapCenterOverride ? mapCenterOverride.lat : (activeRegion === 'northeast' ? 26.2 : 18.5204)}
+              centerLng={mapCenterOverride ? mapCenterOverride.lng : (activeRegion === 'northeast' ? 92.5 : 73.8567)}
+              zoom={mapCenterOverride ? mapCenterOverride.zoom : (activeRegion === 'northeast' ? 7 : 8)}
+              catchmentsUrl={
+                activeRegion === 'northeast'
+                  ? '/api/v1/northeast/catchments'
+                  : '/api/v1/catchments'
+              }
             />
           </div>
 
@@ -639,7 +835,11 @@ export default function App() {
             <RiskCard
               prediction={riskData}
               station={selectedStation}
-              modelProvenance="Model: LightGBM Calibrated v2.1 | Daily Resolution Engine"
+              modelProvenance={
+                activeRegion === 'northeast'
+                  ? 'Model: XGBoost Calibrated NE v1.0 | Brahmaputra Multi-Task Engine'
+                  : 'Model: LightGBM Calibrated v2.1 | Daily Resolution Engine'
+              }
             />
           )}
 
@@ -682,6 +882,26 @@ export default function App() {
         </section>
 
       </main>
+
+      {/* Dev/Debug Verification Overlay (Visible only in DEV mode) */}
+      <RegionDebugPanel
+        activeRegion={activeRegion}
+        onRegionChange={(reg) => {
+          setActiveRegion(reg);
+          setMapCenterOverride(null);
+        }}
+        onSelectStation={(id) => {
+          setSelectedStationId(id);
+          if (predictionCache[id]) setRiskData(predictionCache[id]);
+          else runRiskInference({ stationId: id, batch: false });
+        }}
+        onCheckRisk={(params) => runRiskInference(params)}
+        onJumpToLocation={({ lat, lng, zoom }) => {
+          setMapCenterOverride({ lat, lng, zoom });
+        }}
+        onInjectMockAlert={handleInjectMockAlert}
+        activeStationList={activeStationList}
+      />
     </div>
   );
 }

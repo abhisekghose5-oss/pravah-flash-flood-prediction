@@ -51,11 +51,13 @@ def trigger_emergency_alert(
             f"Please stay safe, avoid low-lying riparian areas, and follow official SDRF directives."
         )
 
-        # SIH Live Demo Sandbox Fallback (when credentials are unconfigured)
+        # SIH Live Demo Sandbox Fallback (when credentials are unconfigured or placeholder)
         is_demo_mode = (
-            TWILIO_ACCOUNT_SID == "YOUR_TWILIO_ACCOUNT_SID"
-            or not TWILIO_ACCOUNT_SID
-            or TWILIO_ACCOUNT_SID.startswith("YOUR_")
+            not TWILIO_ACCOUNT_SID
+            or not TWILIO_AUTH_TOKEN
+            or TWILIO_ACCOUNT_SID.lower().startswith("your_")
+            or "twilio" in TWILIO_ACCOUNT_SID.lower()
+            or TWILIO_ACCOUNT_SID == "YOUR_TWILIO_ACCOUNT_SID"
         )
         if is_demo_mode:
             simulated_sid = f"SM_DEMO_SANDBOX_{abs(hash(cleaned_number + catchment_name)) % 1000000:06d}"

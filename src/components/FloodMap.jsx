@@ -173,6 +173,7 @@ function loadLeafletAssets() {
  * @param {number} [props.centerLat=18.5204] Initial map center latitude (Maharashtra Western Ghats)
  * @param {number} [props.centerLng=73.8567] Initial map center longitude
  * @param {number} [props.zoom=8] Initial zoom level
+ * @param {string} [props.catchmentsUrl='/api/v1/catchments'] URL for catchments GeoJSON
  * @param {string} [props.className] Container class override
  */
 export default function FloodMap({
@@ -184,6 +185,7 @@ export default function FloodMap({
   centerLat = 18.5204,
   centerLng = 73.8567,
   zoom = 8,
+  catchmentsUrl = '/api/v1/catchments',
   className = '',
 }) {
   const mapContainerRef = useRef(null);
@@ -192,11 +194,14 @@ export default function FloodMap({
   const markersLayerRef = useRef(null);
   const radiiLayerRef = useRef(null);
   const catchmentsLayerRef = useRef(null);
+  const radarLayerRef = useRef(null);
 
   // Component UI State
   const [activeTileKey, setActiveTileKey] = useState('cartoDark');
   const [showHazardRadii, setShowHazardRadii] = useState(true);
   const [showCatchmentBoundaries, setShowCatchmentBoundaries] = useState(true);
+  const [showRadarOverlay, setShowRadarOverlay] = useState(true);
+  const [radarStations, setRadarStations] = useState([]);
   const [catchmentsGeoJson, setCatchmentsGeoJson] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -225,16 +230,24 @@ export default function FloodMap({
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch 20 Target Catchment GeoJSON boundaries
+  // Fetch Doppler Radar stations
   useEffect(() => {
-    fetch('/api/v1/catchments')
+    fetch('/api/v1/radar/stations')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setRadarStations(data))
+      .catch((err) => console.warn('Could not load Doppler radar stations:', err));
+  }, []);
+
+  // Fetch Target Catchment GeoJSON boundaries for active region
+  useEffect(() => {
+    fetch(catchmentsUrl)
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error('Catchments GeoJSON HTTP error');
       })
       .then((data) => setCatchmentsGeoJson(data))
-      .catch((err) => console.warn('Could not load catchments GeoJSON:', err));
-  }, []);
+      .catch((err) => console.warn('Could not load catchments GeoJSON from', catchmentsUrl, err));
+  }, [catchmentsUrl]);
 
   // Track station risk counts for legend
   const tierCounts = useMemo(() => {
@@ -292,12 +305,14 @@ export default function FloodMap({
         const catchmentsGroup = L.layerGroup().addTo(map);
         const radiiGroup = L.layerGroup().addTo(map);
         const markersGroup = L.layerGroup().addTo(map);
+        const radarGroup = L.layerGroup().addTo(map);
 
         mapInstanceRef.current = map;
         tileLayerRef.current = tileLayer;
         catchmentsLayerRef.current = catchmentsGroup;
         radiiLayerRef.current = radiiGroup;
         markersLayerRef.current = markersGroup;
+        radarLayerRef.current = radarGroup;
 
         setIsLoading(false);
       })
@@ -316,6 +331,16 @@ export default function FloodMap({
         mapInstanceRef.current = null;
       }
     };
+  }, []);
+
+  // 1B. Smoothly Pan / Fly Map Viewport when Center Coordinates or Zoom Level Change
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([centerLat, centerLng], zoom, {
+        duration: 1.4,
+        easeLinearity: 0.25,
+      });
+    }
   }, [centerLat, centerLng, zoom]);
 
   // 2. Handle Tile Provider Switching
@@ -356,10 +381,13 @@ export default function FloodMap({
     try {
       const geoLayer = L.geoJSON(catchmentsGeoJson, {
         style: (feature) => {
-          const gid = String(feature?.properties?.GaugeID || feature?.properties?.gauge_id || '');
+          const props = feature?.properties || {};
+          const gid = String(props.GaugeID || props.gauge_id || props.station_id || props.station_name || '');
           const st = stations.find(
             (s) =>
               s.station_id === gid ||
+              s.legacy_gauge_id === gid ||
+              s.name?.toLowerCase() === gid.toLowerCase() ||
               s.station_id?.endsWith(gid) ||
               gid.endsWith(s.station_id?.split('_').pop())
           );
@@ -377,10 +405,12 @@ export default function FloodMap({
         },
         onEachFeature: (feature, layer) => {
           const props = feature.properties || {};
-          const gid = String(props.GaugeID || props.gauge_id || '');
+          const gid = String(props.GaugeID || props.gauge_id || props.station_id || props.station_name || '');
           const st = stations.find(
             (s) =>
               s.station_id === gid ||
+              s.legacy_gauge_id === gid ||
+              s.name?.toLowerCase() === gid.toLowerCase() ||
               s.station_id?.endsWith(gid) ||
               gid.endsWith(s.station_id?.split('_').pop())
           );
@@ -411,6 +441,76 @@ export default function FloodMap({
       console.warn('Failed to render catchment polygons on map:', err);
     }
   }, [catchmentsGeoJson, showCatchmentBoundaries, selectedStationId, stations, onSelectStation]);
+
+  // 2B. Render IMD Doppler Radar Stations & Sweep Coverage Circles
+  useEffect(() => {
+    if (!mapInstanceRef.current || !radarLayerRef.current || typeof window === 'undefined' || !window.L) {
+      return;
+    }
+
+    const L = window.L;
+    const radarGroup = radarLayerRef.current;
+    radarGroup.clearLayers();
+
+    if (!showRadarOverlay || !radarStations || radarStations.length === 0) return;
+
+    radarStations.forEach((radar) => {
+      // 1. Radar Coverage Range Circle (e.g. 100km or 250km)
+      const rangeMeters = (radar.range_km || 250) * 1000;
+      const coverageCircle = L.circle([radar.latitude, radar.longitude], {
+        radius: rangeMeters,
+        color: radar.region === 'Northeast' ? '#10b981' : '#06b6d4',
+        weight: 1.2,
+        opacity: 0.5,
+        dashArray: '6, 6',
+        fillColor: radar.region === 'Northeast' ? '#10b981' : '#06b6d4',
+        fillOpacity: 0.04,
+      });
+
+      coverageCircle.bindTooltip(
+        `<div class="font-sans text-xs">
+          <strong class="text-white block">${radar.name}</strong>
+          <span class="text-slate-300 block">Band: ${radar.band} (${radar.range_km} km sweep)</span>
+          <span class="text-emerald-400 block font-mono">Max Reflectivity: ${radar.reflectivity_summary?.max_dbz || 45} dBZ</span>
+          <span class="text-slate-400 block text-[10px]">${radar.coverage}</span>
+        </div>`,
+        { className: 'leaflet-dark-tooltip', direction: 'top' }
+      );
+
+      coverageCircle.addTo(radarGroup);
+
+      // 2. Center Radar Antenna Beacon Marker
+      const beaconHtml = `
+        <div class="relative flex items-center justify-center cursor-pointer" style="width: 28px; height: 28px;">
+          <div class="absolute inset-0 rounded-full animate-ping opacity-60" style="background-color: ${
+            radar.region === 'Northeast' ? '#10b981' : '#06b6d4'
+          };"></div>
+          <div class="relative w-4 h-4 rounded-full border-2 border-white shadow-lg flex items-center justify-center" style="background-color: ${
+            radar.region === 'Northeast' ? '#059669' : '#0891b2'
+          };">
+            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+          </div>
+        </div>
+      `;
+
+      const beaconIcon = L.divIcon({
+        html: beaconHtml,
+        className: 'pravah-radar-beacon-icon',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      });
+
+      const beaconMarker = L.marker([radar.latitude, radar.longitude], { icon: beaconIcon });
+      beaconMarker.bindTooltip(
+        `<div class="font-sans text-xs">
+          <strong class="text-white block">📡 ${radar.name}</strong>
+          <span class="text-cyan-300 block font-mono">Status: ${radar.status}</span>
+        </div>`,
+        { className: 'leaflet-dark-tooltip', direction: 'top' }
+      );
+      beaconMarker.addTo(radarGroup);
+    });
+  }, [radarStations, showRadarOverlay]);
 
   // 3. Render Stations Markers & Circular Hazard Radii
   useEffect(() => {
@@ -656,6 +756,36 @@ export default function FloodMap({
           >
             {showHazardRadii ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span className="hidden md:inline">Hazard Radii</span>
+          </button>
+
+          {/* Toggle IMD Doppler Radar Overlay */}
+          <button
+            type="button"
+            onClick={() => setShowRadarOverlay((prev) => !prev)}
+            title={showRadarOverlay ? 'Hide Doppler Radar' : 'Show Doppler Radar'}
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+              showRadarOverlay
+                ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline">Radar</span>
+          </button>
+
+          {/* Quick-Travel: Jump to Northeast Button (Step 2) */}
+          <button
+            type="button"
+            onClick={() => {
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.flyTo([26.20, 92.93], 7, { duration: 1.4 });
+              }
+            }}
+            title="Jump to Northeast (Brahmaputra)"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600/30 shadow-sm"
+          >
+            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Jump to NE</span>
           </button>
 
           {/* Reset Overview Camera */}

@@ -312,6 +312,183 @@ export const WESTERN_GHATS_STATIONS = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Northeast India (Assam / Brahmaputra Basin) Station Catalog
+// Derived from Assam Water Resources Dept & Central Water Commission stations
+// ---------------------------------------------------------------------------
+export const NORTHEAST_STATIONS = [
+  {
+    station_id: 'NE_AS_01',
+    legacy_gauge_id: 'Beki',
+    name: 'Beki',
+    river: 'Beki / Manas',
+    basin: 'Brahmaputra',
+    district: 'Barpeta',
+    state: 'Assam',
+    lat: 26.4983,
+    lng: 90.9192,
+    region: 'Northeast',
+    warning_level_m: 44.5,
+    danger_level_m: 45.1,
+    default_tier: 'EMERGENCY',
+    default_probability: 0.86,
+    base_rainfall: { day_1: 45.0, day_3_cum: 110.0, day_7_cum: 220.0 },
+  },
+  {
+    station_id: 'NE_AS_02',
+    legacy_gauge_id: 'AWRMI Office Campus',
+    name: 'AWRMI Office Campus',
+    river: 'Brahmaputra / Bharalu',
+    basin: 'Brahmaputra',
+    district: 'Kamrup Metropolitan',
+    state: 'Assam',
+    lat: 26.1027,
+    lng: 91.7951,
+    region: 'Northeast',
+    warning_level_m: 48.0,
+    danger_level_m: 49.0,
+    default_tier: 'ADVISORY',
+    default_probability: 0.38,
+    base_rainfall: { day_1: 22.0, day_3_cum: 58.0, day_7_cum: 115.0 },
+  },
+  {
+    station_id: 'NE_AS_03',
+    legacy_gauge_id: 'Golokganj RG Site',
+    name: 'Golokganj',
+    river: 'Gangadhar',
+    basin: 'Brahmaputra',
+    district: 'Dhubri',
+    state: 'Assam',
+    lat: 26.1088,
+    lng: 89.8307,
+    region: 'Northeast',
+    warning_level_m: 30.0,
+    danger_level_m: 31.0,
+    default_tier: 'WARNING',
+    default_probability: 0.68,
+    base_rainfall: { day_1: 38.0, day_3_cum: 85.0, day_7_cum: 165.0 },
+  },
+  {
+    station_id: 'NE_AS_04',
+    legacy_gauge_id: 'Kokrajhar Circuit House',
+    name: 'Kokrajhar',
+    river: 'Gourang',
+    basin: 'Brahmaputra',
+    district: 'Kokrajhar',
+    state: 'Assam',
+    lat: 26.4005,
+    lng: 90.2598,
+    region: 'Northeast',
+    warning_level_m: 36.0,
+    danger_level_m: 37.2,
+    default_tier: 'WARNING',
+    default_probability: 0.62,
+    base_rainfall: { day_1: 32.0, day_3_cum: 78.0, day_7_cum: 145.0 },
+  },
+  {
+    station_id: 'NE_AS_05',
+    legacy_gauge_id: 'Barpeta  E & D Office',
+    name: 'Barpeta E&D',
+    river: 'Chaulkhoa',
+    basin: 'Brahmaputra',
+    district: 'Barpeta',
+    state: 'Assam',
+    lat: 26.3247,
+    lng: 91.0006,
+    region: 'Northeast',
+    warning_level_m: 42.0,
+    danger_level_m: 43.5,
+    default_tier: 'EMERGENCY',
+    default_probability: 0.81,
+    base_rainfall: { day_1: 42.0, day_3_cum: 95.0, day_7_cum: 195.0 },
+  },
+  {
+    station_id: 'NE_AS_06',
+    legacy_gauge_id: 'Chapar PHC',
+    name: 'Chapar',
+    river: 'Champabati',
+    basin: 'Brahmaputra',
+    district: 'Dhubri',
+    state: 'Assam',
+    lat: 26.2697,
+    lng: 90.4444,
+    region: 'Northeast',
+    warning_level_m: 32.5,
+    danger_level_m: 33.8,
+    default_tier: 'ADVISORY',
+    default_probability: 0.44,
+    base_rainfall: { day_1: 18.0, day_3_cum: 45.0, day_7_cum: 90.0 },
+  },
+  {
+    station_id: 'NE_AS_07',
+    legacy_gauge_id: 'Balbala GP Office Campus',
+    name: 'Balbala',
+    river: 'Jinjiram',
+    basin: 'Brahmaputra',
+    district: 'Goalpara',
+    state: 'Assam',
+    lat: 26.0694,
+    lng: 90.5978,
+    region: 'Northeast',
+    warning_level_m: 34.0,
+    danger_level_m: 35.2,
+    default_tier: 'NORMAL',
+    default_probability: 0.18,
+    base_rainfall: { day_1: 8.0, day_3_cum: 22.0, day_7_cum: 48.0 },
+  },
+  {
+    station_id: 'NE_AS_08',
+    legacy_gauge_id: 'NH15 Crossing Dhansirighat',
+    name: 'Dhansirighat',
+    river: 'Dhansiri',
+    basin: 'Brahmaputra',
+    district: 'Udalguri',
+    state: 'Assam',
+    lat: 26.6958,
+    lng: 92.2578,
+    region: 'Northeast',
+    warning_level_m: 78.0,
+    danger_level_m: 80.0,
+    default_tier: 'ADVISORY',
+    default_probability: 0.48,
+    base_rainfall: { day_1: 26.0, day_3_cum: 62.0, day_7_cum: 125.0 },
+  },
+  {
+    station_id: 'NE_AS_09',
+    legacy_gauge_id: 'NH17 Crossing Boko',
+    name: 'Boko',
+    river: 'Boko / Singra',
+    basin: 'Brahmaputra',
+    district: 'Kamrup',
+    state: 'Assam',
+    lat: 25.9800,
+    lng: 91.2300,
+    region: 'Northeast',
+    warning_level_m: 46.0,
+    danger_level_m: 47.5,
+    default_tier: 'NORMAL',
+    default_probability: 0.22,
+    base_rainfall: { day_1: 12.0, day_3_cum: 32.0, day_7_cum: 68.0 },
+  },
+  {
+    station_id: 'NE_AS_10',
+    legacy_gauge_id: 'Baghmari Tea State',
+    name: 'Baghmari',
+    river: 'Bhoroli',
+    basin: 'Brahmaputra',
+    district: 'Sonitpur',
+    state: 'Assam',
+    lat: 26.7512,
+    lng: 93.2286,
+    region: 'Northeast',
+    warning_level_m: 55.0,
+    danger_level_m: 56.5,
+    default_tier: 'NORMAL',
+    default_probability: 0.16,
+    base_rainfall: { day_1: 9.0, day_3_cum: 25.0, day_7_cum: 52.0 },
+  },
+];
+
 // Tier recommendation mappings
 const TIER_RECOMMENDATIONS = {
   EMERGENCY: {
@@ -482,6 +659,8 @@ export async function fetchFloodPrediction(params = {}) {
   // Attempt live inference via FastAPI backend
   let liveResult = null;
   const gaugeId = station.legacy_gauge_id || station.station_id;
+  const isNe = station.region === 'Northeast' || String(station.station_id).startsWith('NE');
+  const regionParam = isNe ? 'NE' : 'maharashtra';
 
   try {
     const controller = new AbortController();
@@ -491,8 +670,10 @@ export async function fetchFloodPrediction(params = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         gauge_id: String(gaugeId),
+        station_id: String(station.legacy_gauge_id || station.station_id),
+        region: regionParam,
         rainfall_history_10d: tenDaySeries,
-        onset_model: onset_model || 'RandomForest',
+        onset_model: onset_model || (isNe ? 'XGBoost' : 'RandomForest'),
         active_model: active_model || 'XGBoost',
       }),
       signal: controller.signal,
@@ -634,17 +815,22 @@ export async function fetchLiveOpenMeteoRainfall(lat, lng) {
 }
 
 /**
- * Fetch overview of all 20 stations with their current status
+ * Fetch overview of all stations with their current status for requested region
  */
-export async function fetchAllStations(date = new Date().toISOString().split('T')[0]) {
+export async function fetchAllStations(date = new Date().toISOString().split('T')[0], region = 'maharashtra') {
   await new Promise((resolve) => setTimeout(resolve, 150));
-  return WESTERN_GHATS_STATIONS.map((s) => ({
+  const isNe = region?.toLowerCase() === 'northeast' || region?.toLowerCase() === 'ne';
+  const list = isNe ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
+
+  return list.map((s) => ({
     station_id: s.station_id,
     legacy_gauge_id: s.legacy_gauge_id,
     name: s.name,
     river: s.river,
     basin: s.basin,
     district: s.district,
+    state: s.state || (isNe ? 'Assam' : 'Maharashtra'),
+    region: s.region || (isNe ? 'Northeast' : 'Maharashtra'),
     lat: s.lat,
     lng: s.lng,
     risk_tier: s.default_tier,

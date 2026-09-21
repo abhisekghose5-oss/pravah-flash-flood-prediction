@@ -33,6 +33,8 @@ def load_rainfall_observations() -> pd.DataFrame:
             normalized.pop("Data Acquisition Time"), format=TIME_FORMAT, errors="coerce"
         )
         normalized = normalized.rename(columns={"Manual Daily Rainfall (mm)": "rainfall_mm"})
+        normalized["rainfall_mm"] = pd.to_numeric(normalized["rainfall_mm"], errors="coerce")
+        normalized = normalized.dropna(subset=["rainfall_mm"])
         normalized["source_file"] = source_file
         frames.append(normalized)
 
@@ -56,6 +58,8 @@ def load_water_level_observations() -> pd.DataFrame:
             normalized.pop("Data Acquisition Time"), format=TIME_FORMAT, errors="coerce"
         )
         normalized = normalized.rename(columns={"River Water Level Telemetry Hourly (meter)": "water_level_m"})
+        normalized["water_level_m"] = pd.to_numeric(normalized["water_level_m"], errors="coerce")
+        normalized = normalized.dropna(subset=["water_level_m"])
         normalized["source_file"] = source_file
         frames.append(normalized)
 

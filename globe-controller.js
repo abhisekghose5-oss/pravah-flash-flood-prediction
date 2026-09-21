@@ -288,6 +288,150 @@
     },
   ];
 
+  // Northeast India (Assam / Brahmaputra Basin) gauge stations
+  const NORTHEAST_STATIONS = [
+    {
+      station_id: 'NE_AS_01',
+      name: 'Beki',
+      river: 'Beki / Manas',
+      district: 'Barpeta',
+      lat: 26.4983,
+      lng: 90.9192,
+      rainfall: '45.0 mm',
+      warning_level_m: 44.5,
+      danger_level_m: 45.1,
+      risk: 'EMERGENCY',
+      flood_prob: 0.86,
+      color: '#ef4444',
+    },
+    {
+      station_id: 'NE_AS_02',
+      name: 'AWRMI Campus',
+      river: 'Bharalu',
+      district: 'Kamrup Metro',
+      lat: 26.1027,
+      lng: 91.7951,
+      rainfall: '22.0 mm',
+      warning_level_m: 48.0,
+      danger_level_m: 49.0,
+      risk: 'ADVISORY',
+      flood_prob: 0.38,
+      color: '#eab308',
+    },
+    {
+      station_id: 'NE_AS_03',
+      name: 'Golokganj',
+      river: 'Gangadhar',
+      district: 'Dhubri',
+      lat: 26.1088,
+      lng: 89.8307,
+      rainfall: '38.0 mm',
+      warning_level_m: 30.0,
+      danger_level_m: 31.0,
+      risk: 'WARNING',
+      flood_prob: 0.68,
+      color: '#f97316',
+    },
+    {
+      station_id: 'NE_AS_04',
+      name: 'Kokrajhar',
+      river: 'Gourang',
+      district: 'Kokrajhar',
+      lat: 26.4005,
+      lng: 90.2598,
+      rainfall: '32.0 mm',
+      warning_level_m: 36.0,
+      danger_level_m: 37.2,
+      risk: 'WARNING',
+      flood_prob: 0.62,
+      color: '#f97316',
+    },
+    {
+      station_id: 'NE_AS_05',
+      name: 'Barpeta E&D',
+      river: 'Chaulkhoa',
+      district: 'Barpeta',
+      lat: 26.3247,
+      lng: 91.0006,
+      rainfall: '42.0 mm',
+      warning_level_m: 42.0,
+      danger_level_m: 43.5,
+      risk: 'EMERGENCY',
+      flood_prob: 0.81,
+      color: '#ef4444',
+    },
+    {
+      station_id: 'NE_AS_06',
+      name: 'Chapar',
+      river: 'Champabati',
+      district: 'Dhubri',
+      lat: 26.2697,
+      lng: 90.4444,
+      rainfall: '18.0 mm',
+      warning_level_m: 32.5,
+      danger_level_m: 33.8,
+      risk: 'ADVISORY',
+      flood_prob: 0.44,
+      color: '#eab308',
+    },
+    {
+      station_id: 'NE_AS_07',
+      name: 'Balbala',
+      river: 'Jinjiram',
+      district: 'Goalpara',
+      lat: 26.0694,
+      lng: 90.5978,
+      rainfall: '8.0 mm',
+      warning_level_m: 34.0,
+      danger_level_m: 35.2,
+      risk: 'NORMAL',
+      flood_prob: 0.18,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'NE_AS_08',
+      name: 'Dhansirighat',
+      river: 'Dhansiri',
+      district: 'Udalguri',
+      lat: 26.6958,
+      lng: 92.2578,
+      rainfall: '26.0 mm',
+      warning_level_m: 78.0,
+      danger_level_m: 80.0,
+      risk: 'ADVISORY',
+      flood_prob: 0.48,
+      color: '#eab308',
+    },
+    {
+      station_id: 'NE_AS_09',
+      name: 'Boko',
+      river: 'Boko / Singra',
+      district: 'Kamrup',
+      lat: 25.9800,
+      lng: 91.2300,
+      rainfall: '12.0 mm',
+      warning_level_m: 46.0,
+      danger_level_m: 47.5,
+      risk: 'NORMAL',
+      flood_prob: 0.22,
+      color: '#06b6d4',
+    },
+    {
+      station_id: 'NE_AS_10',
+      name: 'Baghmari',
+      river: 'Bhoroli',
+      district: 'Sonitpur',
+      lat: 26.7512,
+      lng: 93.2286,
+      rainfall: '9.0 mm',
+      warning_level_m: 55.0,
+      danger_level_m: 56.5,
+      risk: 'NORMAL',
+      flood_prob: 0.16,
+      color: '#06b6d4',
+    },
+  ];
+
   let globeInstance = null;
   let idleTimer = null;
   let isInteracting = false;
@@ -298,6 +442,13 @@
     lat: 18.2,
     lng: 73.9,
     altitude: 0.72,
+  };
+
+  // Northeast India regional target coordinate
+  const NORTHEAST_VIEW = {
+    lat: 26.2,
+    lng: 92.5,
+    altitude: 0.65,
   };
 
   // Cinematic start perspective (deep space view of Earth against stars)
@@ -465,18 +616,22 @@
       // 5. Rippling Wave Animation Radiating Outward (Requirement 3)
       globeInstance
         .ringsData(WESTERN_GHATS_STATIONS)
-        .ringLat('lat')
-        .ringLng('lng')
+        .ringLat((d) => d.latitude ?? d.lat)
+        .ringLng((d) => d.longitude ?? d.lng)
         .ringColor((d) =>
-          d.risk === 'EMERGENCY'
+          d.latitude !== undefined && d.lat === undefined
+            ? (t) => `rgba(239, 68, 68, ${Math.max(0, 1 - t)})`
+            : d.risk === 'SAFE_ZONE'
+            ? (t) => `rgba(34, 197, 94, ${0.95 * (1 - t)})`
+            : d.risk === 'EMERGENCY'
             ? (t) => `rgba(239, 68, 68, ${0.9 * (1 - t)})`
             : d.risk === 'WARNING'
             ? (t) => `rgba(249, 115, 22, ${0.75 * (1 - t)})`
             : (t) => `rgba(6, 182, 212, ${0.55 * (1 - t)})`
         )
-        .ringMaxRadius((d) => (d.risk === 'EMERGENCY' ? 4.8 : d.risk === 'WARNING' ? 3.0 : 1.8))
-        .ringPropagationSpeed((d) => (d.risk === 'EMERGENCY' ? 4.2 : 2.0))
-        .ringRepeatPeriod((d) => (d.risk === 'EMERGENCY' ? 600 : 1300))
+        .ringMaxRadius((d) => (d.latitude !== undefined && d.lat === undefined ? 2 : d.risk === 'SAFE_ZONE' ? 3.5 : d.risk === 'EMERGENCY' ? 4.8 : d.risk === 'WARNING' ? 3.0 : 1.8))
+        .ringPropagationSpeed((d) => (d.latitude !== undefined && d.lat === undefined ? 1 : d.risk === 'SAFE_ZONE' ? 2.5 : d.risk === 'EMERGENCY' ? 4.2 : 2.0))
+        .ringRepeatPeriod((d) => (d.latitude !== undefined && d.lat === undefined ? 800 : d.risk === 'SAFE_ZONE' ? 800 : d.risk === 'EMERGENCY' ? 600 : 1300))
         // 5b. Evacuation Flight-Paths (Arcs) intact
         .arcsData([])
         .arcStartLat('startLat')
@@ -606,8 +761,22 @@
 
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        if (!globeInstance) return;
-        globeInstance.pointOfView(WESTERN_GHATS_VIEW, 1600);
+        if (window.PRAVAH && typeof window.PRAVAH.switchRegion === 'function') {
+          window.PRAVAH.switchRegion('maharashtra');
+        } else if (globeInstance) {
+          window.PRAVAH_GLOBE.switchRegion('maharashtra');
+        }
+      });
+    }
+
+    const jumpNeBtn = document.getElementById('globeJumpNortheastBtn');
+    if (jumpNeBtn) {
+      jumpNeBtn.addEventListener('click', () => {
+        if (window.PRAVAH && typeof window.PRAVAH.switchRegion === 'function') {
+          window.PRAVAH.switchRegion('northeast');
+        } else if (globeInstance) {
+          window.PRAVAH_GLOBE.switchRegion('northeast');
+        }
       });
     }
   }
@@ -646,10 +815,28 @@
 
   window.PRAVAH_GLOBE = {
     resetToWesternGhats: () => globeInstance && globeInstance.pointOfView(WESTERN_GHATS_VIEW, 1500),
+    resetToNortheast: () => globeInstance && globeInstance.pointOfView(NORTHEAST_VIEW, 1500),
     zoomToGlobal: () => globeInstance && globeInstance.pointOfView(GLOBAL_SPACE_VIEW, 1500),
+    switchRegion: (region) => {
+      if (!globeInstance) return;
+      const isNe = region === 'northeast' || region === 'NE';
+      const targetStations = isNe ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
+      const targetView = isNe ? NORTHEAST_VIEW : WESTERN_GHATS_VIEW;
+      globeInstance.customLayerData(targetStations);
+      globeInstance.ringsData(targetStations);
+      globeInstance.pointOfView(targetView, 1800);
+
+      const resetGhatsBtn = document.getElementById('globeResetGhatsBtn');
+      const jumpNeBtn = document.getElementById('globeJumpNortheastBtn');
+      if (resetGhatsBtn) resetGhatsBtn.classList.toggle('active', !isNe);
+      if (jumpNeBtn) jumpNeBtn.classList.toggle('active', isNe);
+
+      console.log(`[PRAVAH Globe] Panned camera and switched telemetry to ${isNe ? 'Brahmaputra (NE)' : 'Western Ghats (MH)'}.`);
+    },
     flyToStation: (stationId) => {
       if (!globeInstance) return;
-      const st = WESTERN_GHATS_STATIONS.find((s) => s.station_id === stationId);
+      const allStations = [...WESTERN_GHATS_STATIONS, ...NORTHEAST_STATIONS];
+      const st = allStations.find((s) => s.station_id === stationId);
       if (st) {
         globeInstance.pointOfView(
           {
@@ -661,7 +848,25 @@
         );
       }
     },
+    injectAlert: ({ stationId = 'NE_AS_01', tier = 'EMERGENCY', color = '#ef4444' }) => {
+      if (!globeInstance) return;
+      const updatedNE = NORTHEAST_STATIONS.map((s) => {
+        if (s.station_id === stationId || s.legacy_gauge_id === stationId || s.name.toLowerCase() === String(stationId).toLowerCase()) {
+          return {
+            ...s,
+            risk: tier,
+            flood_prob: 0.88,
+            color: color,
+          };
+        }
+        return s;
+      });
+      globeInstance.customLayerData(updatedNE);
+      globeInstance.ringsData(updatedNE.filter((s) => s.risk === 'EMERGENCY' || s.risk === 'WARNING'));
+      console.log(`[PRAVAH Globe] Injected ${tier} alert for station ${stationId} with color ${color}`);
+    },
     getStations: () => WESTERN_GHATS_STATIONS,
+    getNortheastStations: () => NORTHEAST_STATIONS,
     getGlobeInstance: () => globeInstance,
     updateCitizenSosRings: (reports) => {
       if (!globeInstance || !Array.isArray(reports)) return;
@@ -675,6 +880,10 @@
         .ringRepeatPeriod(800);
     },
   };
+
+  // Ensure window.PRAVAH namespace includes switchRegion
+  if (!window.PRAVAH) window.PRAVAH = {};
+  window.PRAVAH.switchRegion = (r) => window.PRAVAH_GLOBE.switchRegion(r);
 
   // =========================================================================
   // CITIZEN SOS REPORTS POLLING & RINGS VISUALIZATION (SRE HARDENED)
@@ -716,14 +925,9 @@
           .slice(-MAX_SOS_BEACONS);
 
         citizenSosReports = validReports;
-        globeInstance
-          .ringsData(citizenSosReports)
-          .ringLat((d) => d.latitude)
-          .ringLng((d) => d.longitude)
-          .ringColor(() => (t) => `rgba(239, 68, 68, ${Math.max(0, 1 - t)})`)
-          .ringMaxRadius(2)
-          .ringPropagationSpeed(1)
-          .ringRepeatPeriod(800);
+        const currentRings = globeInstance.ringsData() || [];
+        const stationRings = currentRings.filter((d) => d.lat !== undefined);
+        globeInstance.ringsData([...stationRings, ...citizenSosReports]);
 
         if (validReports.length > 0) {
           console.log(`[Globe.gl] Rendered ${validReports.length} sanitized Citizen SOS beacon(s).`);
@@ -771,7 +975,7 @@
   }
 
   // Fetch nearest safe zone and render animated evacuation flight-path arc with bounds checking
-  async function fetchAndRenderEvacuation(dangerLat, dangerLng) {
+  async function fetchAndRenderEvacuation(dangerLat, dangerLng, regionHint) {
     const sLat = parseFloat(dangerLat);
     const sLng = parseFloat(dangerLng);
 
@@ -782,13 +986,15 @@
     }
 
     try {
-      const res = await fetch(`/api/evacuation-route?lat=${sLat}&lng=${sLng}`);
+      const regionParam = regionHint ? `&region=${encodeURIComponent(regionHint)}` : '';
+      const res = await fetch(`/api/evacuation-route?lat=${sLat}&lng=${sLng}${regionParam}`);
       if (!res.ok) throw new Error('Route fetch failed');
       const data = await res.json();
       const camp = data.nearest_camp;
+      if (!camp) return;
 
-      const eLat = camp ? parseFloat(camp.latitude) : NaN;
-      const eLng = camp ? parseFloat(camp.longitude) : NaN;
+      const eLat = parseFloat(camp.latitude);
+      const eLng = parseFloat(camp.longitude);
 
       if (Number.isFinite(eLat) && Number.isFinite(eLng) && globeInstance) {
         const newArc = {
@@ -802,11 +1008,37 @@
 
         evacuationArcs = [newArc];
         globeInstance.arcsData(evacuationArcs);
+
+        // Add shelter safe zone as pulsing emerald beacon ring
+        const currentStations = activeRegion === 'northeast' ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
+        const safeZoneRing = {
+          lat: eLat,
+          lng: eLng,
+          risk: 'SAFE_ZONE',
+          name: camp.name,
+        };
+        globeInstance.ringsData([...currentStations, safeZoneRing]);
+
+        // Smoothly focus camera on the station & shelter midpoint, and pause autoRotate so view stays stable
+        const controls = globeInstance.controls();
+        if (controls) {
+          controls.autoRotate = false;
+        }
+        const midLat = (sLat + eLat) / 2;
+        const midLng = (sLng + eLng) / 2;
+        globeInstance.pointOfView({ lat: midLat, lng: midLng, altitude: 0.38 }, 1200);
+
         console.log(`[PRAVAH Evac] Evacuation route drawn to ${camp.name} (${data.distance_km} km)`);
 
-        // Trigger Dynamic Evacuation Directive UI Card
+        // Trigger Dynamic Evacuation Directive UI Card with rich shelter metadata
         if (typeof window.showEvacuationCard === 'function') {
-          window.showEvacuationCard(camp.name, data.distance_km, eLat, eLng);
+          window.showEvacuationCard(camp.name, data.distance_km, eLat, eLng, {
+            ...camp,
+            originLat: sLat,
+            originLng: sLng,
+            estimated_walk_time_mins: data.estimated_walk_time_mins || camp.estimated_walk_time_mins,
+            estimated_drive_time_mins: camp.estimated_drive_time_mins,
+          });
         }
       }
     } catch (err) {
@@ -819,6 +1051,8 @@
     evacuationArcs = [];
     if (globeInstance) {
       globeInstance.arcsData([]);
+      const currentStations = activeRegion === 'northeast' ? NORTHEAST_STATIONS : WESTERN_GHATS_STATIONS;
+      globeInstance.ringsData(currentStations);
     }
     if (typeof window.hideEvacuationCard === 'function') {
       window.hideEvacuationCard();
