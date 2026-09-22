@@ -1,0 +1,1 @@
+"""Community reporting routes package."""

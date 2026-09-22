@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Flood Propagation & Inundation Simulator</title>
+  <meta name="description" content="PRAVAH Flood Propagation Simulator: Dynamic time-based inundation projection, dam release flood routing, river overflow breach modeling, and infrastructure impact estimation." />
+
+  <!-- Fonts & Leaflet CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Tailwind compiled styles -->
+  <link rel="stylesheet" href="/src/index.css" />
+
+  <style>
+    :root {
+      --bg-dark: #070d17;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(56, 189, 248, 0.18);
+      --accent-cyan: #06b6d4;
+      --accent-sky: #38bdf8;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(6, 182, 212, 0.09) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glass-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .shimmer-cyan {
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #06b6d4);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    #simulationMap {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      border-radius: 14px;
+      background: #060a12;
+    }
+
+    .leaflet-container {
+      background: #050b14 !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    /* Range slider custom look */
+    input[type=range] {
+      accent-color: #06b6d4;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.6);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 antialiased selection:bg-cyan-500 selection:text-white flex flex-col">
+
+  <!-- ========================================================================= -->
+  <!-- 1. Top Navigation Bar                                                     -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-slate-950/85 backdrop-blur-md border-b border-cyan-500/20 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-950/70 border border-cyan-500/40 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M2 17h20M2 7h20"></path>
+            <circle cx="12" cy="12" r="3" fill="#06b6d4"></circle>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              <span>PRAVAH SIMULATION</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">PROPAGATION v1.0</span>
+            </h1>
+          </div>
+          <p class="text-xs text-slate-400">Flood Inundation & Temporal Wave Propagation Simulator</p>
+        </div>
+      </div>
+
+      <!-- Quick Portal Links -->
+      <nav class="flex items-center gap-1.5 flex-wrap">
+        <a href="index.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">3D Globe</a>
+        <a href="map.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">GIS Map</a>
+        <a href="weather.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Doppler</a>
+        <a href="evacuation.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Evacuation</a>
+        <a href="alerts.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Alerts</a>
+        <a href="community.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Community</a>
+        <a href="xai.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">XAI Explain</a>
+        <a href="digital_twin.html" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Digital Twin</a>
+        <span class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-500/40">Propagation</span>
+
+        <button onclick="openRawModal()" class="ml-2 px-2.5 py-1.5 rounded-lg text-xs font-mono text-cyan-300 bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span>JSON</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Simulation Workspace                                                   -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- LEFT PANEL: Scenario Inputs & Controls (4 cols) -->
+    <div class="lg:col-span-4 flex flex-col gap-4">
+      
+      <!-- Preset Scenarios Card -->
+      <div class="glass-panel p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span>Scenario Presets</span>
+          </h2>
+          <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">Benchmark</span>
+        </div>
+        <select id="scenarioSelect" onchange="onScenarioSelect()" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 transition">
+          <option value="">-- Choose Benchmark Scenario --</option>
+        </select>
+        <p id="scenarioDesc" class="text-[11px] text-slate-400 mt-2 leading-relaxed italic">Select a preset or customize scenario parameters below.</p>
+      </div>
+
+      <!-- Scenario Type Tabs -->
+      <div class="glass-panel p-4">
+        <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2.5">1. Scenario Category</div>
+        <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-900/80 rounded-lg border border-slate-800 text-xs">
+          <button id="tabRainfall" onclick="setScenarioTab('rainfall')" class="py-1.5 px-2 rounded font-medium text-center transition bg-cyan-600 text-white shadow">
+            🌧️ Rain
+          </button>
+          <button id="tabDamRelease" onclick="setScenarioTab('dam_release')" class="py-1.5 px-2 rounded font-medium text-center transition text-slate-400 hover:text-slate-200">
+            🌊 Dam
+          </button>
+          <button id="tabRiverOverflow" onclick="setScenarioTab('river_overflow')" class="py-1.5 px-2 rounded font-medium text-center transition text-slate-400 hover:text-slate-200">
+            ⚠️ Overflow
+          </button>
+        </div>
+
+        <!-- Simulation Period Horizon -->
+        <div class="mt-4">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs font-medium text-slate-300">Simulation Horizon</label>
+            <span id="periodBadge" class="text-[11px] font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">24 Hours</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1 text-xs font-mono">
+            <button type="button" onclick="setPeriod(1)" class="period-btn py-1 rounded border border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400" data-period="1">1h</button>
+            <button type="button" onclick="setPeriod(6)" class="period-btn py-1 rounded border border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400" data-period="6">6h</button>
+            <button type="button" onclick="setPeriod(12)" class="period-btn py-1 rounded border border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400" data-period="12">12h</button>
+            <button type="button" onclick="setPeriod(24)" class="period-btn py-1 rounded border-cyan-400 bg-cyan-600/30 text-cyan-300" data-period="24">24h</button>
+            <button type="button" onclick="setPeriod(48)" class="period-btn py-1 rounded border border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400" data-period="48">48h</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Parameter Fields Container -->
+        <div class="mt-4 pt-3 border-t border-slate-800/80">
+          
+          <!-- TAB 1: Rainfall Parameters -->
+          <div id="paramsRainfall" class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Precipitation Accumulation</span>
+                <span id="rainfallVal" class="font-mono text-cyan-400 font-semibold">220 mm</span>
+              </div>
+              <input id="rainfallSlider" type="range" min="30" max="500" step="10" value="220" oninput="document.getElementById('rainfallVal').innerText = this.value + ' mm'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Storm Duration</span>
+                <span id="rainDurationVal" class="font-mono text-cyan-400 font-semibold">6 hours</span>
+              </div>
+              <input id="rainDurationSlider" type="range" min="1" max="24" step="1" value="6" oninput="document.getElementById('rainDurationVal').innerText = this.value + ' hours'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-300 block mb-1">Spatial Distribution Profile</label>
+              <select id="spatialDistSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200">
+                <option value="convective_core">Convective Cloudburst Core (Intense Escarpment)</option>
+                <option value="orographic_ridge">Orographic Ridge Surge (Western Ghats Crest)</option>
+                <option value="uniform_catchment">Uniform Catchment Basin</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-300 block mb-1">Target Watershed / Catchment</label>
+              <select id="rainCatchmentSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200">
+                <option value="INDOFLOODS-gauge-602">INDOFLOODS-gauge-602 (Mahad / Savitri)</option>
+                <option value="INDOFLOODS-gauge-684">INDOFLOODS-gauge-684 (Karad / Krishna)</option>
+                <option value="INDOFLOODS-gauge-643">INDOFLOODS-gauge-643 (Terwad / Panchganga)</option>
+                <option value="INDOFLOODS-gauge-626">INDOFLOODS-gauge-626 (Ujani Dam Basin)</option>
+                <option value="INDOFLOODS-gauge-668">INDOFLOODS-gauge-668 (Badlapur / Ulhas)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Antecedent Soil Saturation</span>
+                <span id="soilSatVal" class="font-mono text-cyan-400 font-semibold">80%</span>
+              </div>
+              <input id="soilSatSlider" type="range" min="10" max="100" step="5" value="80" oninput="document.getElementById('soilSatVal').innerText = this.value + '%'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+          </div>
+
+          <!-- TAB 2: Dam Release Parameters -->
+          <div id="paramsDamRelease" class="space-y-3 hidden">
+            <div>
+              <label class="text-xs text-slate-300 block mb-1">Reservoir Dam Facility</label>
+              <select id="damSelect" onchange="onDamChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200">
+                <option value="DAM_KOYNA">Koyna Dam (Krishna Basin, Satara)</option>
+                <option value="DAM_UJANI">Ujani Dam (Bhima Basin, Solapur)</option>
+                <option value="DAM_RADHANAGARI">Radhanagari Dam (Bhogawati / Panchganga)</option>
+                <option value="DAM_BHATSA">Bhatsa Dam (Thane / Ulhas Basin)</option>
+                <option value="DAM_KHADAKWASLA">Khadakwasla Dam (Mutha Basin, Pune)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Discharge Spillway Rate</span>
+                <span id="dischargeVal" class="font-mono text-amber-400 font-semibold">4,500 m³/s</span>
+              </div>
+              <input id="dischargeSlider" type="range" min="200" max="12000" step="100" value="4500" oninput="document.getElementById('dischargeVal').innerText = Number(this.value).toLocaleString() + ' m³/s'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Release Window Duration</span>
+                <span id="damDurationVal" class="font-mono text-amber-400 font-semibold">4 hours</span>
+              </div>
+              <input id="damDurationSlider" type="range" min="1" max="24" step="1" value="4" oninput="document.getElementById('damDurationVal').innerText = this.value + ' hours'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Downstream Safe Channel Limit</span>
+                <span id="channelCapVal" class="font-mono text-slate-300 font-semibold">2,500 m³/s</span>
+              </div>
+              <input id="channelCapSlider" type="range" min="500" max="6000" step="100" value="2500" oninput="document.getElementById('channelCapVal').innerText = Number(this.value).toLocaleString() + ' m³/s'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Current Storage Capacity</span>
+                <span id="resStorageVal" class="font-mono text-amber-400 font-semibold">95%</span>
+              </div>
+              <input id="resStorageSlider" type="range" min="50" max="100" step="1" value="95" oninput="document.getElementById('resStorageVal').innerText = this.value + '%'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+          </div>
+
+          <!-- TAB 3: River Overflow Parameters -->
+          <div id="paramsRiverOverflow" class="space-y-3 hidden">
+            <div>
+              <label class="text-xs text-slate-300 block mb-1">Monitored Riparian River Reach</label>
+              <select id="riverSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200">
+                <option value="RIVER_SAVITRI">Savitri River (Mahad Valley, Raigad)</option>
+                <option value="RIVER_KRISHNA">Krishna River (Karad / Sangli Stretch)</option>
+                <option value="RIVER_PANCHGANGA">Panchganga River (Kolhapur Floodplain)</option>
+                <option value="RIVER_ULHAS">Ulhas River (Kalyan / Dombivli Estuary)</option>
+                <option value="RIVER_BRAHMAPUTRA">Brahmaputra River (Guwahati Lowlands)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Simulated Crest Stage</span>
+                <span id="stageLevelVal" class="font-mono text-rose-400 font-semibold">12.6 m</span>
+              </div>
+              <input id="stageLevelSlider" type="range" min="6.0" max="25.0" step="0.2" value="12.6" oninput="document.getElementById('stageLevelVal').innerText = Number(this.value).toFixed(1) + ' m'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Embankment Breach Width</span>
+                <span id="breachWidthVal" class="font-mono text-rose-400 font-semibold">65 m</span>
+              </div>
+              <input id="breachWidthSlider" type="range" min="10" max="250" step="5" value="65" oninput="document.getElementById('breachWidthVal').innerText = this.value + ' m'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300">Overtopping Inundation Window</span>
+                <span id="overflowDurationVal" class="font-mono text-rose-400 font-semibold">8 hours</span>
+              </div>
+              <input id="overflowDurationSlider" type="range" min="1" max="24" step="1" value="8" oninput="document.getElementById('overflowDurationVal').innerText = this.value + ' hours'" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Launch Simulation Button -->
+        <button id="runSimBtn" onclick="runSimulation()" class="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600 via-sky-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs tracking-wide shadow-lg shadow-cyan-600/30 flex items-center justify-center gap-2 transition transform active:scale-95">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>EXECUTE SIMULATION</span>
+        </button>
+      </div>
+
+      <!-- Execution Status Card -->
+      <div id="statusCard" class="glass-panel p-3.5 hidden">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-semibold text-slate-300 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="simStatusText">Simulation Ready</span>
+          </span>
+          <span id="simExecutionTime" class="font-mono text-[11px] text-cyan-400">0.0 ms</span>
+        </div>
+        <div class="text-[11px] text-slate-400 space-y-1">
+          <div class="flex justify-between">
+            <span>Simulation ID:</span>
+            <span id="simIdLabel" class="font-mono text-slate-200">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Target Reach:</span>
+            <span id="simTargetRegion" class="text-slate-200 truncate max-w-[200px]">--</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT / CENTER PANEL: Interactive Map & Live Timeline (8 cols) -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+      
+      <!-- Interactive Map Card -->
+      <div class="glass-panel p-4 flex flex-col relative">
+        
+        <!-- Map Header Controls -->
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Spatial Flood Inundation & Wave Propagation</span>
+            </h2>
+            <p class="text-xs text-slate-400">Dynamic 5-tier depth contour mapping across elapsed timeline</p>
+          </div>
+
+          <!-- Layer Toggles -->
+          <div class="flex items-center gap-2 text-xs">
+            <label class="flex items-center gap-1.5 cursor-pointer bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
+              <input type="checkbox" id="chkDepthContour" checked onchange="toggleLayer('inundation')" class="accent-cyan-500">
+              <span class="text-slate-300 text-[11px]">Depth Zones</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer bg-slate-900/80 px-2 py-1 rounded border border-slate-800">
+              <input type="checkbox" id="chkInfra" checked onchange="toggleLayer('infra')" class="accent-cyan-500">
+              <span class="text-slate-300 text-[11px]">Infrastructure</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="relative w-full h-[480px] rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+          <div id="simulationMap"></div>
+
+          <!-- Mandatory Provenance Banner -->
+          <div class="absolute bottom-2 left-2 z-[400] bg-slate-950/85 backdrop-blur-md border border-cyan-500/30 rounded px-2.5 py-1 text-[10px] text-cyan-300 font-mono flex items-center gap-1.5 pointer-events-none shadow-lg">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span>SIMULATED ESTIMATE — For Emergency Planning Only</span>
+          </div>
+
+          <!-- Depth Legend Overlay -->
+          <div class="absolute top-2 right-2 z-[400] bg-slate-950/90 backdrop-blur-md border border-slate-800 rounded-lg p-2 text-[10px] text-slate-300 font-mono shadow-lg space-y-1">
+            <div class="font-bold text-slate-400 mb-1 border-b border-slate-800 pb-0.5">WATER DEPTH</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-2 rounded" style="background:#06b6d4;"></span> 0.0 – 0.5m (Low)</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-2 rounded" style="background:#3b82f6;"></span> 0.5 – 1.0m (Moderate)</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-2 rounded" style="background:#f59e0b;"></span> 1.0 – 2.0m (High)</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-2 rounded" style="background:#f97316;"></span> 2.0 – 5.0m (Severe)</div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-2 rounded" style="background:#ef4444;"></span> &gt; 5.0m (Extreme)</div>
+          </div>
+        </div>
+
+        <!-- Timeline Scrubber Bar -->
+        <div class="mt-3.5 pt-3 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-slate-300">Timeline Progression:</span>
+              <span id="currentStepLabel" class="font-mono text-cyan-300 text-xs px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30">Step 0 (0.0h)</span>
+            </div>
+            
+            <!-- Playback Controls -->
+            <div class="flex items-center gap-1 text-xs">
+              <button id="btnPlayPause" onclick="togglePlayback()" class="p-1.5 px-2.5 rounded bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1">
+                <span id="playIcon">▶</span>
+                <span id="playLabel">Play</span>
+              </button>
+              <button onclick="resetPlayback()" class="p-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Reset to start">
+                ↺
+              </button>
+              <select id="playbackSpeed" onchange="updatePlaybackSpeed()" class="bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-[11px] text-slate-300">
+                <option value="1500">1x</option>
+                <option value="800" selected>2x</option>
+                <option value="400">4x</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Slider -->
+          <input id="timelineSlider" type="range" min="0" max="0" value="0" step="1" oninput="onSliderChange(this.value)" class="w-full h-2 bg-slate-800 rounded-lg cursor-pointer">
+          <div id="stepMarkers" class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+            <span>0h</span>
+            <span>End Horizon</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-Time Metrics & Telemetry Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="glass-panel p-3">
+          <span class="text-[11px] text-slate-400 block">Flooded Extent</span>
+          <span id="metricExtent" class="text-xl font-bold font-mono text-cyan-400">0.00 <span class="text-xs font-normal text-slate-400">km²</span></span>
+          <span id="metricExtentGrowth" class="text-[10px] font-mono text-slate-400 block mt-0.5">Initial Stage</span>
+        </div>
+
+        <div class="glass-panel p-3">
+          <span class="text-[11px] text-slate-400 block">Max Flood Depth</span>
+          <span id="metricDepth" class="text-xl font-bold font-mono text-blue-400">0.0 <span class="text-xs font-normal text-slate-400">m</span></span>
+          <span id="metricSeverity" class="text-[10px] font-mono text-slate-400 block mt-0.5">Low Alert</span>
+        </div>
+
+        <div class="glass-panel p-3">
+          <span class="text-[11px] text-slate-400 block">Exposed Population</span>
+          <span id="metricPopulation" class="text-xl font-bold font-mono text-amber-400">0</span>
+          <span id="metricHighRisk" class="text-[10px] font-mono text-slate-400 block mt-0.5">0 high-risk</span>
+        </div>
+
+        <div class="glass-panel p-3">
+          <span class="text-[11px] text-slate-400 block">Evacuation Urgency</span>
+          <span id="metricUrgency" class="text-xs font-bold font-mono text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 inline-block mt-1">ROUTINE</span>
+          <span id="metricRoads" class="text-[10px] font-mono text-slate-400 block mt-1">0 km roads submerged</span>
+        </div>
+      </div>
+
+      <!-- Impact Breakdown & Growth Charts -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Extent Growth Curve Canvas -->
+        <div class="glass-panel p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Flood Extent Growth (km²)</h3>
+            <span class="text-[10px] font-mono text-cyan-400">Time-Series</span>
+          </div>
+          <div class="w-full h-36 relative">
+            <canvas id="growthCanvas" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Infrastructure Impact Card -->
+        <div class="glass-panel p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Lifeline Infrastructure Vulnerability</h3>
+            <span class="text-[10px] font-mono text-rose-400">OSM Assessment</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono mt-2">
+            <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 text-[10px] block">Submerged Roads</span>
+              <span id="infraRoads" class="text-sm font-bold text-white">0.0 km</span>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 text-[10px] block">Bridges Impacted</span>
+              <span id="infraBridges" class="text-sm font-bold text-amber-400">0</span>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 text-[10px] block">Hospitals at Risk</span>
+              <span id="infraHospitals" class="text-sm font-bold text-rose-400">0</span>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded border border-slate-800">
+              <span class="text-slate-400 text-[10px] block">Schools at Risk</span>
+              <span id="infraSchools" class="text-sm font-bold text-cyan-400">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Raw JSON Inspection Modal                                              -->
+  <!-- ========================================================================= -->
+  <div id="rawModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-3xl w-full max-h-[85vh] flex flex-col p-5">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-cyan-400 font-mono flex items-center gap-2">
+          <span>&lt;/&gt;</span>
+          <span>Simulation Engine JSON Telemetry</span>
+        </h3>
+        <button onclick="closeRawModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div class="flex-1 overflow-auto mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs text-cyan-300">
+        <pre id="rawJsonContent">No simulation has been executed yet.</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet & App Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    // -----------------------------------------------------------------------
+    // Global State
+    // -----------------------------------------------------------------------
+    let map = null;
+    let inundationLayerGroup = null;
+    let infraLayerGroup = null;
+    let originMarkerLayerGroup = null;
+
+    let currentSimulation = null;
+    let currentStepIndex = 0;
+    let playbackInterval = null;
+    let playbackSpeedMs = 800;
+    let isPlaying = false;
+
+    let selectedScenarioType = 'rainfall';
+    let selectedPeriodHours = 24;
+    let benchmarkScenarios = [];
+
+    // Depth tier colors
+    const DEPTH_COLORS = {
+      "0.0-0.5": "#06b6d4",
+      "0.5-1.0": "#3b82f6",
+      "1.0-2.0": "#f59e0b",
+      "2.0-5.0": "#f97316",
+      ">5.0": "#ef4444"
+    };
+
+    // -----------------------------------------------------------------------
+    // Initialization
+    // -----------------------------------------------------------------------
+    window.addEventListener("DOMContentLoaded", async () => {
+      initMap();
+      await loadScenarioPresets();
+      // Auto-trigger default benchmark simulation for instant demonstration
+      setTimeout(() => {
+        if (benchmarkScenarios.length > 0) {
+          applyPreset(benchmarkScenarios[0]);
+          runSimulation();
+        }
+      }, 500);
+    });
+
+    function initMap() {
+      // Default to Western Ghats (Mahad / Savitri valley)
+      map = L.map('simulationMap', {
+        center: [18.0922, 73.4603],
+        zoom: 11,
+        zoomControl: true,
+      });
+
+      // CartoDB Dark Matter basemap
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      inundationLayerGroup = L.layerGroup().addTo(map);
+      infraLayerGroup = L.layerGroup().addTo(map);
+      originMarkerLayerGroup = L.layerGroup().addTo(map);
+    }
+
+    // -----------------------------------------------------------------------
+    // Benchmark Presets
+    // -----------------------------------------------------------------------
+    async function loadScenarioPresets() {
+      try {
+        const res = await fetch('/api/simulation/scenarios');
+        if (res.ok) {
+          benchmarkScenarios = await res.json();
+          const select = document.getElementById('scenarioSelect');
+          select.innerHTML = '<option value="">-- Choose Benchmark Scenario --</option>';
+          benchmarkScenarios.forEach((scen, idx) => {
+            const opt = document.createElement('option');
+            opt.value = scen.template_id;
+            opt.textContent = `${scen.title} (${scen.region})`;
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.warn("Could not fetch scenarios from API:", e);
+      }
+    }
+
+    function onScenarioSelect() {
+      const val = document.getElementById('scenarioSelect').value;
+      const found = benchmarkScenarios.find(s => s.template_id === val);
+      if (found) {
+        applyPreset(found);
+      }
+    }
+
+    function applyPreset(scen) {
+      document.getElementById('scenarioDesc').textContent = scen.description;
+      setPeriod(scen.default_period_hours || 24);
+      setScenarioTab(scen.scenario_type);
+
+      const p = scen.parameters || {};
+      if (scen.scenario_type === 'rainfall') {
+        if (p.rainfall_mm) {
+          document.getElementById('rainfallSlider').value = p.rainfall_mm;
+          document.getElementById('rainfallVal').innerText = p.rainfall_mm + ' mm';
+        }
+        if (p.rainfall_duration_hours) {
+          document.getElementById('rainDurationSlider').value = p.rainfall_duration_hours;
+          document.getElementById('rainDurationVal').innerText = p.rainfall_duration_hours + ' hours';
+        }
+        if (p.spatial_distribution) {
+          document.getElementById('spatialDistSelect').value = p.spatial_distribution;
+        }
+        if (p.catchment_id) {
+          document.getElementById('rainCatchmentSelect').value = p.catchment_id;
+        }
+        if (p.initial_soil_saturation_pct) {
+          document.getElementById('soilSatSlider').value = p.initial_soil_saturation_pct;
+          document.getElementById('soilSatVal').innerText = p.initial_soil_saturation_pct + '%';
+        }
+      } else if (scen.scenario_type === 'dam_release') {
+        if (p.dam_id) document.getElementById('damSelect').value = p.dam_id;
+        if (p.release_rate_m3s) {
+          document.getElementById('dischargeSlider').value = p.release_rate_m3s;
+          document.getElementById('dischargeVal').innerText = Number(p.release_rate_m3s).toLocaleString() + ' m³/s';
+        }
+        if (p.release_duration_hours) {
+          document.getElementById('damDurationSlider').value = p.release_duration_hours;
+          document.getElementById('damDurationVal').innerText = p.release_duration_hours + ' hours';
+        }
+        if (p.downstream_safe_capacity_m3s) {
+          document.getElementById('channelCapSlider').value = p.downstream_safe_capacity_m3s;
+          document.getElementById('channelCapVal').innerText = Number(p.downstream_safe_capacity_m3s).toLocaleString() + ' m³/s';
+        }
+      } else if (scen.scenario_type === 'river_overflow') {
+        if (p.river_id) document.getElementById('riverSelect').value = p.river_id;
+        if (p.simulated_water_level_m) {
+          document.getElementById('stageLevelSlider').value = p.simulated_water_level_m;
+          document.getElementById('stageLevelVal').innerText = Number(p.simulated_water_level_m).toFixed(1) + ' m';
+        }
+        if (p.breach_width_m) {
+          document.getElementById('breachWidthSlider').value = p.breach_width_m;
+          document.getElementById('breachWidthVal').innerText = p.breach_width_m + ' m';
+        }
+        if (p.overtopping_duration_hours) {
+          document.getElementById('overflowDurationSlider').value = p.overtopping_duration_hours;
+          document.getElementById('overflowDurationVal').innerText = p.overtopping_duration_hours + ' hours';
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // UI Tab & Period Switchers
+    // -----------------------------------------------------------------------
+    function setScenarioTab(type) {
+      selectedScenarioType = type;
+      ['rainfall', 'dam_release', 'river_overflow'].forEach(t => {
+        const tabBtn = document.getElementById(t === 'rainfall' ? 'tabRainfall' : t === 'dam_release' ? 'tabDamRelease' : 'tabRiverOverflow');
+        const paramDiv = document.getElementById(t === 'rainfall' ? 'paramsRainfall' : t === 'dam_release' ? 'paramsDamRelease' : 'paramsRiverOverflow');
+        if (t === type) {
+          tabBtn.className = 'py-1.5 px-2 rounded font-medium text-center transition bg-cyan-600 text-white shadow';
+          paramDiv.classList.remove('hidden');
+        } else {
+          tabBtn.className = 'py-1.5 px-2 rounded font-medium text-center transition text-slate-400 hover:text-slate-200';
+          paramDiv.classList.add('hidden');
+        }
+      });
+    }
+
+    function setPeriod(h) {
+      selectedPeriodHours = Number(h);
+      document.getElementById('periodBadge').innerText = h + ' Hours';
+      document.querySelectorAll('.period-btn').forEach(btn => {
+        if (Number(btn.dataset.period) === selectedPeriodHours) {
+          btn.className = 'period-btn py-1 rounded border-cyan-400 bg-cyan-600/30 text-cyan-300 font-semibold';
+        } else {
+          btn.className = 'period-btn py-1 rounded border border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400';
+        }
+      });
+    }
+
+    function onDamChanged() {
+      const damId = document.getElementById('damSelect').value;
+      if (damId === 'DAM_KOYNA') {
+        document.getElementById('dischargeSlider').value = 4500;
+        document.getElementById('dischargeVal').innerText = '4,500 m³/s';
+        document.getElementById('channelCapSlider').value = 2500;
+        document.getElementById('channelCapVal').innerText = '2,500 m³/s';
+      } else if (damId === 'DAM_UJANI') {
+        document.getElementById('dischargeSlider').value = 6000;
+        document.getElementById('dischargeVal').innerText = '6,000 m³/s';
+        document.getElementById('channelCapSlider').value = 4000;
+        document.getElementById('channelCapVal').innerText = '4,000 m³/s';
+      } else if (damId === 'DAM_RADHANAGARI') {
+        document.getElementById('dischargeSlider').value = 1800;
+        document.getElementById('dischargeVal').innerText = '1,800 m³/s';
+        document.getElementById('channelCapSlider').value = 1000;
+        document.getElementById('channelCapVal').innerText = '1,000 m³/s';
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Execute Simulation
+    // -----------------------------------------------------------------------
+    async function runSimulation() {
+      const btn = document.getElementById('runSimBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> <span>SIMULATING...</span>`;
+      btn.disabled = true;
+
+      // Build payload
+      const payload = {
+        scenario_type: selectedScenarioType,
+        simulation_period_hours: selectedPeriodHours
+      };
+
+      if (selectedScenarioType === 'rainfall') {
+        payload.rainfall_params = {
+          rainfall_mm: parseFloat(document.getElementById('rainfallSlider').value),
+          rainfall_duration_hours: parseFloat(document.getElementById('rainDurationSlider').value),
+          spatial_distribution: document.getElementById('spatialDistSelect').value,
+          catchment_id: document.getElementById('rainCatchmentSelect').value,
+          initial_soil_saturation_pct: parseFloat(document.getElementById('soilSatSlider').value),
+        };
+      } else if (selectedScenarioType === 'dam_release') {
+        const damSelect = document.getElementById('damSelect');
+        const damId = damSelect.value;
+        const damName = damSelect.options[damSelect.selectedIndex].text.split(' (')[0];
+        let basin = "Krishna";
+        if (damId === 'DAM_UJANI') basin = "Bhima";
+        if (damId === 'DAM_RADHANAGARI') basin = "Panchganga";
+        if (damId === 'DAM_BHATSA') basin = "Ulhas";
+        if (damId === 'DAM_KHADAKWASLA') basin = "Mutha";
+
+        payload.dam_release_params = {
+          dam_id: damId,
+          dam_name: damName,
+          river_basin: basin,
+          release_rate_m3s: parseFloat(document.getElementById('dischargeSlider').value),
+          release_duration_hours: parseFloat(document.getElementById('damDurationSlider').value),
+          downstream_safe_capacity_m3s: parseFloat(document.getElementById('channelCapSlider').value),
+          reservoir_level_pct: parseFloat(document.getElementById('resStorageSlider').value),
+        };
+      } else if (selectedScenarioType === 'river_overflow') {
+        const riverSelect = document.getElementById('riverSelect');
+        const riverId = riverSelect.value;
+        const riverName = riverSelect.options[riverSelect.selectedIndex].text.split(' (')[0];
+
+        payload.river_overflow_params = {
+          river_id: riverId,
+          river_name: riverName,
+          gauge_id: "INDOFLOODS-gauge-602",
+          simulated_water_level_m: parseFloat(document.getElementById('stageLevelSlider').value),
+          overflow_threshold_m: 11.0,
+          breach_width_m: parseFloat(document.getElementById('breachWidthSlider').value),
+          overtopping_duration_hours: parseFloat(document.getElementById('overflowDurationSlider').value),
+        };
+      }
+
+      try {
+        const res = await fetch('/api/simulation/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Simulation run failed');
+        }
+
+        const data = await res.json();
+        currentSimulation = data;
+        onSimulationLoaded(data);
+      } catch (err) {
+        console.error("Simulation error:", err);
+        alert("Simulation Error: " + err.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Post-Simulation Processing & Mapping
+    // -----------------------------------------------------------------------
+    function onSimulationLoaded(sim) {
+      // Show status
+      document.getElementById('statusCard').classList.remove('hidden');
+      document.getElementById('simStatusText').textContent = 'Simulation ' + sim.status;
+      document.getElementById('simExecutionTime').textContent = sim.execution_time_ms + ' ms';
+      document.getElementById('simIdLabel').textContent = sim.simulation_id;
+      document.getElementById('simTargetRegion').textContent = sim.target_region;
+
+      // Update Raw JSON viewer
+      document.getElementById('rawJsonContent').textContent = JSON.stringify(sim, null, 2);
+
+      // Setup slider
+      const numSteps = sim.time_steps.length;
+      const slider = document.getElementById('timelineSlider');
+      slider.min = 0;
+      slider.max = numSteps - 1;
+      slider.value = 0;
+
+      // Set markers
+      const stepMarkers = document.getElementById('stepMarkers');
+      stepMarkers.innerHTML = `<span>0h</span><span>Step ${Math.floor(numSteps/2)}</span><span>${sim.simulation_period_hours}h</span>`;
+
+      // Render Growth Chart
+      renderGrowthChart(sim.growth_timeline);
+
+      // Render initial step (or middle/peak step)
+      renderStep(0);
+
+      // Fit map to simulation bounds
+      fitMapToSimulation(sim);
+    }
+
+    function fitMapToSimulation(sim) {
+      // Find bounds across all features in all time steps
+      let latLngs = [];
+      sim.time_steps.forEach(st => {
+        if (st.geojson_feature_collection && st.geojson_feature_collection.features) {
+          st.geojson_feature_collection.features.forEach(feat => {
+            if (feat.geometry && feat.geometry.coordinates) {
+              feat.geometry.coordinates.forEach(ring => {
+                ring.forEach(pt => {
+                  latLngs.push([pt[1], pt[0]]);
+                });
+              });
+            }
+          });
+        }
+      });
+
+      if (latLngs.length > 0) {
+        map.fitBounds(L.latLngBounds(latLngs), { padding: [40, 40] });
+      }
+    }
+
+    function renderStep(idx) {
+      if (!currentSimulation || !currentSimulation.time_steps) return;
+      currentStepIndex = Number(idx);
+      const step = currentSimulation.time_steps[currentStepIndex];
+      const impact = currentSimulation.impact_timeline[currentStepIndex];
+
+      // Update Slider and Label
+      document.getElementById('timelineSlider').value = currentStepIndex;
+      document.getElementById('currentStepLabel').innerText = `Step ${currentStepIndex} (${step.elapsed_hours}h)`;
+
+      // Update Metrics Cards
+      document.getElementById('metricExtent').innerHTML = `${step.extent_km2.toFixed(2)} <span class="text-xs font-normal text-slate-400">km²</span>`;
+      document.getElementById('metricExtentGrowth').innerText = `+${step.growth_rate_pct.toFixed(1)}% expansion`;
+      document.getElementById('metricDepth').innerHTML = `${step.peak_depth_m.toFixed(1)} <span class="text-xs font-normal text-slate-400">m</span>`;
+      document.getElementById('metricSeverity').innerText = step.severity_class.toUpperCase() + ' SEVERITY';
+
+      // Demographic metrics
+      if (impact && impact.population) {
+        document.getElementById('metricPopulation').innerText = impact.population.estimated_population_exposed.toLocaleString();
+        document.getElementById('metricHighRisk').innerText = `${impact.population.high_risk_population.toLocaleString()} high-risk (${impact.population.evacuation_urgency})`;
+        
+        // Urgency badge color
+        const urgBadge = document.getElementById('metricUrgency');
+        urgBadge.innerText = impact.population.evacuation_urgency;
+        if (impact.population.evacuation_urgency === 'IMMEDIATE_MANDATORY') {
+          urgBadge.className = 'text-xs font-bold font-mono text-rose-400 px-2 py-0.5 rounded bg-rose-950/70 border border-rose-500/40 inline-block mt-1 animate-pulse';
+        } else if (impact.population.evacuation_urgency === 'WARNING') {
+          urgBadge.className = 'text-xs font-bold font-mono text-orange-400 px-2 py-0.5 rounded bg-orange-950/70 border border-orange-500/40 inline-block mt-1';
+        } else {
+          urgBadge.className = 'text-xs font-bold font-mono text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 inline-block mt-1';
+        }
+      }
+
+      // Infrastructure metrics
+      if (impact && impact.infrastructure) {
+        const inf = impact.infrastructure;
+        document.getElementById('metricRoads').innerText = `${inf.roads_submerged_km} km roads submerged`;
+        document.getElementById('infraRoads').innerText = `${inf.roads_submerged_km} km`;
+        document.getElementById('infraBridges').innerText = inf.bridges_submerged_count;
+        document.getElementById('infraHospitals').innerText = inf.hospitals_at_risk_count;
+        document.getElementById('infraSchools').innerText = inf.schools_at_risk_count;
+      }
+
+      // Render GeoJSON Inundation Polygons
+      inundationLayerGroup.clearLayers();
+      originMarkerLayerGroup.clearLayers();
+
+      if (step.geojson_feature_collection) {
+        const geoLayer = L.geoJSON(step.geojson_feature_collection, {
+          style: (feat) => {
+            const depthRange = feat.properties.depth_range || "0.0-0.5";
+            const color = DEPTH_COLORS[depthRange] || "#06b6d4";
+            return {
+              color: color,
+              weight: 1.5,
+              opacity: 0.9,
+              fillColor: color,
+              fillOpacity: 0.45,
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const p = feature.properties || {};
+            layer.bindPopup(`
+              <div class="text-xs p-1">
+                <strong class="text-cyan-400 block text-sm">${p.layer_name || "Flood Contour"}</strong>
+                <span class="text-slate-300 block">Depth: <strong>${p.depth_range} m</strong></span>
+                <span class="text-slate-400 block">Severity: ${p.severity || "Active"}</span>
+                <span class="text-slate-400 block">Area: ${p.area_km2 || step.extent_km2} km²</span>
+              </div>
+            `);
+          }
+        });
+        inundationLayerGroup.addLayer(geoLayer);
+      }
+
+      // Render Infrastructure Markers
+      infraLayerGroup.clearLayers();
+      if (impact && impact.infrastructure && impact.infrastructure.critical_facilities_at_risk) {
+        impact.infrastructure.critical_facilities_at_risk.forEach(fac => {
+          const lat = fac.latitude;
+          const lon = fac.longitude;
+          if (lat && lon) {
+            const markerColor = fac.facility_type === 'Hospital' ? '#ef4444' : '#38bdf8';
+            const circle = L.circleMarker([lat, lon], {
+              radius: 6,
+              fillColor: markerColor,
+              color: '#ffffff',
+              weight: 1.5,
+              opacity: 1,
+              fillOpacity: 0.9
+            }).bindTooltip(`<strong>${fac.facility_name}</strong><br>${fac.facility_type} (${fac.risk_level})`, {
+              sticky: true,
+              className: 'bg-slate-900 text-slate-200 text-xs border border-slate-700 rounded px-2 py-1'
+            });
+            infraLayerGroup.addLayer(circle);
+          }
+        });
+      }
+    }
+
+    function onSliderChange(val) {
+      renderStep(val);
+    }
+
+    // -----------------------------------------------------------------------
+    // Playback Controls
+    // -----------------------------------------------------------------------
+    function togglePlayback() {
+      if (isPlaying) {
+        pausePlayback();
+      } else {
+        startPlayback();
+      }
+    }
+
+    function startPlayback() {
+      if (!currentSimulation) return;
+      isPlaying = true;
+      document.getElementById('playIcon').innerText = '⏸';
+      document.getElementById('playLabel').innerText = 'Pause';
+
+      if (currentStepIndex >= currentSimulation.time_steps.length - 1) {
+        currentStepIndex = 0;
+      }
+
+      playbackInterval = setInterval(() => {
+        if (currentStepIndex < currentSimulation.time_steps.length - 1) {
+          currentStepIndex++;
+          renderStep(currentStepIndex);
+        } else {
+          pausePlayback();
+        }
+      }, playbackSpeedMs);
+    }
+
+    function pausePlayback() {
+      isPlaying = false;
+      document.getElementById('playIcon').innerText = '▶';
+      document.getElementById('playLabel').innerText = 'Play';
+      if (playbackInterval) {
+        clearInterval(playbackInterval);
+        playbackInterval = null;
+      }
+    }
+
+    function resetPlayback() {
+      pausePlayback();
+      renderStep(0);
+    }
+
+    function updatePlaybackSpeed() {
+      playbackSpeedMs = Number(document.getElementById('playbackSpeed').value);
+      if (isPlaying) {
+        pausePlayback();
+        startPlayback();
+      }
+    }
+
+    function toggleLayer(type) {
+      if (type === 'inundation') {
+        const chk = document.getElementById('chkDepthContour').checked;
+        if (chk) map.addLayer(inundationLayerGroup);
+        else map.removeLayer(inundationLayerGroup);
+      } else if (type === 'infra') {
+        const chk = document.getElementById('chkInfra').checked;
+        if (chk) map.addLayer(infraLayerGroup);
+        else map.removeLayer(infraLayerGroup);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Canvas Growth Chart
+    // -----------------------------------------------------------------------
+    function renderGrowthChart(growthTimeline) {
+      const canvas = document.getElementById('growthCanvas');
+      if (!canvas || !growthTimeline || growthTimeline.length === 0) return;
+
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const padLeft = 32;
+      const padRight = 16;
+      const padTop = 16;
+      const padBottom = 24;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Max values
+      const maxExtent = Math.max(...growthTimeline.map(g => g.cumulative_extent_km2), 1.0);
+      const maxHours = Math.max(...growthTimeline.map(g => g.elapsed_hours), 1.0);
+
+      // Draw grid lines
+      ctx.strokeStyle = "rgba(51, 65, 85, 0.4)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 3; i++) {
+        const y = padTop + (h - padTop - padBottom) * (i / 3);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(w - padRight, y);
+        ctx.stroke();
+
+        // Label
+        const val = (maxExtent * (1 - i / 3)).toFixed(1);
+        ctx.fillStyle = "#64748b";
+        ctx.font = "9px monospace";
+        ctx.fillText(val, 2, y + 3);
+      }
+
+      // Coordinate mapping
+      const getX = (hr) => padLeft + (hr / maxHours) * (w - padLeft - padRight);
+      const getY = (ext) => (h - padBottom) - (ext / maxExtent) * (h - padTop - padBottom);
+
+      // Draw gradient area under curve
+      const grad = ctx.createLinearGradient(0, padTop, 0, h - padBottom);
+      grad.addColorStop(0, "rgba(6, 182, 212, 0.35)");
+      grad.addColorStop(1, "rgba(6, 182, 212, 0.0)");
+
+      ctx.beginPath();
+      growthTimeline.forEach((pt, i) => {
+        const x = getX(pt.elapsed_hours);
+        const y = getY(pt.cumulative_extent_km2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.lineTo(getX(growthTimeline[growthTimeline.length - 1].elapsed_hours), h - padBottom);
+      ctx.lineTo(getX(0), h - padBottom);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Draw stroke curve
+      ctx.beginPath();
+      growthTimeline.forEach((pt, i) => {
+        const x = getX(pt.elapsed_hours);
+        const y = getY(pt.cumulative_extent_km2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = "#06b6d4";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Draw points
+      growthTimeline.forEach(pt => {
+        const x = getX(pt.elapsed_hours);
+        const y = getY(pt.cumulative_extent_km2);
+        ctx.beginPath();
+        ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#38bdf8";
+        ctx.fill();
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // Modal Helpers
+    // -----------------------------------------------------------------------
+    function openRawModal() {
+      document.getElementById('rawModal').classList.remove('hidden');
+    }
+
+    function closeRawModal() {
+      document.getElementById('rawModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

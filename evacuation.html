@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Evacuation Planning & Safe Route Generation Engine</title>
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Shared PRAVAH Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet GIS Map Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* Scoped styling for Evacuation Planning Engine */
+    :root {
+      --evac-bg: #060a12;
+      --evac-card: rgba(15, 23, 42, 0.85);
+      --evac-border: rgba(30, 41, 59, 0.85);
+      --color-cyan: #06b6d4;
+      --color-emerald: #10b981;
+      --color-amber: #f59e0b;
+      --color-rose: #f43f5e;
+      --color-blue: #3b82f6;
+      --color-purple: #a855f7;
+    }
+
+    body.evacuation-page-body {
+      background-color: var(--evac-bg);
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 90% 25%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(244, 63, 94, 0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #060a12 0%, #0b1329 100%);
+      background-attachment: fixed;
+    }
+
+    .evac-container {
+      max-width: 1850px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    /* Primary Workspace Split Grid */
+    .evac-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1300px) {
+      .evac-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Map Panel */
+    .map-panel {
+      background: var(--evac-card);
+      border: 1px solid var(--evac-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 780px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .map-header-strip {
+      padding: 0.85rem 1.25rem;
+      background: rgba(15, 23, 42, 0.92);
+      border-bottom: 1px solid var(--evac-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .map-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #evacuationMap {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #090d16;
+    }
+
+    /* Floating Legend inside Map */
+    .map-floating-legend {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 1.25rem;
+      background: rgba(10, 15, 30, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--evac-border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      z-index: 500;
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend-line {
+      width: 18px;
+      height: 4px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* Sidebar Controls & Route Results Panel */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .card-box {
+      background: var(--evac-card);
+      border: 1px solid var(--evac-border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #cbd5e1;
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: rgba(10, 16, 32, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      color: #f8fafc;
+      font-size: 0.82rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    /* Objective Pills */
+    .objective-pills {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .obj-btn {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.5rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .obj-btn:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: #f8fafc;
+    }
+
+    .obj-btn.active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--color-cyan);
+      color: var(--color-cyan);
+    }
+
+    .btn-calculate-route {
+      width: 100%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-calculate-route:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.55);
+    }
+
+    /* Route Result Cards */
+    .route-option-card {
+      background: rgba(10, 16, 32, 0.75);
+      border: 1px solid var(--evac-border);
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .route-option-card:hover {
+      border-color: var(--color-cyan);
+      background: rgba(20, 30, 55, 0.85);
+    }
+
+    .route-option-card.active {
+      border-color: var(--color-emerald);
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+    }
+
+    .route-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .route-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+    }
+
+    .badge-safe {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .badge-caution {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .route-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      background: rgba(5, 9, 20, 0.6);
+      padding: 0.6rem;
+      border-radius: 8px;
+    }
+
+    .metric-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .metric-title {
+      font-size: 0.64rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .metric-num {
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f8fafc;
+    }
+
+    /* Modal / Drawer */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 18, 0.82);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #090e1b;
+      border: 1px solid var(--evac-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1.15rem 1.35rem;
+      border-bottom: 1px solid var(--evac-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #060913;
+    }
+
+    .modal-body {
+      padding: 1.35rem;
+    }
+  </style>
+</head>
+<body class="evacuation-page-body">
+
+  <!-- ========================================================================= -->
+  <!-- 1. Top Navigation Bar                                                     -->
+  <!-- ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-shield" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <!-- Shield with Route Pathway -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+        </svg>
+        <span class="beacon-pulse" style="background: #10b981;"></span>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>PRAVAH EVACUATION</span>
+          <span class="brand-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4);">ROUTING</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Safe Route Generation Engine</span>
+          <span>•</span>
+          <span>Dijkstra & A* Pathfinding</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-pill">
+        <span class="telemetry-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+        <span>Dynamic Hazard Graph Online</span>
+      </div>
+
+      <!-- Quick Nav Buttons -->
+      <a href="index.html" class="btn btn-ghost magnetic" title="Return to 3D Earth Globe">
+        <span>3D Globe</span>
+      </a>
+      <a href="map.html" class="btn btn-ghost magnetic" title="Interactive GIS Flood Simulation">
+        <span>GIS Map</span>
+      </a>
+      <a href="weather.html" class="btn btn-ghost magnetic" title="Doppler Weather Radar">
+        <span>Doppler Radar</span>
+      </a>
+      <a href="community.html" class="btn btn-ghost magnetic" title="Crowdsourced Community Intelligence">
+        <span>Community</span>
+      </a>
+      <a href="alerts.html" class="btn btn-ghost magnetic" title="Multi-Channel Alerts Center">
+        <span>Alerts Center</span>
+      </a>
+      <a href="awareness.html" class="btn btn-ghost magnetic" title="Public Disaster Awareness">
+        <span>Awareness</span>
+      </a>
+      <a href="xai.html" class="btn btn-ghost magnetic" title="Explainable AI & SHAP Interpretability">
+        <span>XAI Center</span>
+      </a>
+      <a href="digital_twin.html" class="btn btn-ghost magnetic" title="Virtual Watershed Hydrology & Runoff Simulation">
+        <span>Digital Twin</span>
+      </a>
+      <a href="simulation.html" class="btn btn-ghost magnetic" title="Flood Inundation & Wave Propagation Simulator">
+        <span>Propagation</span>
+      </a>
+
+      <!-- Current Location Quick Action -->
+      <button class="btn btn-primary magnetic" style="font-size: 0.78rem; padding: 0.5rem 0.9rem;" onclick="locateUserGPS()">
+        <span>📍 Locate Me</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Main Portal Workspace Grid                                             -->
+  <!-- ========================================================================= -->
+  <div class="evac-container">
+    <div class="evac-grid">
+
+      <!-- LEFT: Interactive Route & Hazard Map -->
+      <div class="map-panel">
+        <div class="map-header-strip">
+          <div class="map-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-cyan)" stroke-width="2.2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            <span>Interactive Evacuation Corridors & Hazard Map</span>
+          </div>
+          <div style="font-size: 0.74rem; color: #94a3b8; font-family: 'JetBrains Mono';">
+            Click map to set Origin • Shelters & Closures Active
+          </div>
+        </div>
+
+        <div id="evacuationMap"></div>
+
+        <!-- Floating Map Legend -->
+        <div class="map-floating-legend">
+          <div style="font-weight: 800; font-size: 0.7rem; color: #f8fafc; text-transform: uppercase;">Map Legend</div>
+          <div class="legend-row">
+            <span class="legend-dot" style="background: #10b981;"></span>
+            <span>Relief Shelter (Available)</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-dot" style="background: #ef4444;"></span>
+            <span>Relief Shelter (Full / Closed)</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-line" style="background: #ef4444;"></span>
+            <span>Closed Road Segment</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-line" style="background: #06b6d4; box-shadow: 0 0 8px #06b6d4;"></span>
+            <span>Primary Safe Route</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-line" style="background: #a855f7; border: 1px dashed #c084fc;"></span>
+            <span>Alternative Route Option</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Controls & Generated Route Selection -->
+      <div class="controls-panel">
+
+        <!-- Evacuation Route Planner Card -->
+        <div class="card-box">
+          <div class="card-title">
+            <span>Route Parameters & Objectives</span>
+            <span style="font-family: 'JetBrains Mono'; color: var(--color-cyan); font-size: 0.74rem;">PRAVAH Core</span>
+          </div>
+
+          <form id="evacuationForm" onsubmit="handleRouteCalculation(event)">
+            <!-- Basin Presets -->
+            <div class="form-group">
+              <label class="form-label" for="basinPresetSelect">Quick Basin Location Preset</label>
+              <select class="form-select" id="basinPresetSelect" onchange="applyBasinPreset(this.value)">
+                <option value="pune" selected>Pune Headwaters — Mula-Mutha Confluence (18.5204°N, 73.8567°E)</option>
+                <option value="karad">Karad — Krishna / Koyna River Confluence (17.2890°N, 74.1810°E)</option>
+                <option value="mahad">Mahad — Savitri River Basin Corridor (18.0833°N, 73.4167°E)</option>
+                <option value="chiplun">Chiplun — Vashishti River Valley (17.5323°N, 73.5178°E)</option>
+                <option value="kolhapur">Kolhapur — Panchganga Lowland Catchment (16.7050°N, 74.2433°E)</option>
+                <option value="guwahati">Guwahati — Brahmaputra Waterfront Corridor (26.1820°N, 91.7510°E)</option>
+              </select>
+            </div>
+
+            <!-- GPS Origin Coordinates -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="inputOriginLat">Origin Latitude</label>
+                <input type="number" class="form-input" id="inputOriginLat" step="0.0001" value="18.5204" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="inputOriginLng">Origin Longitude</label>
+                <input type="number" class="form-input" id="inputOriginLng" step="0.0001" value="73.8567" required />
+              </div>
+            </div>
+
+            <!-- Objective Selector Pills -->
+            <label class="form-label">Routing Strategy Objective</label>
+            <div class="objective-pills">
+              <button type="button" class="obj-btn active" data-obj="BALANCED" onclick="setObjective(this, 'BALANCED')">
+                ⚖️ Balanced (Optimal)
+              </button>
+              <button type="button" class="obj-btn" data-obj="FASTEST" onclick="setObjective(this, 'FASTEST')">
+                ⚡ Fastest Time
+              </button>
+              <button type="button" class="obj-btn" data-obj="LOWEST_RISK" onclick="setObjective(this, 'LOWEST_RISK')">
+                🛡️ Lowest Flood Risk
+              </button>
+              <button type="button" class="obj-btn" data-obj="NEAREST_SHELTER" onclick="setObjective(this, 'NEAREST_SHELTER')">
+                🏠 Nearest Refuge
+              </button>
+            </div>
+
+            <!-- Algorithm and Destination -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="selectAlgorithm">Pathfinding Algorithm</label>
+                <select class="form-select" id="selectAlgorithm">
+                  <option value="ASTAR" selected>A* Pathfinding (Heuristic)</option>
+                  <option value="DIJKSTRA">Dijkstra's Algorithm</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="selectShelter">Target Destination Shelter</label>
+                <select class="form-select" id="selectShelter">
+                  <option value="" selected>Auto-Optimal Shelter</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-calculate-route" id="btnCompute">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>GENERATE SAFE EVACUATION ROUTE</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Generated Route Options -->
+        <div class="card-box" id="routeResultsContainer">
+          <div class="card-title">
+            <span>Evacuation Route Recommendations</span>
+            <span id="routeCountTag" style="font-family: 'JetBrains Mono'; color: var(--color-emerald); font-size: 0.74rem;">Ready</span>
+          </div>
+
+          <div id="routeCardsList">
+            <div style="text-align: center; padding: 2rem 1rem; color: #64748b;">
+              <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">🧭</div>
+              <div>Select starting coordinates and click <strong>Generate Route</strong> to evaluate safe corridors.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal for Shelter Details -->
+  <div class="modal-backdrop" id="shelterModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="font-weight: 800; font-size: 1.05rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🏠 Relief Shelter Telemetry</span>
+          <span id="modalShelterId" style="font-size: 0.72rem; font-family: 'JetBrains Mono'; color: var(--color-cyan);"></span>
+        </div>
+        <button class="btn-ghost" style="border: none; color: #94a3b8; cursor: pointer;" onclick="closeShelterModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalShelterBody">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Client Application Script                                              -->
+  <!-- ========================================================================= -->
+  <script>
+    // State management
+    let map = null;
+    let originMarker = null;
+    let shelterMarkers = [];
+    let roadClosureLines = [];
+    let riskZonePolygons = [];
+    let routePolylines = [];
+    let currentPlan = null;
+    let selectedObjective = 'BALANCED';
+    let availableShelters = [];
+
+    // Basin Presets Coordinates
+    const PRESETS = {
+      pune: { lat: 18.5204, lng: 73.8567, zoom: 12 },
+      karad: { lat: 17.2890, lng: 74.1810, zoom: 13 },
+      mahad: { lat: 18.0833, lng: 73.4167, zoom: 13 },
+      chiplun: { lat: 17.5323, lng: 73.5178, zoom: 13 },
+      kolhapur: { lat: 16.7050, lng: 74.2433, zoom: 13 },
+      guwahati: { lat: 26.1820, lng: 91.7510, zoom: 12 },
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initMap();
+      await loadShelters();
+      await loadRiskZones();
+      await loadRoadClosures();
+      // Auto compute default initial route
+      triggerRouteCalculation();
+    });
+
+    function initMap() {
+      // Centered on Western Ghats (Pune)
+      map = L.map('evacuationMap', { zoomControl: true }).setView([18.5204, 73.8567], 12);
+
+      // Dark Matter Base Tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Map Click to update origin
+      map.on('click', (e) => {
+        setOrigin(e.latlng.lat, e.latlng.lng);
+      });
+
+      // Initial Origin Marker
+      setOrigin(18.5204, 73.8567, false);
+    }
+
+    function setOrigin(lat, lng, pan = true) {
+      document.getElementById('inputOriginLat').value = lat.toFixed(4);
+      document.getElementById('inputOriginLng').value = lng.toFixed(4);
+
+      if (originMarker) {
+        originMarker.setLatLng([lat, lng]);
+      } else {
+        const originIcon = L.divIcon({
+          className: 'origin-marker-icon',
+          html: '<div style="background: #38bdf8; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 12px #38bdf8;"></div>',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        });
+        originMarker = L.marker([lat, lng], { icon: originIcon, draggable: true }).addTo(map);
+        originMarker.on('dragend', (e) => {
+          const pos = e.target.getLatLng();
+          setOrigin(pos.lat, pos.lng, false);
+        });
+      }
+
+      if (pan) {
+        map.panTo([lat, lng]);
+      }
+    }
+
+    function locateUserGPS() {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setOrigin(pos.coords.latitude, pos.coords.longitude, true);
+            triggerRouteCalculation();
+          },
+          (err) => {
+            alert('Location access denied or unavailable. Using selected preset.');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    }
+
+    function applyBasinPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      setOrigin(p.lat, p.lng, false);
+      map.setView([p.lat, p.lng], p.zoom);
+      triggerRouteCalculation();
+    }
+
+    function setObjective(btn, obj) {
+      document.querySelectorAll('.obj-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedObjective = obj;
+      triggerRouteCalculation();
+    }
+
+    async function loadShelters() {
+      try {
+        const res = await fetch('/api/evacuation/shelters');
+        if (!res.ok) return;
+        availableShelters = await res.json();
+
+        // Populate dropdown
+        const sel = document.getElementById('selectShelter');
+        sel.innerHTML = '<option value="" selected>Auto-Optimal Shelter</option>';
+        availableShelters.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.name} (${s.status})`;
+          sel.appendChild(opt);
+        });
+
+        // Add to map
+        shelterMarkers.forEach(m => map.removeLayer(m));
+        shelterMarkers = [];
+
+        availableShelters.forEach(s => {
+          const isAvail = s.status === 'AVAILABLE' || s.status === 'NEAR_CAPACITY';
+          const color = isAvail ? '#10b981' : '#ef4444';
+          const icon = L.divIcon({
+            className: 'shelter-marker-icon',
+            html: `<div style="background: ${color}; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: bold; border: 2px solid #ffffff; box-shadow: 0 0 10px ${color};">🏠</div>`,
+            iconSize: [22, 22],
+            iconAnchor: [11, 11],
+          });
+
+          const m = L.marker([s.latitude, s.longitude], { icon: icon }).addTo(map);
+          m.on('click', () => openShelterModal(s));
+          shelterMarkers.push(m);
+        });
+      } catch (e) {
+        console.error('Failed to load shelters:', e);
+      }
+    }
+
+    async function loadRiskZones() {
+      try {
+        const res = await fetch('/api/evacuation/risk-zones');
+        if (!res.ok) return;
+        const geojson = await res.json();
+
+        L.geoJSON(geojson, {
+          style: (feature) => {
+            const lvl = feature.properties.risk_level;
+            const color = lvl === 'EXTREME' ? '#ef4444' : lvl === 'HIGH' ? '#f97316' : '#eab308';
+            return {
+              color: color,
+              weight: 1.5,
+              opacity: 0.8,
+              fillColor: color,
+              fillOpacity: 0.18,
+              dashArray: '4, 4',
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup(`
+              <div style="font-family: 'Inter'; font-size: 12px; color: #041019;">
+                <strong>🌊 ${feature.properties.name}</strong><br/>
+                Risk Level: <strong>${feature.properties.risk_level}</strong> (${feature.properties.risk_score})<br/>
+                Flood Depth: ${feature.properties.inundation_depth_m}m
+              </div>
+            `);
+          }
+        }).addTo(map);
+      } catch (e) {
+        console.error('Failed to load risk zones:', e);
+      }
+    }
+
+    async function loadRoadClosures() {
+      try {
+        const res = await fetch('/api/evacuation/road-closures');
+        if (!res.ok) return;
+        const closures = await res.json();
+
+        closures.forEach(c => {
+          if (c.coordinates && c.coordinates.length >= 2) {
+            const line = L.polyline(c.coordinates, {
+              color: '#ef4444',
+              weight: 5,
+              opacity: 0.9,
+              dashArray: '6, 6',
+            }).addTo(map);
+
+            line.bindPopup(`
+              <div style="font-family: 'Inter'; font-size: 12px; color: #041019;">
+                <strong>🚧 ${c.name}</strong><br/>
+                Status: <strong style="color: #dc2626;">${c.status}</strong><br/>
+                Cause: ${c.cause}
+              </div>
+            `);
+          }
+        });
+      } catch (e) {
+        console.error('Failed to load closures:', e);
+      }
+    }
+
+    function triggerRouteCalculation() {
+      const form = document.getElementById('evacuationForm');
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+
+    async function handleRouteCalculation(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnCompute');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Calculating Safe Corridors...</span>';
+
+      const payload = {
+        latitude: parseFloat(document.getElementById('inputOriginLat').value),
+        longitude: parseFloat(document.getElementById('inputOriginLng').value),
+        destination_shelter_id: document.getElementById('selectShelter').value || null,
+        objective: selectedObjective,
+        algorithm: document.getElementById('selectAlgorithm').value,
+        travel_mode: 'VEHICLE',
+      };
+
+      try {
+        const res = await fetch('/api/evacuation/route', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          currentPlan = await res.json();
+          renderPlanResults(currentPlan);
+        } else {
+          const err = await res.json();
+          alert(`Routing Error: ${err.detail || 'Could not compute evacuation plan.'}`);
+        }
+      } catch (err) {
+        alert('Network or server error while computing route.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>GENERATE SAFE EVACUATION ROUTE</span>
+        `;
+      }
+    }
+
+    function renderPlanResults(plan) {
+      const container = document.getElementById('routeCardsList');
+      const countTag = document.getElementById('routeCountTag');
+
+      if (plan.status === 'no_safe_route' || !plan.primary_route) {
+        countTag.textContent = 'NO ROUTE';
+        countTag.style.color = '#f87171';
+        container.innerHTML = `
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 1.25rem; color: #fca5a5;">
+            <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">⚠️ No Safe Route Available</div>
+            <div style="font-size: 0.8rem; line-height: 1.4;">${plan.message}</div>
+          </div>
+        `;
+        clearRoutePolylines();
+        return;
+      }
+
+      countTag.textContent = `${1 + plan.alternative_routes.length} Options`;
+      countTag.style.color = '#34d399';
+
+      const routes = [plan.primary_route, ...plan.alternative_routes];
+      container.innerHTML = routes.map((r, idx) => {
+        const isPrimary = idx === 0;
+        const badgeClass = r.safety_classification === 'LOW_RISK' ? 'badge-safe' :
+                           r.safety_classification === 'MODERATE_RISK' ? 'badge-caution' : 'badge-danger';
+
+        return `
+          <div class="route-option-card ${isPrimary ? 'active' : ''}" onclick="selectRouteOption(${idx})">
+            <div class="route-header">
+              <div>
+                <strong style="color: #f8fafc; font-size: 0.9rem;">${isPrimary ? 'Primary: ' : 'Alt: '}${r.objective}</strong>
+                <div style="font-size: 0.72rem; color: #94a3b8;">Destination: ${r.destination.name}</div>
+              </div>
+              <span class="route-badge ${badgeClass}">${r.safety_classification}</span>
+            </div>
+            <div class="route-metrics-grid">
+              <div class="metric-box">
+                <span class="metric-title">ETA</span>
+                <span class="metric-num" style="color: #38bdf8;">${r.estimated_time_minutes} min</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-title">Distance</span>
+                <span class="metric-num">${r.distance_km} km</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-title">Risk Score</span>
+                <span class="metric-num" style="color: ${r.risk_score > 0.4 ? '#fb923c' : '#34d399'};">${r.risk_score}</span>
+              </div>
+            </div>
+            <div style="font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between;">
+              <span>Delays: Flood +${r.flood_delay_minutes}m, Road +${r.road_delay_minutes}m</span>
+              <span>Bypassed Closures: ${r.road_closures_avoided}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      drawRoutePolylines(routes, 0);
+    }
+
+    function selectRouteOption(index) {
+      document.querySelectorAll('.route-option-card').forEach((c, idx) => {
+        if (idx === index) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+
+      const routes = [currentPlan.primary_route, ...currentPlan.alternative_routes];
+      drawRoutePolylines(routes, index);
+    }
+
+    function clearRoutePolylines() {
+      routePolylines.forEach(p => map.removeLayer(p));
+      routePolylines = [];
+    }
+
+    function drawRoutePolylines(routes, selectedIdx) {
+      clearRoutePolylines();
+
+      // Draw non-selected routes first
+      routes.forEach((r, idx) => {
+        if (idx !== selectedIdx) {
+          const poly = L.polyline(r.polyline, {
+            color: '#a855f7',
+            weight: 4,
+            opacity: 0.5,
+            dashArray: '6, 6',
+          }).addTo(map);
+          routePolylines.push(poly);
+        }
+      });
+
+      // Draw selected route on top
+      const sel = routes[selectedIdx];
+      if (sel) {
+        const primaryPoly = L.polyline(sel.polyline, {
+          color: '#06b6d4',
+          weight: 6,
+          opacity: 0.95,
+        }).addTo(map);
+        routePolylines.push(primaryPoly);
+
+        // Zoom map to fit primary route
+        map.fitBounds(primaryPoly.getBounds(), { padding: [40, 40] });
+      }
+    }
+
+    function openShelterModal(s) {
+      document.getElementById('modalShelterId').textContent = s.id;
+      const pct = Math.round((s.current_occupancy / Math.max(1, s.capacity)) * 100);
+
+      document.getElementById('modalShelterBody').innerHTML = `
+        <h3 style="margin: 0 0 0.5rem 0; color: #f8fafc; font-size: 1.15rem;">${s.name}</h3>
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;">
+          ${s.shelter_type} • ${s.region} (${s.district || 'Western Ghats'})
+        </div>
+
+        <div style="background: rgba(10, 16, 32, 0.75); padding: 0.85rem; border-radius: 8px; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.35rem;">
+            <span>Occupancy: <strong>${s.current_occupancy} / ${s.capacity} beds</strong></span>
+            <strong style="color: ${pct > 80 ? '#fbbf24' : '#34d399'};">${pct}% Filled</strong>
+          </div>
+          <div style="width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden;">
+            <div style="width: ${pct}%; height: 100%; background: ${pct > 80 ? '#f59e0b' : '#10b981'};"></div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.8rem; line-height: 1.5; color: #cbd5e1; margin-bottom: 1rem;">
+          <div>📞 Emergency Hotline: <strong>${s.contact || '112'}</strong></div>
+          <div>♿ Accessibility: ${s.accessibility_notes || 'Standard ramp and medical access available.'}</div>
+          <div>Status: <span style="font-weight: bold; color: ${s.status === 'AVAILABLE' ? '#34d399' : '#f87171'};">${s.status}</span></div>
+        </div>
+
+        <button class="btn-calculate-route" onclick="targetThisShelter('${s.id}')">
+          <span>Set As Evacuation Destination</span>
+        </button>
+      `;
+      document.getElementById('shelterModalBackdrop').classList.add('open');
+    }
+
+    function closeShelterModal() {
+      document.getElementById('shelterModalBackdrop').classList.remove('open');
+    }
+
+    function targetThisShelter(shelterId) {
+      document.getElementById('selectShelter').value = shelterId;
+      closeShelterModal();
+      triggerRouteCalculation();
+    }
+  </script>
+</body>
+</html>

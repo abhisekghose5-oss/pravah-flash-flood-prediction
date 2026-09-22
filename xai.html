@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Explainable AI (XAI) & SHAP Interpretability Center</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Shared CSS & Tailwind CDN -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            slate: {
+              850: '#151f33',
+              950: '#060a12',
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-dark: #060a12;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --accent-cyan: #38bdf8;
+      --accent-rose: #fb7185;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(244, 63, 94, 0.06) 0%, transparent 45%);
+      background-attachment: fixed;
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .model-pill-active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: #06b6d4;
+      color: #38bdf8;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.35);
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- 1. Top Navigation Bar                                                     -->
+  <!-- ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-shield" style="border-color: #06b6d4; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
+        </svg>
+        <span class="beacon-pulse" style="background: #38bdf8;"></span>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>PRAVAH XAI ENGINE</span>
+          <span class="brand-tag" style="background: rgba(6, 182, 212, 0.2); color: #38bdf8; border-color: rgba(6, 182, 212, 0.4);">SHAP v0.52</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Explainable AI & Feature Attribution Center</span>
+          <span>•</span>
+          <span>Random Forest + XGBoost + LightGBM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-telemetry flex items-center gap-2 flex-wrap">
+      <div class="telemetry-pill">
+        <span class="telemetry-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+        <span id="explainerStatus">SHAP TreeExplainer Online</span>
+      </div>
+
+      <!-- Quick Nav Buttons -->
+      <a href="index.html" class="btn btn-ghost magnetic" title="Return to 3D Earth Globe">
+        <span>3D Globe</span>
+      </a>
+      <a href="map.html" class="btn btn-ghost magnetic" title="Interactive GIS Flood Simulation">
+        <span>GIS Map</span>
+      </a>
+      <a href="weather.html" class="btn btn-ghost magnetic" title="Doppler Weather Radar">
+        <span>Doppler</span>
+      </a>
+      <a href="evacuation.html" class="btn btn-ghost magnetic" title="Evacuation & Safe Route Planner">
+        <span>Evacuation</span>
+      </a>
+      <a href="alerts.html" class="btn btn-ghost magnetic" title="Multi-Channel Alerts Center">
+        <span>Alerts</span>
+      </a>
+      <a href="community.html" class="btn btn-ghost magnetic" title="Crowdsourced Community Intelligence">
+        <span>Community</span>
+      </a>
+      <a href="digital_twin.html" class="btn btn-ghost magnetic" title="Virtual Watershed Hydrology & Runoff Simulation">
+        <span>Digital Twin</span>
+      </a>
+      <a href="simulation.html" class="btn btn-ghost magnetic" title="Flood Inundation & Wave Propagation Simulator">
+        <span>Propagation</span>
+      </a>
+
+      <!-- Inspect JSON Action -->
+      <button class="btn btn-ghost magnetic" onclick="openRawModal()" title="Inspect Raw JSON Telemetry">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        <span>Raw JSON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Main Container Shell                                                   -->
+  <!-- ========================================================================= -->
+  <main class="max-w-[1440px] mx-auto px-4 md:px-8 py-6 space-y-6">
+
+    <!-- Tactical Scenario Controls Card -->
+    <section class="glass-card p-6 border-slate-800">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        
+        <!-- Model Selection Pills -->
+        <div>
+          <span class="text-xs font-mono uppercase text-slate-400 block mb-2 font-bold tracking-wider">
+            1. Select Machine Learning Architecture
+          </span>
+          <div class="flex items-center gap-2 flex-wrap" id="modelSelectorGroup">
+            <button class="px-4 py-2 rounded-xl text-xs font-mono font-bold border border-slate-700 bg-slate-900/80 transition-all model-pill-active" onclick="switchModel('RandomForest', this)">
+              🌲 Random Forest (300 Trees)
+            </button>
+            <button class="px-4 py-2 rounded-xl text-xs font-mono font-bold border border-slate-700 bg-slate-900/80 transition-all text-slate-300 hover:border-slate-500" onclick="switchModel('XGBoost', this)">
+              ⚡ XGBoost Gradient Boosting
+            </button>
+            <button class="px-4 py-2 rounded-xl text-xs font-mono font-bold border border-slate-700 bg-slate-900/80 transition-all text-slate-300 hover:border-slate-500" onclick="switchModel('LightGBM', this)">
+              💡 LightGBM (GOSS)
+            </button>
+          </div>
+        </div>
+
+        <!-- Target Catchment Selector -->
+        <div>
+          <span class="text-xs font-mono uppercase text-slate-400 block mb-2 font-bold tracking-wider">
+            2. Monitored River Catchment
+          </span>
+          <select id="gaugeSelect" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-mono rounded-xl px-3 py-2 outline-none focus:border-cyan-500" onchange="runExplanation()">
+            <option value="684">Karad — Krishna / Koyna Confluence (Station 684)</option>
+            <option value="685">Mahad — Savitri River Basin (Station 685)</option>
+            <option value="686">Chiplun — Vashishti River Valley (Station 686)</option>
+            <option value="687">Kolhapur — Panchganga Catchment (Station 687)</option>
+            <option value="688">Pune — Mula-Mutha Confluence (Station 688)</option>
+            <option value="Beki">Guwahati / Beki — Brahmaputra Sector (NE-Beki)</option>
+          </select>
+        </div>
+
+        <!-- Storm Presets -->
+        <div>
+          <span class="text-xs font-mono uppercase text-slate-400 block mb-2 font-bold tracking-wider">
+            3. Weather Inflow Preset
+          </span>
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-rose-950/60 border border-rose-800/40 text-rose-300 hover:bg-rose-900/40" onclick="applyPreset('storm')">
+              ⚡ Cloudburst (180mm)
+            </button>
+            <button class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-amber-950/60 border border-amber-800/40 text-amber-300 hover:bg-amber-900/40" onclick="applyPreset('moderate')">
+              🌧️ Moderate (65mm)
+            </button>
+            <button class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-emerald-950/60 border border-emerald-800/40 text-emerald-300 hover:bg-emerald-900/40" onclick="applyPreset('dry')">
+              ☀️ Dry (5mm)
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Top KPI Strip & "Why High/Low Risk?" Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Risk Meter Card -->
+      <section class="glass-card p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider font-bold">Flood Risk Probability</span>
+            <span id="riskTierBadge" class="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-800/50">
+              ADVISORY
+            </span>
+          </div>
+          <div class="flex items-baseline gap-3 my-3">
+            <span id="riskProbText" class="text-5xl font-black font-mono text-white">16.4%</span>
+            <span id="thresholdNotice" class="text-xs font-mono text-slate-400">Threshold: 0.29</span>
+          </div>
+          <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800 my-2">
+            <div id="riskProgressBar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 transition-all duration-700" style="width: 16.4%;"></div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 text-xs font-mono text-slate-400 space-y-1">
+          <div class="flex justify-between">
+            <span>Model Output:</span>
+            <span id="modelUsedText" class="text-cyan-400 font-bold">task_a_onset_RandomForest</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Expected Base E[f(x)]:</span>
+            <span id="baseValueText" class="text-slate-200">0.500</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Target Station:</span>
+            <span id="stationNameText" class="text-slate-200">Karad</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dynamic "Why High Risk?" / "Why Low Risk?" Narrative Card (Section 8 & 9) -->
+      <section class="glass-card p-6 lg:col-span-2 flex flex-col justify-between" id="narrativeSection">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="headlineTitleBadge" class="px-3 py-1 rounded-full text-xs font-mono font-black tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              WHY MODERATE RISK?
+            </span>
+            <span class="text-xs font-mono text-slate-400">
+              Shapley Decomposition
+            </span>
+          </div>
+          <p id="headlineNarrativeText" class="text-sm md:text-base text-slate-200 leading-relaxed font-sans mb-4">
+            Loading real-time attribution breakdown...
+          </p>
+        </div>
+
+        <!-- Top Factor Badges -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+          <div class="p-3 bg-slate-950/70 border border-rose-950/40 rounded-xl">
+            <span class="text-xs font-bold font-mono text-rose-400 block mb-2">▲ Drivers Increasing Risk</span>
+            <div id="topPosFactorsList" class="space-y-1.5 text-xs text-slate-300">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+          <div class="p-3 bg-slate-950/70 border border-sky-950/40 rounded-xl">
+            <span class="text-xs font-bold font-mono text-sky-400 block mb-2">▼ Drivers Mitigating Risk</span>
+            <div id="topNegFactorsList" class="space-y-1.5 text-xs text-slate-300">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SHAP Force Plot Section (Section 11) -->
+    <section class="glass-card p-6">
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-wide">Interactive SHAP Force Plot</h2>
+          <p class="text-xs font-mono text-slate-400">
+            Pushing forces from model baseline E[f(x)] toward final calculated risk probability
+          </p>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono">
+          <span class="flex items-center gap-1.5 text-rose-400">
+            <span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Positive Forces (Risk Up)
+          </span>
+          <span class="flex items-center gap-1.5 text-sky-400">
+            <span class="w-2.5 h-2.5 rounded-sm bg-sky-400"></span> Negative Forces (Risk Down)
+          </span>
+        </div>
+      </div>
+
+      <!-- SVG Canvas Container -->
+      <div id="forcePlotContainer" class="w-full overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 shadow-inner">
+        <!-- SVG injected by JS -->
+      </div>
+    </section>
+
+    <!-- Global Explainability Section (Section 10 & 12 & 13) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Feature Importance Graph (Section 12) -->
+      <section class="glass-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base font-bold text-white">Global Feature Importance</h3>
+            <p class="text-xs text-slate-400 font-mono">Top 10 Most Influential Features across Catchments</p>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-800/40 px-2.5 py-0.5 rounded">
+            Mean |SHAP|
+          </span>
+        </div>
+
+        <div id="importanceList" class="space-y-3 pt-1">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- SHAP Summary Distribution (Section 10) -->
+      <section class="glass-card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base font-bold text-white">SHAP Summary Distribution</h3>
+            <p class="text-xs text-slate-400 font-mono">Feature Value Impact Spread across Diverse Profiles</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono">
+            <span class="flex items-center gap-1 text-sky-400">● Low Val</span>
+            <span class="flex items-center gap-1 text-rose-400">● High Val</span>
+          </div>
+        </div>
+
+        <div id="summarySwarmList" class="space-y-3 pt-1">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="flex justify-between items-center text-[10px] font-mono text-slate-500 mt-4 px-20">
+          <span>&larr; Reduces Flood Risk</span>
+          <span>Zero Line</span>
+          <span>Increases Flood Risk &rarr;</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Complete Feature Attribution Inventory Table -->
+    <section class="glass-card p-6">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <h3 class="text-base font-bold text-white">Complete Feature Attribution Inventory</h3>
+          <p class="text-xs font-mono text-slate-400">Exact numerical inputs and directional Shapley values for active prediction</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="featureSearch" placeholder="Search features..." class="bg-slate-950 border border-slate-700 text-xs px-3 py-1.5 rounded-lg outline-none focus:border-cyan-500 text-slate-200" oninput="filterFeatureTable(this.value)" />
+        </div>
+      </div>
+
+      <div class="overflow-x-auto max-h-96 overflow-y-auto rounded-xl border border-slate-800">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 uppercase text-[10px] font-mono text-slate-400 sticky top-0 backdrop-blur-sm border-b border-slate-800">
+            <tr>
+              <th class="py-2.5 px-3">Input Feature</th>
+              <th class="py-2.5 px-3">Observed Value</th>
+              <th class="py-2.5 px-3">SHAP Value (&phi;)</th>
+              <th class="py-2.5 px-3">Attribution Share</th>
+              <th class="py-2.5 px-3">Direction</th>
+              <th class="py-2.5 px-3">Domain Category</th>
+            </tr>
+          </thead>
+          <tbody id="contributionsTableBody" class="divide-y divide-slate-800/60 font-sans">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Transparent Disclaimer Banner (Section 20) -->
+    <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/80 text-xs text-slate-400 flex items-center gap-3">
+      <span class="text-xl">ℹ️</span>
+      <div>
+        <strong class="text-slate-300 font-semibold">Interpretability Disclaimer:</strong>
+        XAI explanations show which model inputs contributed to the prediction. They should not be interpreted as proof of direct real-world causation.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Raw JSON Modal                                                         -->
+  <!-- ========================================================================= -->
+  <div id="rawModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold font-mono text-cyan-400">XAI Raw JSON Payload</h3>
+        <button class="text-slate-400 hover:text-white" onclick="closeRawModal()">✕</button>
+      </div>
+      <div class="flex-1 overflow-y-auto my-4 bg-slate-950 rounded-xl p-4 border border-slate-800">
+        <pre id="rawJsonCode" class="text-xs font-mono text-slate-300 whitespace-pre-wrap"></pre>
+      </div>
+      <div class="flex justify-end">
+        <button class="btn btn-primary" onclick="closeRawModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. Client-side Controller Script                                          -->
+  <!-- ========================================================================= -->
+  <script>
+    let currentModel = 'RandomForest';
+    let currentRainfall = [0.0, 5.0, 15.0, 30.0, 55.0, 80.0, 110.0, 45.0, 20.0, 65.0];
+    let latestExplanation = null;
+    let allContributions = [];
+
+    // Switch Model Architecture
+    function switchModel(modelName, btnElement) {
+      currentModel = modelName;
+      const group = document.getElementById('modelSelectorGroup');
+      group.querySelectorAll('button').forEach(b => {
+        b.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold border border-slate-700 bg-slate-900/80 transition-all text-slate-300 hover:border-slate-500';
+      });
+      btnElement.className = 'px-4 py-2 rounded-xl text-xs font-mono font-bold border border-slate-700 bg-slate-900/80 transition-all model-pill-active';
+      runExplanation();
+      loadGlobalAnalytics();
+    }
+
+    // Apply Presets
+    function applyPreset(type) {
+      if (type === 'storm') {
+        currentRainfall = [35.0, 50.0, 75.0, 110.0, 140.0, 160.0, 180.0, 120.0, 90.0, 115.0];
+      } else if (type === 'moderate') {
+        currentRainfall = [5.0, 10.0, 20.0, 35.0, 45.0, 55.0, 65.0, 40.0, 25.0, 30.0];
+      } else {
+        currentRainfall = [0.0, 0.0, 0.0, 2.0, 5.0, 0.0, 0.0, 3.0, 1.0, 2.0];
+      }
+      runExplanation();
+    }
+
+    // Run Local Explanation
+    async function runExplanation() {
+      const gaugeId = document.getElementById('gaugeSelect').value;
+      const payload = {
+        gauge_id: gaugeId,
+        rainfall_history_10d: currentRainfall,
+        model_name: currentModel,
+        task: 'onset',
+      };
+
+      try {
+        const resp = await fetch('/api/xai/explain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
+        const data = await resp.json();
+        latestExplanation = data;
+        renderExplanation(data);
+      } catch (err) {
+        console.error('Failed to run explanation:', err);
+      }
+    }
+
+    // Render Local Explanation
+    function renderExplanation(data) {
+      // Risk & Prob
+      const prob = data.prediction_probability;
+      document.getElementById('riskProbText').innerText = `${(prob * 100).toFixed(1)}%`;
+      document.getElementById('riskProgressBar').style.width = `${Math.min(100, prob * 100)}%`;
+      document.getElementById('thresholdNotice').innerText = `Threshold: ${data.decision_threshold.toFixed(2)}`;
+      document.getElementById('modelUsedText').innerText = data.model_used;
+      document.getElementById('baseValueText').innerText = data.base_value.toFixed(3);
+      document.getElementById('stationNameText').innerText = data.station_name;
+
+      // Tier Badge
+      const tierBadge = document.getElementById('riskTierBadge');
+      tierBadge.innerText = data.risk_level;
+      if (data.risk_level === 'EMERGENCY' || data.risk_level === 'WARNING') {
+        tierBadge.className = 'px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-rose-950 text-rose-400 border border-rose-800/50';
+      } else if (data.risk_level === 'ADVISORY') {
+        tierBadge.className = 'px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-800/50';
+      } else {
+        tierBadge.className = 'px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/50';
+      }
+
+      // Headline
+      const headlineBadge = document.getElementById('headlineTitleBadge');
+      headlineBadge.innerText = data.headline_title;
+      if (data.headline_title.includes('HIGH')) {
+        headlineBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-black tracking-wider uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40';
+      } else if (data.headline_title.includes('MODERATE')) {
+        headlineBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-black tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      } else {
+        headlineBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-black tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+      }
+
+      document.getElementById('headlineNarrativeText').innerText = data.headline_narrative;
+
+      // Top Positive
+      const posList = document.getElementById('topPosFactorsList');
+      posList.innerHTML = '';
+      if (!data.top_contributing_factors || data.top_contributing_factors.length === 0) {
+        posList.innerHTML = '<span class="text-slate-500 italic">None</span>';
+      } else {
+        data.top_contributing_factors.slice(0, 3).forEach(f => {
+          posList.innerHTML += `
+            <div class="flex items-center justify-between">
+              <span class="truncate pr-2">${f.feature_name} (${f.feature_value}${f.unit ? ' ' + f.unit : ''})</span>
+              <span class="font-mono font-bold text-rose-400">+${f.relative_contribution.toFixed(0)}%</span>
+            </div>
+          `;
+        });
+      }
+
+      // Top Negative
+      const negList = document.getElementById('topNegFactorsList');
+      negList.innerHTML = '';
+      if (!data.top_reducing_factors || data.top_reducing_factors.length === 0) {
+        negList.innerHTML = '<span class="text-slate-500 italic">None</span>';
+      } else {
+        data.top_reducing_factors.slice(0, 3).forEach(f => {
+          negList.innerHTML += `
+            <div class="flex items-center justify-between">
+              <span class="truncate pr-2">${f.feature_name} (${f.feature_value}${f.unit ? ' ' + f.unit : ''})</span>
+              <span class="font-mono font-bold text-sky-400">-${f.relative_contribution.toFixed(0)}%</span>
+            </div>
+          `;
+        });
+      }
+
+      // Force Plot SVG
+      if (data.force_plot && data.force_plot.svg_markup) {
+        document.getElementById('forcePlotContainer').innerHTML = data.force_plot.svg_markup;
+      }
+
+      // Table
+      allContributions = data.all_contributions || [];
+      renderTable(allContributions);
+    }
+
+    // Render Table
+    function renderTable(list) {
+      const tbody = document.getElementById('contributionsTableBody');
+      tbody.innerHTML = '';
+      list.forEach(c => {
+        const isPos = c.shap_value > 0;
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-3 font-semibold text-slate-200">${c.feature_name}</td>
+            <td class="py-2 px-3 font-mono text-slate-300">${c.feature_value}${c.unit ? ' ' + c.unit : ''}</td>
+            <td class="py-2 px-3 font-mono font-bold ${isPos ? 'text-rose-400' : 'text-sky-400'}">${isPos ? '+' : ''}${c.shap_value.toFixed(4)}</td>
+            <td class="py-2 px-3 font-mono">
+              <div class="flex items-center gap-2">
+                <span>${c.relative_contribution.toFixed(1)}%</span>
+                <div class="w-12 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                  <div class="h-full ${isPos ? 'bg-rose-500' : 'bg-sky-400'}" style="width: ${Math.min(100, c.relative_contribution * 2)}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="py-2 px-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                isPos ? 'bg-rose-950 text-rose-300 border border-rose-800/40' : 'bg-sky-950 text-sky-300 border border-sky-800/40'
+              }">
+                ${isPos ? '▲ INCREASES' : '▼ DECREASES'}
+              </span>
+            </td>
+            <td class="py-2 px-3 capitalize text-slate-400 font-mono text-[11px]">${c.domain_category}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Filter Table
+    function filterFeatureTable(query) {
+      const q = query.toLowerCase();
+      const filtered = allContributions.filter(c => 
+        c.feature_name.toLowerCase().includes(q) || c.feature_key.toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+    }
+
+    // Load Global Feature Importance & Summary
+    async function loadGlobalAnalytics() {
+      try {
+        // Feature Importance
+        const impResp = await fetch(`/api/xai/feature-importance?model=${currentModel}`);
+        if (impResp.ok) {
+          const impData = await impResp.json();
+          renderFeatureImportance(impData.features || []);
+        }
+
+        // Summary Plot
+        const sumResp = await fetch(`/api/xai/summary?model=${currentModel}`);
+        if (sumResp.ok) {
+          const sumData = await sumResp.json();
+          renderSummarySwarm(sumData.top_features || []);
+        }
+      } catch (e) {
+        console.error('Failed to load global analytics:', e);
+      }
+    }
+
+    function renderFeatureImportance(features) {
+      const container = document.getElementById('importanceList');
+      container.innerHTML = '';
+      const top10 = features.slice(0, 8);
+      const maxScore = Math.max(...top10.map(f => f.importance_score), 0.001);
+
+      top10.forEach(f => {
+        const pct = Math.min(100, Math.max(4, (f.importance_score / maxScore) * 100));
+        container.innerHTML += `
+          <div class="text-xs">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-slate-300 font-medium truncate pr-2">
+                <span class="font-mono text-slate-500 mr-1.5">#${f.rank}</span>${f.feature_name}
+              </span>
+              <span class="font-mono text-cyan-400 shrink-0 font-bold">${f.relative_importance_percent.toFixed(1)}%</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/60">
+              <div class="bg-gradient-to-r from-cyan-500 to-sky-400 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderSummarySwarm(features) {
+      const container = document.getElementById('summarySwarmList');
+      container.innerHTML = '';
+      features.slice(0, 8).forEach(feat => {
+        container.innerHTML += `
+          <div class="flex items-center gap-3 text-xs">
+            <div class="w-36 text-right truncate font-medium text-slate-300 shrink-0" title="${feat.feature_name}">
+              ${feat.feature_name}
+            </div>
+            <div class="flex-1 h-5 bg-slate-950/80 rounded-lg relative flex items-center px-3 border border-slate-800/80">
+              <div class="w-0.5 h-full bg-slate-700 absolute left-1/2 -translate-x-1/2"></div>
+              <div class="w-full flex justify-between items-center z-10 px-2">
+                <span class="w-2 h-2 rounded-full bg-blue-400/90 shadow-sm" title="Low value"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500/80 shadow-sm"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500/70"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-400/80 shadow-sm"></span>
+                <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm" title="High value"></span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Modal Control
+    function openRawModal() {
+      if (latestExplanation) {
+        document.getElementById('rawJsonCode').innerText = JSON.stringify(latestExplanation, null, 2);
+      }
+      document.getElementById('rawModal').classList.remove('hidden');
+      document.getElementById('rawModal').classList.add('flex');
+    }
+
+    function closeRawModal() {
+      document.getElementById('rawModal').classList.add('hidden');
+      document.getElementById('rawModal').classList.remove('flex');
+    }
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+      runExplanation();
+      loadGlobalAnalytics();
+    });
+  </script>
+</body>
+</html>

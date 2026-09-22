@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRAVAH — Community Reporting & Crowdsourced Flood Intelligence</title>
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Shared PRAVAH Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet GIS Map Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* Scoped styling for Community Reporting Portal */
+    :root {
+      --comm-bg: #060a12;
+      --comm-card: rgba(15, 23, 42, 0.75);
+      --comm-border: rgba(30, 41, 59, 0.8);
+      --comm-cyan: #06b6d4;
+      --comm-emerald: #10b981;
+      --comm-amber: #f59e0b;
+      --comm-rose: #f43f5e;
+      --comm-blue: #3b82f6;
+    }
+
+    body.community-page-body {
+      background-color: var(--comm-bg);
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 45%),
+        linear-gradient(180deg, #060a12 0%, #0b1329 100%);
+      background-attachment: fixed;
+    }
+
+    .comm-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: var(--comm-card);
+      border: 1px solid var(--comm-border);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .kpi-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f8fafc;
+      line-height: 1.1;
+    }
+
+    .kpi-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    /* Primary Action Header Bar */
+    .action-header-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--comm-border);
+    }
+
+    .action-title-group h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .action-title-group p {
+      margin: 0.2rem 0 0 0;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .btn-report-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.75rem 1.4rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(6, 182, 212, 0.5);
+    }
+
+    /* Workspace Split Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* GIS Map Container */
+    .map-panel {
+      background: var(--comm-card);
+      border: 1px solid var(--comm-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--comm-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .panel-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #communityGisMap {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #090d16;
+    }
+
+    /* Table Panel */
+    .table-panel {
+      background: var(--comm-card);
+      border: 1px solid var(--comm-border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .table-controls-bar {
+      padding: 0.75rem 1rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid var(--comm-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .filter-btn {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: #f1f5f9;
+    }
+
+    .filter-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .search-input-box {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      color: #f8fafc;
+      font-size: 0.78rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      outline: none;
+      width: 180px;
+    }
+
+    .search-input-box:focus {
+      border-color: var(--comm-cyan);
+    }
+
+    .table-scroll-wrap {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .comm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      text-align: left;
+    }
+
+    .comm-table th {
+      background: rgba(15, 23, 42, 0.95);
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--comm-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .comm-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+      color: #cbd5e1;
+      vertical-align: middle;
+    }
+
+    .comm-table tr:hover td {
+      background: rgba(30, 41, 59, 0.4);
+      cursor: pointer;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-critical { background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.6); color: #fb7185; }
+    .badge-high { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.6); color: #fbbf24; }
+    .badge-mod { background: rgba(234, 179, 8, 0.2); border: 1px solid rgba(234, 179, 8, 0.6); color: #fde047; }
+    .badge-low { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.6); color: #34d399; }
+
+    .badge-verified { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.5); color: #34d399; }
+    .badge-pending { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.5); color: #fbbf24; }
+    .badge-rejected { background: rgba(100, 116, 139, 0.2); border: 1px solid rgba(100, 116, 139, 0.5); color: #94a3b8; }
+    .badge-resolved { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.5); color: #60a5fa; }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0b1324;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 760px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--comm-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #090e1b;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.25rem;
+      padding: 0.3rem;
+      border-radius: 6px;
+      line-height: 1;
+    }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: #f8fafc;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--comm-cyan);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+    }
+
+    .report-type-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .type-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 2px solid rgba(51, 65, 85, 0.8);
+      border-radius: 10px;
+      padding: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      transition: all 0.15s ease;
+    }
+
+    .type-card:hover {
+      border-color: #38bdf8;
+      background: rgba(30, 41, 59, 0.6);
+    }
+
+    .type-card.selected {
+      border-color: var(--comm-cyan);
+      background: rgba(6, 182, 212, 0.12);
+    }
+
+    .type-card-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .type-card-desc {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    /* Photo Upload Dropzone */
+    .photo-dropzone {
+      border: 2px dashed rgba(51, 65, 85, 0.9);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.4);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .photo-dropzone:hover {
+      border-color: var(--comm-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    .photo-preview-wrap {
+      display: none;
+      position: relative;
+      margin-top: 0.75rem;
+      max-height: 220px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--comm-border);
+    }
+
+    .photo-preview-img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-photo-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Mini Pin Selector Map */
+    #miniPinMap {
+      height: 180px;
+      border-radius: 8px;
+      border: 1px solid var(--comm-border);
+      margin-top: 0.5rem;
+    }
+
+    /* Custom Leaflet Radar Marker HTML */
+    .pulse-pin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="community-page-body">
+
+  <!-- ========================================================================= -->
+  <!-- 1. Top Navigation Bar                                                     -->
+  <!-- ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-icon-shield">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#041019" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span class="beacon-pulse"></span>
+      </div>
+      <div class="brand-text">
+        <h1>
+          <span>PRAVAH CROWDSOURCE</span>
+          <span class="brand-tag">INTELLIGENCE</span>
+        </h1>
+        <div class="brand-subtitle">
+          <span>Community Early Warning System</span>
+          <span>•</span>
+          <span id="headerRegionLabel">Multi-Basin Ground Observation</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-telemetry">
+      <div class="telemetry-pill">
+        <span class="telemetry-dot"></span>
+        <span id="liveIntelFeedText">Ground Telemetry Active</span>
+      </div>
+
+      <!-- Quick Nav Buttons -->
+      <a href="index.html" class="btn btn-ghost magnetic" title="Return to 3D Earth Globe">
+        <span>3D Globe</span>
+      </a>
+      <a href="map.html" class="btn btn-ghost magnetic" title="Interactive GIS Flood Simulation">
+        <span>GIS Map</span>
+      </a>
+      <a href="weather.html" class="btn btn-ghost magnetic" title="Doppler Weather Radar">
+        <span>Doppler Radar</span>
+      </a>
+      <a href="awareness.html" class="btn btn-ghost magnetic" title="Disaster Awareness">
+        <span>Awareness</span>
+      </a>
+      <a href="alerts.html" class="btn btn-ghost magnetic" title="Multi-Channel Alerts Center">
+        <span>Alerts Center</span>
+      </a>
+      <a href="evacuation.html" class="btn btn-ghost magnetic" title="Evacuation & Safe Route Planner">
+        <span>Evacuation</span>
+      </a>
+      <a href="xai.html" class="btn btn-ghost magnetic" title="Explainable AI & SHAP Interpretability">
+        <span>XAI Center</span>
+      </a>
+      <a href="digital_twin.html" class="btn btn-ghost magnetic" title="Virtual Watershed Hydrology & Runoff Simulation">
+        <span>Digital Twin</span>
+      </a>
+      <a href="simulation.html" class="btn btn-ghost magnetic" title="Flood Inundation & Wave Propagation Simulator">
+        <span>Propagation</span>
+      </a>
+
+      <!-- Primary Action -->
+      <button class="btn-report-action" onclick="openReportModal()">
+        <span>+ REPORT FLOOD INCIDENT</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. Main Portal Container                                                  -->
+  <!-- ========================================================================= -->
+  <div class="comm-container">
+
+    <!-- KPI Summary Metric Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Total Ground Reports</span>
+          <span class="kpi-badge" style="background: rgba(6,182,212,0.15); color: #38bdf8;">ALL TIME</span>
+        </div>
+        <div class="kpi-value" id="kpiTotalReports">--</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Reports Today</span>
+          <span class="kpi-badge" style="background: rgba(59,130,246,0.15); color: #60a5fa;">24H UTC</span>
+        </div>
+        <div class="kpi-value" id="kpiReportsToday">--</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Pending Verification</span>
+          <span class="kpi-badge" style="background: rgba(245,158,11,0.15); color: #fbbf24;">REVIEW QUEUE</span>
+        </div>
+        <div class="kpi-value" id="kpiPendingReview" style="color: #fbbf24;">--</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Verified By SDRF/NDRF</span>
+          <span class="kpi-badge" style="background: rgba(16,185,129,0.15); color: #34d399;">OFFICIAL</span>
+        </div>
+        <div class="kpi-value" id="kpiVerifiedReports" style="color: #34d399;">--</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Blocked Road Hazards</span>
+          <span class="kpi-badge" style="background: rgba(244,63,94,0.15); color: #fb7185;">PASSABILITY</span>
+        </div>
+        <div class="kpi-value" id="kpiBlockedRoads" style="color: #fb7185;">--</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>Active Flood Incidents</span>
+          <span class="kpi-badge" style="background: rgba(168,85,247,0.15); color: #c084fc;">UNRESOLVED</span>
+        </div>
+        <div class="kpi-value" id="kpiActiveIncidents" style="color: #c084fc;">--</div>
+      </div>
+    </div>
+
+    <!-- Quick Action / Region Filter Header -->
+    <div class="action-header-bar">
+      <div class="action-title-group">
+        <h2>
+          <span>🌊 Ground-Level Flood Intelligence Workspace</span>
+        </h2>
+        <p>Real-time citizen observations, blocked highways, water depth gauges, and geotagged evidence</p>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="filter-btn active" onclick="zoomToRegion('all')" id="btnZoomAll">All India</button>
+        <button class="filter-btn" onclick="zoomToRegion('mh')" id="btnZoomMh">Western Ghats (MH)</button>
+        <button class="filter-btn" onclick="zoomToRegion('ne')" id="btnZoomNe">Brahmaputra (NE)</button>
+        <button class="btn btn-ghost" onclick="fetchAndRenderTelemetry()" title="Refresh Telemetry">
+          <span>⟳ Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dual Workspace: GIS Map + Incident Table -->
+    <div class="workspace-grid">
+      
+      <!-- Interactive Leaflet Map -->
+      <div class="map-panel">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            <span>Live Geospatial Hazard Map</span>
+          </span>
+          <span style="font-size: 0.72rem; color: #94a3b8; font-family: monospace;" id="mapMarkerCountLabel">0 active markers</span>
+        </div>
+        <div id="communityGisMap"></div>
+      </div>
+
+      <!-- Structured Incident Table -->
+      <div class="table-panel">
+        <div class="table-controls-bar">
+          <div class="filter-pills">
+            <button class="filter-btn active" data-type="ALL" onclick="filterReportsByType('ALL')">All</button>
+            <button class="filter-btn" data-type="FLOOD_OBSERVATION" onclick="filterReportsByType('FLOOD_OBSERVATION')">🌊 Flood</button>
+            <button class="filter-btn" data-type="BLOCKED_ROAD" onclick="filterReportsByType('BLOCKED_ROAD')">🚧 Roads</button>
+            <button class="filter-btn" data-type="WATER_LEVEL" onclick="filterReportsByType('WATER_LEVEL')">📏 Level</button>
+            <button class="filter-btn" data-type="GENERAL_INCIDENT" onclick="filterReportsByType('GENERAL_INCIDENT')">⚠️ Other</button>
+          </div>
+
+          <input
+            type="text"
+            class="search-input-box"
+            id="tableSearchInput"
+            placeholder="Search location/code..."
+            oninput="handleSearchInput()"
+          />
+        </div>
+
+        <div class="table-scroll-wrap">
+          <table class="comm-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Time</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Severity</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="communityTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">Loading telemetry reports...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. Modal 1: Citizen Report Submission Form                                -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" id="reportModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🚨 Submit Ground Flood Observation</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeReportModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="communityReportForm" onsubmit="handleFormSubmit(event)">
+          
+          <!-- Step 1: Select Report Type -->
+          <div class="form-group">
+            <label class="form-label">What happened? (Select Incident Category)</label>
+            <div class="report-type-selector">
+              <div class="type-card selected" id="typeCardFlood" onclick="selectReportType('FLOOD_OBSERVATION')">
+                <span class="type-card-title">🌊 Flood Observation</span>
+                <span class="type-card-desc">Water entering streets, houses, or agricultural fields</span>
+              </div>
+              <div class="type-card" id="typeCardRoad" onclick="selectReportType('BLOCKED_ROAD')">
+                <span class="type-card-title">🚧 Blocked Road</span>
+                <span class="type-card-desc">Highways or local roads impassable due to water or debris</span>
+              </div>
+              <div class="type-card" id="typeCardWater" onclick="selectReportType('WATER_LEVEL')">
+                <span class="type-card-title">📏 Water Level</span>
+                <span class="type-card-desc">Observed river water mark or bridge pier gauge reading</span>
+              </div>
+              <div class="type-card" id="typeCardOther" onclick="selectReportType('GENERAL_INCIDENT')">
+                <span class="type-card-title">⚠️ General Incident</span>
+                <span class="type-card-desc">Landslides, bridge scour, damaged infrastructure, stranded persons</span>
+              </div>
+            </div>
+            <input type="hidden" id="formReportType" value="FLOOD_OBSERVATION" />
+          </div>
+
+          <!-- Conditional: Road Status (Only for Blocked Road) -->
+          <div class="form-group" id="groupRoadFields" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div>
+                <label class="form-label">Road Passability Status</label>
+                <select class="form-select" id="formRoadStatus">
+                  <option value="COMPLETELY_BLOCKED">Completely Blocked</option>
+                  <option value="PARTIALLY_BLOCKED" selected>Partially Blocked</option>
+                  <option value="OPEN">Open with Caution</option>
+                  <option value="UNKNOWN">Unknown</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Road / Highway Name</label>
+                <input type="text" class="form-input" id="formRoadName" placeholder="e.g. NH-48 Wai Bypass" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Conditional: Water Depth (For Flood & Water Level) -->
+          <div class="form-group" id="groupWaterFields">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div>
+                <label class="form-label">Approximate Water Depth (Meters)</label>
+                <input type="number" step="0.1" min="0" max="25" class="form-input" id="formWaterDepth" placeholder="e.g. 1.2" value="0.8" />
+              </div>
+              <div>
+                <label class="form-label">Reported Severity</label>
+                <select class="form-select" id="formSeverity">
+                  <option value="LOW">Low (Ankle deep)</option>
+                  <option value="MODERATE">Moderate (Knee deep)</option>
+                  <option value="HIGH" selected>High (Waist deep)</option>
+                  <option value="CRITICAL">Critical (Above waist danger)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label">Incident Description & Current Situation *</label>
+            <textarea class="form-textarea" id="formDescription" rows="3" required placeholder="Describe what you see: water speed, submerged landmarks, trapped vehicles..."></textarea>
+          </div>
+
+          <!-- Geolocation Selection -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <label class="form-label" style="margin: 0;">Location & GPS Coordinates *</label>
+              <button type="button" class="filter-btn" onclick="detectUserGps()" id="btnAutoGps" style="background: #0284c7; color: #fff;">
+                📍 Auto-Detect GPS
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div>
+                <input type="number" step="0.0001" class="form-input" id="formLatitude" placeholder="Latitude (e.g. 18.0833)" required />
+              </div>
+              <div>
+                <input type="number" step="0.0001" class="form-input" id="formLongitude" placeholder="Longitude (e.g. 73.4167)" required />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <input type="text" class="form-input" id="formLocationName" placeholder="Village / Town / Landmark" />
+              <input type="text" class="form-input" id="formDistrict" placeholder="District (e.g. Satara, Raigad, Barpeta)" />
+            </div>
+
+            <!-- Mini Pin Selector Map -->
+            <div id="miniPinMap"></div>
+            <p style="font-size: 0.7rem; color: #64748b; margin: 0.3rem 0 0 0;">💡 Click anywhere on the mini-map to drop a pin at the exact hazard location.</p>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="form-group">
+            <label class="form-label">Upload Flood Photograph (Optional)</label>
+            <div class="photo-dropzone" onclick="document.getElementById('formPhotoFile').click()">
+              <input type="file" id="formPhotoFile" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="handlePhotoSelect(event)" />
+              <div id="dropzonePrompt">
+                <svg style="margin: 0 auto 0.4rem auto; display: block; color: #64748b;" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <p style="font-size: 0.8rem; margin: 0; color: #cbd5e1; font-weight: 600;">Click to upload or drag photograph here</p>
+                <p style="font-size: 0.7rem; color: #64748b; margin: 0.2rem 0 0 0;">JPG, PNG, or WebP (max 10 MB). Executables strictly blocked.</p>
+              </div>
+              <div class="photo-preview-wrap" id="photoPreviewWrap">
+                <img id="photoPreviewImg" class="photo-preview-img" alt="Preview" />
+                <button type="button" class="remove-photo-btn" onclick="clearPhoto(event)">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional Reporter Contact -->
+          <div class="form-group" style="background: rgba(15,23,42,0.4); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(51,65,85,0.6);">
+            <label class="form-label" style="color: #94a3b8;">Citizen Reporter Details (Optional & Strictly Private)</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <input type="text" class="form-input" id="formReporterName" placeholder="Your name (e.g. Rohit K.)" />
+              <input type="text" class="form-input" id="formReporterContact" placeholder="Contact number (never published)" />
+            </div>
+            <p style="font-size: 0.68rem; color: #64748b; margin: 0.4rem 0 0 0;">🔒 PRAVAH Privacy Guarantee: Contact details are never exposed in public feeds or APIs.</p>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeReportModal()">Cancel</button>
+            <button type="submit" class="btn-report-action" id="btnSubmitReport">
+              <span>Submit Ground Report</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. Modal 2: Report Inspection & Moderation Dialog                         -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" id="detailModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span id="detailReportCode">CR-1001</span>
+          <span id="detailStatusBadge"></span>
+        </div>
+        <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Photo banner if available -->
+        <div id="detailPhotoContainer" style="display: none; margin-bottom: 1.25rem; border-radius: 10px; overflow: hidden; max-height: 320px; border: 1px solid var(--comm-border);">
+          <img id="detailPhotoImg" src="" style="width: 100%; max-height: 320px; object-fit: cover;" alt="Evidence Photo" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Type</span>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #f8fafc;" id="detailType">Flood Observation</div>
+          </div>
+          <div>
+            <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Severity</span>
+            <div style="font-size: 0.95rem; font-weight: 700;" id="detailSeverity">HIGH</div>
+          </div>
+          <div>
+            <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Location</span>
+            <div style="font-size: 0.95rem; font-weight: 600; color: #f8fafc;" id="detailLocation">Wai, Satara</div>
+          </div>
+          <div>
+            <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Reported Time</span>
+            <div style="font-size: 0.85rem; font-family: monospace; color: #cbd5e1;" id="detailTime">--</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Description</span>
+          <div style="font-size: 0.88rem; color: #e2e8f0; line-height: 1.5; margin-top: 0.25rem;" id="detailDescription">--</div>
+        </div>
+
+        <div style="background: rgba(15,23,42,0.6); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--comm-border); margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem;">
+            <span style="color: #94a3b8;">GPS Coordinates:</span>
+            <span style="font-family: monospace; color: #38bdf8;" id="detailCoords">--</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-top: 0.35rem;">
+            <span style="color: #94a3b8;">Incident Cluster Size:</span>
+            <span style="font-weight: 700; color: #a855f7;" id="detailClusterCount">1 Report</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-top: 0.35rem;">
+            <span style="color: #94a3b8;">Source Provenance:</span>
+            <span style="font-weight: 600; color: #e2e8f0;" id="detailReporter">Citizen Reported</span>
+          </div>
+        </div>
+
+        <!-- Moderation Actions -->
+        <div style="border-top: 1px solid var(--comm-border); padding-top: 1rem;">
+          <span style="font-size: 0.72rem; color: #64748b; text-transform: uppercase; font-weight: 700;">Emergency Controller Moderation</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem;">
+            <button class="filter-btn" style="background: rgba(16,185,129,0.2); border-color: #10b981; color: #34d399;" onclick="setReportStatus('VERIFIED')">✓ Verify Incident</button>
+            <button class="filter-btn" style="background: rgba(59,130,246,0.2); border-color: #3b82f6; color: #60a5fa;" onclick="setReportStatus('RESOLVED')">🛡️ Mark Resolved</button>
+            <button class="filter-btn" style="background: rgba(244,63,94,0.2); border-color: #f43f5e; color: #fb7185;" onclick="setReportStatus('REJECTED')">✕ Reject Report</button>
+            <button class="filter-btn" onclick="setReportStatus('PENDING_REVIEW')">⏳ Reset Pending</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. Client Scripts                                                         -->
+  <!-- ========================================================================= -->
+  <script>
+    // State management
+    let mapInstance = null;
+    let miniPinMapInstance = null;
+    let pinMarker = null;
+    let allReports = [];
+    let activeFilterType = 'ALL';
+    let searchQuery = '';
+    let mapMarkers = [];
+    let selectedReportId = null;
+
+    // Severity Colors
+    const SEV_COLORS = {
+      CRITICAL: '#f43f5e',
+      HIGH: '#f59e0b',
+      MODERATE: '#eab308',
+      LOW: '#10b981'
+    };
+
+    // Initialize GIS Maps & Telemetry on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initGisMap();
+      initMiniPinMap();
+      fetchAndRenderTelemetry();
+      setInterval(fetchAndRenderTelemetry, 15000); // 15s refresh
+    });
+
+    function initGisMap() {
+      mapInstance = L.map('communityGisMap', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([18.2, 73.8], 8);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18,
+      }).addTo(mapInstance);
+    }
+
+    function initMiniPinMap() {
+      miniPinMapInstance = L.map('miniPinMap', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([18.0833, 73.4167], 10);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18,
+      }).addTo(miniPinMapInstance);
+
+      miniPinMapInstance.on('click', (e) => {
+        setPinLocation(e.latlng.lat, e.latlng.lng);
+      });
+    }
+
+    function setPinLocation(lat, lng) {
+      document.getElementById('formLatitude').value = lat.toFixed(4);
+      document.getElementById('formLongitude').value = lng.toFixed(4);
+
+      if (pinMarker) {
+        miniPinMapInstance.removeLayer(pinMarker);
+      }
+      pinMarker = L.circleMarker([lat, lng], {
+        radius: 7,
+        fillColor: '#06b6d4',
+        color: '#ffffff',
+        weight: 2,
+        fillOpacity: 0.9
+      }).addTo(miniPinMapInstance);
+      miniPinMapInstance.panTo([lat, lng]);
+    }
+
+    async function fetchAndRenderTelemetry() {
+      try {
+        // 1. Fetch KPI stats
+        const statsRes = await fetch('/api/community/stats');
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          document.getElementById('kpiTotalReports').textContent = stats.total_reports;
+          document.getElementById('kpiReportsToday').textContent = stats.reports_today;
+          document.getElementById('kpiPendingReview').textContent = stats.pending_verification;
+          document.getElementById('kpiVerifiedReports').textContent = stats.verified_reports;
+          document.getElementById('kpiBlockedRoads').textContent = stats.blocked_roads;
+          document.getElementById('kpiActiveIncidents').textContent = stats.active_incidents;
+        }
+
+        // 2. Fetch reports list
+        const listRes = await fetch('/api/community/reports?limit=200');
+        if (listRes.ok) {
+          allReports = await listRes.json();
+          renderTable();
+          renderMapMarkers();
+        }
+      } catch (err) {
+        console.error('Telemetry fetch error:', err);
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('communityTableBody');
+      const filtered = allReports.filter(r => {
+        const matchesType = (activeFilterType === 'ALL' || r.report_type === activeFilterType);
+        const searchTarget = `${r.report_code} ${r.description} ${r.location_name || ''} ${r.district || ''} ${r.road_name || ''}`.toLowerCase();
+        const matchesSearch = (!searchQuery || searchTarget.includes(searchQuery));
+        return matchesType && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">No incident reports matching current criteria.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => {
+        const sevClass = r.severity ? `badge-${r.severity.toLowerCase()}` : 'badge-mod';
+        const statusClass = r.verification_status ? `badge-${r.verification_status.toLowerCase()}` : 'badge-pending';
+        const formattedTime = new Date(r.reported_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr onclick="openDetailModal(${r.id})">
+            <td style="font-family: monospace; font-weight: 700; color: #38bdf8;">${r.report_code}</td>
+            <td style="color: #94a3b8;">${formattedTime}</td>
+            <td style="font-weight: 600;">${formatReportType(r.report_type)}</td>
+            <td>${r.location_name || (r.district || 'Ground Location')}</td>
+            <td><span class="badge ${sevClass}">${r.severity}</span></td>
+            <td><span class="badge ${statusClass}">${r.verification_status.replace('_', ' ')}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderMapMarkers() {
+      if (!mapInstance) return;
+
+      // Clear existing markers
+      mapMarkers.forEach(m => mapInstance.removeLayer(m));
+      mapMarkers = [];
+
+      const filtered = allReports.filter(r => (activeFilterType === 'ALL' || r.report_type === activeFilterType));
+      document.getElementById('mapMarkerCountLabel').textContent = `${filtered.length} active markers`;
+
+      filtered.forEach(r => {
+        const color = SEV_COLORS[r.severity] || '#06b6d4';
+        const marker = L.circleMarker([r.latitude, r.longitude], {
+          radius: r.severity === 'CRITICAL' ? 10 : 8,
+          fillColor: color,
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 0.85
+        }).addTo(mapInstance);
+
+        const verifiedBadge = r.is_verified 
+          ? '<span style="color: #34d399; font-weight: bold;">✓ VERIFIED</span>' 
+          : '<span style="color: #fbbf24;">⏳ Citizen Reported</span>';
+
+        const popupContent = `
+          <div style="font-family: sans-serif; font-size: 12px; color: #0f172a; min-width: 180px;">
+            <div style="font-weight: bold; font-size: 14px; margin-bottom: 2px;">${r.report_code} (${formatReportType(r.report_type)})</div>
+            <div style="margin-bottom: 4px;">${verifiedBadge}</div>
+            <div style="color: #475569; margin-bottom: 6px;">${r.description.substring(0, 80)}...</div>
+            ${r.water_depth ? `<div style="font-weight: 600; color: #0284c7;">Depth: ${r.water_depth}m</div>` : ''}
+            ${r.road_status ? `<div style="font-weight: 600; color: #dc2626;">Road: ${r.road_status}</div>` : ''}
+            <button onclick="openDetailModal(${r.id})" style="margin-top: 6px; background: #0284c7; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">Inspect Details</button>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        mapMarkers.push(marker);
+      });
+    }
+
+    function formatReportType(type) {
+      switch (type) {
+        case 'FLOOD_OBSERVATION': return '🌊 Flood';
+        case 'BLOCKED_ROAD': return '🚧 Road Block';
+        case 'WATER_LEVEL': return '📏 Water Level';
+        case 'GENERAL_INCIDENT': return '⚠️ Incident';
+        default: return type;
+      }
+    }
+
+    function filterReportsByType(type) {
+      activeFilterType = type;
+      document.querySelectorAll('.filter-pills .filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+      });
+      renderTable();
+      renderMapMarkers();
+    }
+
+    function handleSearchInput() {
+      searchQuery = document.getElementById('tableSearchInput').value.trim().toLowerCase();
+      renderTable();
+    }
+
+    function zoomToRegion(region) {
+      document.querySelectorAll('#btnZoomAll, #btnZoomMh, #btnZoomNe').forEach(b => b.classList.remove('active'));
+      if (region === 'mh') {
+        document.getElementById('btnZoomMh').classList.add('active');
+        mapInstance.flyTo([17.5, 73.8], 8);
+      } else if (region === 'ne') {
+        document.getElementById('btnZoomNe').classList.add('active');
+        mapInstance.flyTo([26.2, 92.5], 7);
+      } else {
+        document.getElementById('btnZoomAll').classList.add('active');
+        mapInstance.flyTo([21.0, 82.0], 5);
+      }
+    }
+
+    // Modal Handlers
+    function openReportModal() {
+      document.getElementById('reportModalBackdrop').classList.add('open');
+      setTimeout(() => {
+        miniPinMapInstance.invalidateSize();
+      }, 200);
+    }
+
+    function closeReportModal() {
+      document.getElementById('reportModalBackdrop').classList.remove('open');
+    }
+
+    function selectReportType(type) {
+      document.getElementById('formReportType').value = type;
+      document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+
+      if (type === 'FLOOD_OBSERVATION') document.getElementById('typeCardFlood').classList.add('selected');
+      if (type === 'BLOCKED_ROAD') document.getElementById('typeCardRoad').classList.add('selected');
+      if (type === 'WATER_LEVEL') document.getElementById('typeCardWater').classList.add('selected');
+      if (type === 'GENERAL_INCIDENT') document.getElementById('typeCardOther').classList.add('selected');
+
+      document.getElementById('groupRoadFields').style.display = (type === 'BLOCKED_ROAD') ? 'block' : 'none';
+      document.getElementById('groupWaterFields').style.display = (type === 'FLOOD_OBSERVATION' || type === 'WATER_LEVEL') ? 'block' : 'none';
+    }
+
+    function detectUserGps() {
+      const btn = document.getElementById('btnAutoGps');
+      btn.textContent = '⏳ Detecting...';
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        btn.textContent = '📍 Auto-Detect GPS';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setPinLocation(pos.coords.latitude, pos.coords.longitude);
+          btn.textContent = '✓ GPS Locked';
+        },
+        (err) => {
+          alert('GPS permission denied or unavailable. Please click location on mini-map.');
+          btn.textContent = '📍 Auto-Detect GPS';
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+
+    function handlePhotoSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Photo exceeds 10 MB limit.');
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('photoPreviewImg').src = e.target.result;
+        document.getElementById('photoPreviewWrap').style.display = 'block';
+        document.getElementById('dropzonePrompt').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearPhoto(e) {
+      e.stopPropagation();
+      document.getElementById('formPhotoFile').value = '';
+      document.getElementById('photoPreviewWrap').style.display = 'none';
+      document.getElementById('dropzonePrompt').style.display = 'block';
+    }
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('btnSubmitReport');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Submitting...</span>';
+
+      const type = document.getElementById('formReportType').value;
+      const desc = document.getElementById('formDescription').value;
+      const lat = parseFloat(document.getElementById('formLatitude').value);
+      const lon = parseFloat(document.getElementById('formLongitude').value);
+      const locName = document.getElementById('formLocationName').value;
+      const district = document.getElementById('formDistrict').value;
+      const photoFile = document.getElementById('formPhotoFile').files[0];
+
+      try {
+        let response;
+        if (photoFile) {
+          const fd = new FormData();
+          fd.append('report_type', type);
+          fd.append('description', desc);
+          fd.append('severity', document.getElementById('formSeverity').value);
+          fd.append('latitude', lat);
+          fd.append('longitude', lon);
+          if (locName) fd.append('location_name', locName);
+          if (district) fd.append('district', district);
+          if (document.getElementById('formWaterDepth').value) fd.append('water_depth', parseFloat(document.getElementById('formWaterDepth').value));
+          if (type === 'BLOCKED_ROAD') {
+            fd.append('road_status', document.getElementById('formRoadStatus').value);
+            if (document.getElementById('formRoadName').value) fd.append('road_name', document.getElementById('formRoadName').value);
+          }
+          if (document.getElementById('formReporterName').value) fd.append('reporter_name', document.getElementById('formReporterName').value);
+          if (document.getElementById('formReporterContact').value) fd.append('reporter_contact', document.getElementById('formReporterContact').value);
+          fd.append('photo', photoFile);
+
+          response = await fetch('/api/community/reports/multipart', { method: 'POST', body: fd });
+        } else {
+          const payload = {
+            report_type: type,
+            description: desc,
+            severity: document.getElementById('formSeverity').value,
+            latitude: lat,
+            longitude: lon,
+            location_name: locName || null,
+            district: district || null,
+            water_depth: document.getElementById('formWaterDepth').value ? parseFloat(document.getElementById('formWaterDepth').value) : null,
+            road_status: (type === 'BLOCKED_ROAD') ? document.getElementById('formRoadStatus').value : null,
+            road_name: document.getElementById('formRoadName').value || null,
+            reporter_name: document.getElementById('formReporterName').value || null,
+            reporter_contact: document.getElementById('formReporterContact').value || null,
+          };
+          response = await fetch('/api/community/reports', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        if (response.ok) {
+          const created = await response.json();
+          alert(`✓ Report Submitted!\nReport Code: ${created.report_code}\nThank you for contributing ground intelligence. Your report is currently pending verification.`);
+          closeReportModal();
+          document.getElementById('communityReportForm').reset();
+          clearPhoto({ stopPropagation: () => {} });
+          fetchAndRenderTelemetry();
+        } else {
+          const err = await response.json();
+          alert(`Submission error: ${err.detail || 'Could not submit report.'}`);
+        }
+      } catch (err) {
+        alert('Network or server error while submitting report.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Submit Ground Report</span>';
+      }
+    }
+
+    // Detail Modal Handlers
+    function openDetailModal(reportId) {
+      selectedReportId = reportId;
+      const r = allReports.find(item => item.id === reportId);
+      if (!r) return;
+
+      document.getElementById('detailReportCode').textContent = r.report_code;
+      const statusBadge = document.getElementById('detailStatusBadge');
+      statusBadge.className = `badge badge-${r.verification_status.toLowerCase()}`;
+      statusBadge.textContent = r.verification_status.replace('_', ' ');
+
+      document.getElementById('detailType').textContent = formatReportType(r.report_type);
+      document.getElementById('detailSeverity').textContent = r.severity;
+      document.getElementById('detailSeverity').style.color = SEV_COLORS[r.severity] || '#f8fafc';
+      document.getElementById('detailLocation').textContent = `${r.location_name || 'Ground Location'} (${r.district || r.state_region || 'India'})`;
+      document.getElementById('detailTime').textContent = new Date(r.reported_at).toLocaleString();
+      document.getElementById('detailDescription').textContent = r.description;
+      document.getElementById('detailCoords').textContent = `${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}`;
+      document.getElementById('detailClusterCount').textContent = `${r.cluster_count} Associated Reports`;
+      document.getElementById('detailReporter').textContent = r.reporter_display || 'Citizen Reporter';
+
+      const photoCont = document.getElementById('detailPhotoContainer');
+      const photoImg = document.getElementById('detailPhotoImg');
+      if (r.photo_url) {
+        photoImg.src = r.photo_url;
+        photoCont.style.display = 'block';
+      } else {
+        photoCont.style.display = 'none';
+      }
+
+      document.getElementById('detailModalBackdrop').classList.add('open');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModalBackdrop').classList.remove('open');
+      selectedReportId = null;
+    }
+
+    async function setReportStatus(targetStatus) {
+      if (!selectedReportId) return;
+      try {
+        const res = await fetch(`/api/community/reports/${selectedReportId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            verification_status: targetStatus,
+            moderator_notes: `Status updated to ${targetStatus} via Community Intelligence Dashboard.`
+          })
+        });
+        if (res.ok) {
+          alert(`Report status successfully updated to: ${targetStatus}`);
+          closeDetailModal();
+          fetchAndRenderTelemetry();
+        } else {
+          const err = await res.json();
+          alert(`Failed to update status: ${err.detail}`);
+        }
+      } catch (err) {
+        alert('Network error while updating status.');
+      }
+    }
+  </script>
+</body>
+</html>

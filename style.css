@@ -4197,16 +4197,34 @@ body {
 .sos-modal-card {
   position: relative;
   width: 100%;
-  max-width: 520px;
-  background: rgba(15, 23, 42, 0.92);
+  max-width: 660px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 16px;
   box-shadow: 0 0 45px rgba(239, 68, 68, 0.25), 0 25px 60px rgba(0, 0, 0, 0.9);
-  padding: 2rem;
+  padding: 1.75rem;
   box-sizing: border-box;
   animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom scrollbar for sos-modal-card */
+.sos-modal-card::-webkit-scrollbar {
+  width: 6px;
+}
+.sos-modal-card::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 3px;
+}
+.sos-modal-card::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.3);
+  border-radius: 3px;
+}
+.sos-modal-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6);
 }
 
 .sos-modal-close {
@@ -4486,6 +4504,125 @@ body {
 
 .btn-sos-photo-clear:hover {
   background: rgba(239, 68, 68, 0.22);
+}
+
+/* --- Enhanced Citizen SOS Form Components --- */
+.sos-report-type-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+}
+
+@media (max-width: 540px) {
+  .sos-report-type-selector {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sos-type-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px solid rgba(51, 65, 85, 0.8);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: all 0.18s ease;
+}
+
+.sos-type-card:hover {
+  border-color: #38bdf8;
+  background: rgba(30, 41, 59, 0.7);
+  transform: translateY(-1px);
+}
+
+.sos-type-card.selected {
+  border-color: #06b6d4;
+  background: rgba(6, 182, 212, 0.15);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
+}
+
+.sos-type-title {
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sos-type-desc {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.sos-textarea {
+  resize: vertical;
+  min-height: 70px;
+  line-height: 1.4;
+}
+
+.sos-loc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.btn-geolocate-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: #0284c7;
+  border: 1px solid #38bdf8;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-geolocate-compact:hover {
+  background: #0369a1;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.sos-mini-pin-map {
+  height: 180px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  margin-top: 0.35rem;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.sos-map-hint {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+}
+
+.sos-photo-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sos-reporter-details-box {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+}
+
+.sos-privacy-guarantee {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin: 0.4rem 0 0 0;
 }
 
 @keyframes fadeInModal {

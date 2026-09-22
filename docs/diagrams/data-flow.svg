@@ -1,0 +1,242 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="100%" height="100%" style="background:#0a0f1d; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="grad-node-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="grad-node-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="grad-node-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="grad-node-4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="grad-node-5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#34d399"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="30" y="20" width="1040" height="60" rx="10" fill="#131d33" stroke="#1e293b"/>
+  <text x="50" y="55" fill="#38bdf8" font-size="20" font-weight="700">PRAVAH — END-TO-END DATA FLOW PIPELINE</text>
+  <text x="650" y="55" fill="#94a3b8" font-size="12">Telemetry Ingestion ➔ ML / XAI ➔ Simulation ➔ Evacuation ➔ Multi-Channel Alert</text>
+
+  <!-- Stage 1: Ingestion -->
+  <g transform="translate(40, 110)">
+    <rect width="180" height="420" rx="10" fill="#111827" stroke="#0284c7" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="10" fill="#0284c7"/>
+    <text x="90" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">1. DATA INGESTION</text>
+
+    <g transform="translate(10, 45)">
+      <rect width="160" height="75" rx="6" fill="#1e293b"/>
+      <text x="10" y="22" fill="#38bdf8" font-size="11" font-weight="600">CWC &amp; NE Gauges</text>
+      <text x="10" y="40" fill="#cbd5e1" font-size="9">66 Hydrometric Stations</text>
+      <text x="10" y="55" fill="#94a3b8" font-size="9">Real-time water levels</text>
+      <text x="10" y="68" fill="#38bdf8" font-size="8">Warning/Danger limits</text>
+    </g>
+
+    <g transform="translate(10, 135)">
+      <rect width="160" height="75" rx="6" fill="#1e293b"/>
+      <text x="10" y="22" fill="#38bdf8" font-size="11" font-weight="600">Open-Meteo Poller</text>
+      <text x="10" y="40" fill="#cbd5e1" font-size="9">15-Minute Automated</text>
+      <text x="10" y="55" fill="#94a3b8" font-size="9">10-Day precipitation</text>
+      <text x="10" y="68" fill="#38bdf8" font-size="8">1-Day ahead forecast</text>
+    </g>
+
+    <g transform="translate(10, 225)">
+      <rect width="160" height="75" rx="6" fill="#1e293b"/>
+      <text x="10" y="22" fill="#38bdf8" font-size="11" font-weight="600">Topography &amp; DEM</text>
+      <text x="10" y="40" fill="#cbd5e1" font-size="9">30m Elevation Grid</text>
+      <text x="10" y="55" fill="#94a3b8" font-size="9">Slope, Basin boundary</text>
+      <text x="10" y="68" fill="#38bdf8" font-size="8">SCS-CN Soil hydrologic</text>
+    </g>
+
+    <g transform="translate(10, 315)">
+      <rect width="160" height="75" rx="6" fill="#1e293b"/>
+      <text x="10" y="22" fill="#38bdf8" font-size="11" font-weight="600">Community SOS</text>
+      <text x="10" y="40" fill="#cbd5e1" font-size="9">Crowdsourced reports</text>
+      <text x="10" y="55" fill="#94a3b8" font-size="9">Water depth tags</text>
+      <text x="10" y="68" fill="#38bdf8" font-size="8">Geo-referenced photos</text>
+    </g>
+  </g>
+
+  <!-- Connect 1 -> 2 -->
+  <line x1="220" y1="320" x2="250" y2="320" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 2: Feature Engineering & ML Inference -->
+  <g transform="translate(250, 110)">
+    <rect width="180" height="420" rx="10" fill="#111827" stroke="#059669" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="10" fill="#059669"/>
+    <text x="90" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">2. ML INFERENCE</text>
+
+    <g transform="translate(10, 45)">
+      <rect width="160" height="100" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#34d399" font-size="11" font-weight="600">Antecedent Features</text>
+      <text x="10" y="38" fill="#94a3b8" font-size="9">• rain_1d, rain_2d_sum</text>
+      <text x="10" y="52" fill="#94a3b8" font-size="9">• rain_3d_sum, rain_5d_sum</text>
+      <text x="10" y="66" fill="#94a3b8" font-size="9">• rain_7d_sum, rain_10d_sum</text>
+      <text x="10" y="80" fill="#94a3b8" font-size="9">• rain_3d_max, dry_days</text>
+      <text x="10" y="94" fill="#34d399" font-size="8">Static characteristics join</text>
+    </g>
+
+    <g transform="translate(10, 160)">
+      <rect width="160" height="110" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#34d399" font-size="11" font-weight="600">Dual-Task Models</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">Task A: Onset Prob (0-1)</text>
+      <text x="10" y="52" fill="#cbd5e1" font-size="9">Task B: Active Flooding</text>
+      <text x="10" y="70" fill="#94a3b8" font-size="8">• Random Forest (Tuned)</text>
+      <text x="10" y="84" fill="#94a3b8" font-size="8">• XGBoost (Calibrated)</text>
+      <text x="10" y="98" fill="#94a3b8" font-size="8">• LightGBM (Fast inf)</text>
+    </g>
+
+    <g transform="translate(10, 285)">
+      <rect width="160" height="105" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#34d399" font-size="11" font-weight="600">Tuned Alert Tiers</text>
+      <text x="10" y="38" fill="#22c55e" font-size="9">● NORMAL (Green)</text>
+      <text x="10" y="54" fill="#eab308" font-size="9">● ADVISORY (Yellow)</text>
+      <text x="10" y="70" fill="#f97316" font-size="9">● WARNING (Orange)</text>
+      <text x="10" y="86" fill="#ef4444" font-size="9">● CRITICAL / EVAC (Red)</text>
+    </g>
+  </g>
+
+  <!-- Connect 2 -> 3 -->
+  <line x1="430" y1="320" x2="460" y2="320" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 3: Explainable AI & Simulation -->
+  <g transform="translate(460, 110)">
+    <rect width="180" height="420" rx="10" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="10" fill="#7c3aed"/>
+    <text x="90" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">3. XAI &amp; SIMULATION</text>
+
+    <g transform="translate(10, 45)">
+      <rect width="160" height="150" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#c084fc" font-size="11" font-weight="600">SHAP Explainability</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">TreeExplainer attributions</text>
+      <text x="10" y="54" fill="#94a3b8" font-size="8">Top Positive Drivers (+)</text>
+      <text x="10" y="68" fill="#94a3b8" font-size="8">Top Negative Protectors (-)</text>
+      <text x="10" y="84" fill="#cbd5e1" font-size="9">Waterfall breakdowns</text>
+      <text x="10" y="100" fill="#c084fc" font-size="9">Operator Narratives</text>
+      <text x="10" y="118" fill="#a855f7" font-size="8">"High 3-day rainfall..."</text>
+      <text x="10" y="136" fill="#34d399" font-size="8">✓ Isolated Failure Mode</text>
+    </g>
+
+    <g transform="translate(10, 210)">
+      <rect width="160" height="180" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#c084fc" font-size="11" font-weight="600">Dynamic Propagation</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">1h, 6h, 12h, 24h, 48h</text>
+      <text x="10" y="54" fill="#94a3b8" font-size="8">• Convective Storm</text>
+      <text x="10" y="68" fill="#94a3b8" font-size="8">• Koyna Dam Discharge</text>
+      <text x="10" y="82" fill="#94a3b8" font-size="8">• River Overtopping</text>
+      <text x="10" y="100" fill="#cbd5e1" font-size="9">Inundation Footprint</text>
+      <text x="10" y="116" fill="#94a3b8" font-size="8">Depth: Shallow &lt;0.5m</text>
+      <text x="10" y="130" fill="#94a3b8" font-size="8">Moderate 0.5-1.5m</text>
+      <text x="10" y="144" fill="#94a3b8" font-size="8">Deep &gt;1.5m</text>
+      <text x="10" y="162" fill="#c084fc" font-size="8">Population Exposure Calc</text>
+    </g>
+  </g>
+
+  <!-- Connect 3 -> 4 -->
+  <line x1="640" y1="320" x2="670" y2="320" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: Evacuation Routing -->
+  <g transform="translate(670, 110)">
+    <rect width="180" height="420" rx="10" fill="#111827" stroke="#d97706" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="10" fill="#d97706"/>
+    <text x="90" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">4. EVACUATION ENGINE</text>
+
+    <g transform="translate(10, 45)">
+      <rect width="160" height="95" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#fbbf24" font-size="11" font-weight="600">Hazard Overlay</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">Intersect road network</text>
+      <text x="10" y="52" fill="#cbd5e1" font-size="9">with simulation depths</text>
+      <text x="10" y="70" fill="#f87171" font-size="8">Block roads with</text>
+      <text x="10" y="84" fill="#f87171" font-size="8">depth &gt; 0.3m (Cutoff)</text>
+    </g>
+
+    <g transform="translate(10, 155)">
+      <rect width="160" height="115" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#fbbf24" font-size="11" font-weight="600">Dijkstra &amp; A* Solver</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">Multi-Objective weights:</text>
+      <text x="10" y="54" fill="#94a3b8" font-size="8">• Lowest Flood Risk</text>
+      <text x="10" y="68" fill="#94a3b8" font-size="8">• Shortest Distance</text>
+      <text x="10" y="82" fill="#94a3b8" font-size="8">• Fastest Travel Time</text>
+      <text x="10" y="100" fill="#34d399" font-size="8">Safe Elevation Preference</text>
+    </g>
+
+    <g transform="translate(10, 285)">
+      <rect width="160" height="105" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#fbbf24" font-size="11" font-weight="600">Relief Center Target</text>
+      <text x="10" y="38" fill="#cbd5e1" font-size="9">10 Designated Shelters</text>
+      <text x="10" y="54" fill="#94a3b8" font-size="8">• Capacity &amp; Medical</text>
+      <text x="10" y="68" fill="#94a3b8" font-size="8">• Elevation headroom</text>
+      <text x="10" y="84" fill="#fbbf24" font-size="8">Turn-by-turn segments</text>
+    </g>
+  </g>
+
+  <!-- Connect 4 -> 5 -->
+  <line x1="850" y1="320" x2="880" y2="320" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Stage 5: Multi-Channel Dispatch -->
+  <g transform="translate(880, 110)">
+    <rect width="180" height="420" rx="10" fill="#111827" stroke="#e11d48" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="10" fill="#e11d48"/>
+    <text x="90" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">5. ALERT DISPATCH</text>
+
+    <g transform="translate(10, 45)">
+      <rect width="160" height="70" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#fda4af" font-size="11" font-weight="600">SMS Broadcast</text>
+      <text x="10" y="36" fill="#cbd5e1" font-size="9">Cellular SMS text</text>
+      <text x="10" y="50" fill="#94a3b8" font-size="8">Offline delivery fallback</text>
+      <text x="10" y="62" fill="#38bdf8" font-size="8">Twilio / Mock sandbox</text>
+    </g>
+
+    <g transform="translate(10, 125)">
+      <rect width="160" height="70" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#86efac" font-size="11" font-weight="600">WhatsApp Alert</text>
+      <text x="10" y="36" fill="#cbd5e1" font-size="9">Rich interactive UI</text>
+      <text x="10" y="50" fill="#94a3b8" font-size="8">Shelter pin &amp; route links</text>
+      <text x="10" y="62" fill="#38bdf8" font-size="8">Emergency directives</text>
+    </g>
+
+    <g transform="translate(10, 205)">
+      <rect width="160" height="70" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#7dd3fc" font-size="11" font-weight="600">Telegram Bot</text>
+      <text x="10" y="36" fill="#cbd5e1" font-size="9">Community channel post</text>
+      <text x="10" y="50" fill="#94a3b8" font-size="8">Instant group broadcasts</text>
+      <text x="10" y="62" fill="#38bdf8" font-size="8">HTML styled alerts</text>
+    </g>
+
+    <g transform="translate(10, 285)">
+      <rect width="160" height="85" rx="6" fill="#1e293b"/>
+      <text x="10" y="20" fill="#fef08a" font-size="11" font-weight="600">IVRS Voice Calls</text>
+      <text x="10" y="36" fill="#cbd5e1" font-size="9">Automated phone calls</text>
+      <text x="10" y="50" fill="#94a3b8" font-size="8">TwiML speech synthesis</text>
+      <text x="10" y="64" fill="#38bdf8" font-size="8">Clear natural audio</text>
+      <text x="10" y="76" fill="#f59e0b" font-size="8">Evacuation directive</text>
+    </g>
+  </g>
+
+  <!-- Bottom: Persistence Layer -->
+  <g transform="translate(40, 560)">
+    <rect width="1020" height="110" rx="10" fill="#0f172a" stroke="#334155"/>
+    <text x="25" y="28" fill="#38bdf8" font-size="13" font-weight="700">PERSISTENT TRANSACTION &amp; AUDIT LOGGING (SQLite: data/pravah_telemetry.db)</text>
+    <text x="25" y="50" fill="#cbd5e1" font-size="10">• schema_migrations: Version 001 (baseline) &amp; 002 (integration entities)</text>
+    <text x="25" y="66" fill="#94a3b8" font-size="10">• river_gauge_records: Stage, danger threshold flags, 24h rates of rise</text>
+    <text x="25" y="82" fill="#94a3b8" font-size="10">• xai_explanation_records: Feature attributions, Shapley values, model names</text>
+    <text x="520" y="50" fill="#94a3b8" font-size="10">• ivrs_call_records: Call SIDs, speech duration, recipient numbers, outcomes</text>
+    <text x="520" y="66" fill="#94a3b8" font-size="10">• flood_propagation_simulation_records: Inundation footprint km², population exposure</text>
+    <text x="520" y="82" fill="#94a3b8" font-size="10">• evacuation_routes: Saved routing geometry, safe shelters, travel time (mins)</text>
+  </g>
+</svg>

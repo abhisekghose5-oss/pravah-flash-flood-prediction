@@ -179,9 +179,11 @@ app.add_middleware(
 )
 
 
-# Static file serving for SOS photo uploads
+# Static file serving for SOS and Community photo uploads
 SOS_UPLOADS_DIR = REPO_ROOT / "data" / "uploads" / "sos_photos"
 SOS_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+COMMUNITY_UPLOADS_DIR = REPO_ROOT / "data" / "uploads" / "community_photos"
+COMMUNITY_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(REPO_ROOT / "data" / "uploads")), name="uploads")
 
 
@@ -1152,5 +1154,106 @@ def get_latest_radar_scan(station_id: Optional[str] = Query("DWR_GUWAHATI")) -> 
     }
 
 
+# =============================================================================
+# Crowdsourced Community Reporting & Intelligence Module (Modular Extension)
+# =============================================================================
+from src.community.report_service import init_community_tables
+from src.community.routes.community_routes import router as community_router
+
+# Initialize SQLite tables and seed demo reports if table empty
+init_community_tables()
+
+# Register new community routes under /api/community
+app.include_router(community_router)
+
+
+# =============================================================================
+# Standalone Multi-Channel Alerting System Module (SMS + WhatsApp + Telegram)
+# =============================================================================
+from src.alerts.alert_service import init_alert_tables
+from src.alerts.routes.alert_routes import router as multi_channel_alert_router
+
+# Initialize SQLite tables and seed demo alert history if table empty
+init_alert_tables()
+
+# Register multi-channel alert routes under /api/alerts
+app.include_router(multi_channel_alert_router)
+
+
+# =============================================================================
+# Standalone Evacuation Planning & Safe Route Generation Module (Dijkstra + A*)
+# =============================================================================
+from src.evacuation.services.route_service import init_evacuation_tables
+from src.evacuation.routes.evacuation_routes import router as evacuation_planning_router
+
+# Initialize SQLite tables for evacuation route history
+init_evacuation_tables()
+
+# Register advanced evacuation planning routes under /api/evacuation
+app.include_router(evacuation_planning_router)
+
+
+# =============================================================================
+# Standalone Explainable AI (XAI) System Module (SHAP + Feature Importance)
+# =============================================================================
+from src.xai.routes.xai_routes import router as xai_router
+
+# Register Explainable AI routes under /api/xai
+app.include_router(xai_router)
+
+
+# =============================================================================
+# Standalone Digital Twin Studio & Hydrological Simulation Module
+# =============================================================================
+from src.digital_twin.routes.digital_twin_routes import router as digital_twin_router
+
+# Register Digital Twin routes under /api/digital-twin
+app.include_router(digital_twin_router)
+
+
+# =============================================================================
+# Standalone Flood Propagation & Inundation Simulation Engine
+# =============================================================================
+from src.simulation.routes.simulation_routes import router as flood_propagation_simulation_router
+
+# Register Flood Propagation Simulation routes under /api/simulation
+app.include_router(flood_propagation_simulation_router)
+
+
+# =============================================================================
+# Automated Database Migrations & Schema Tracking
+# =============================================================================
+from src.data.migrations import apply_migrations
+try:
+    apply_migrations()
+except Exception as _mig_exc:
+    logger.warning("Database migration startup notice: %s", _mig_exc)
+
+
+# =============================================================================
+# River Gauge Monitoring Module (CWC & Northeast Gauges)
+# =============================================================================
+from src.gauges.routes.gauge_routes import router as gauge_monitoring_router
+
+# Register river gauge routes under /api/gauges
+app.include_router(gauge_monitoring_router)
+
+
+# =============================================================================
+# IVRS Voice Calling Engine (Twilio TwiML + Sandbox Mode)
+# =============================================================================
+from src.alerts.routes.ivrs_routes import router as ivrs_calling_router
+
+# Register IVRS voice calling routes under /api/ivrs
+app.include_router(ivrs_calling_router)
+
+
+# =============================================================================
+# Central Platform Integration & Cross-Module Orchestration Router
+# =============================================================================
+from src.integration.routes.integration_routes import router as platform_integration_router
+
+# Register consolidated workflows and unified health under /api/integration
+app.include_router(platform_integration_router)
 
 

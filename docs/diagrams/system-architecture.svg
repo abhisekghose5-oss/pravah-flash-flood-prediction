@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" height="100%" style="background:#0a0f1d; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="grad-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="grad-card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="grad-accent-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="grad-accent-amber" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="grad-accent-emerald" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Title Banner -->
+  <rect x="30" y="25" width="1140" height="70" rx="12" fill="#131d33" stroke="#1e293b" stroke-width="1.5"/>
+  <text x="60" y="60" fill="#38bdf8" font-size="22" font-weight="700" letter-spacing="1">PRAVAH — UNIFIED 9-MODULE SYSTEM ARCHITECTURE</text>
+  <text x="60" y="80" fill="#94a3b8" font-size="12">Full Multi-Tier Consolidation: Telemetry · ML Inference · Explainable AI · Digital Twin · Simulation · Evacuation · Multi-Channel Alerts</text>
+  <rect x="1000" y="42" width="140" height="34" rx="6" fill="#0369a1"/>
+  <text x="1070" y="64" fill="#ffffff" font-size="12" font-weight="600" text-anchor="middle">VERSION 2.5.0</text>
+
+  <!-- Layer 1: Ingestion & Telemetry -->
+  <rect x="30" y="115" width="1140" height="110" rx="10" fill="#111827" stroke="#374151" stroke-dasharray="4,4"/>
+  <text x="45" y="135" fill="#64748b" font-size="11" font-weight="700" letter-spacing="1.5">LAYER 1: DATA INGESTION &amp; HYDROMETRIC OBSERVATION</text>
+
+  <g transform="translate(50, 145)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">River Gauge Monitoring</text>
+    <text x="15" y="46" fill="#94a3b8" font-size="10">20 Maharashtra CWC + 46 NE Gauges</text>
+    <text x="15" y="58" fill="#38bdf8" font-size="9">/api/gauges (Stage, Rate of Rise)</text>
+  </g>
+
+  <g transform="translate(330, 145)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Meteorological Ingestion</text>
+    <text x="15" y="46" fill="#94a3b8" font-size="10">Open-Meteo 15-min background poller</text>
+    <text x="15" y="58" fill="#38bdf8" font-size="9">10-day historical + 1-day forecast</text>
+  </g>
+
+  <g transform="translate(610, 145)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Crowdsourced Reporting</text>
+    <text x="15" y="46" fill="#94a3b8" font-size="10">Citizen SOS reports, geo-photos</text>
+    <text x="15" y="58" fill="#38bdf8" font-size="9">/api/community (SOS &amp; water depth)</text>
+  </g>
+
+  <g transform="translate(890, 145)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Catchment &amp; DEM Spatial</text>
+    <text x="15" y="46" fill="#94a3b8" font-size="10">66 Catchments GeoJSON &amp; 30m DEM</text>
+    <text x="15" y="58" fill="#38bdf8" font-size="9">Western Ghats + Brahmaputra Basin</text>
+  </g>
+
+  <!-- Connectors L1 -> L2 -->
+  <line x1="175" y1="225" x2="175" y2="255" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,3"/>
+  <line x1="455" y1="225" x2="455" y2="255" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,3"/>
+  <line x1="735" y1="225" x2="735" y2="255" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,3"/>
+  <line x1="1015" y1="225" x2="1015" y2="255" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,3"/>
+
+  <!-- Layer 2: Core Intelligence & Processing -->
+  <rect x="30" y="255" width="1140" height="135" rx="10" fill="#111827" stroke="#374151" stroke-dasharray="4,4"/>
+  <text x="45" y="275" fill="#64748b" font-size="11" font-weight="700" letter-spacing="1.5">LAYER 2: CORE INTELLIGENCE, PREDICTION &amp; MODELING ENGINES</text>
+
+  <g transform="translate(50, 290)">
+    <rect width="250" height="85" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">ML Flood Prediction Engine</text>
+    <text x="15" y="44" fill="#a7f3d0" font-size="10">Random Forest · XGBoost · LightGBM</text>
+    <text x="15" y="60" fill="#94a3b8" font-size="9">Dual-task: Onset (binary) &amp; Active depth</text>
+    <text x="15" y="74" fill="#10b981" font-size="9">/api/v1/predict/live</text>
+  </g>
+
+  <g transform="translate(330, 290)">
+    <rect width="250" height="85" rx="8" fill="#1e293b" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Explainable AI (XAI) Engine</text>
+    <text x="15" y="44" fill="#d8b4fe" font-size="10">SHAP TreeExplainer &amp; Narratives</text>
+    <text x="15" y="60" fill="#94a3b8" font-size="9">Waterfall attributions &amp; summary plots</text>
+    <text x="15" y="74" fill="#a855f7" font-size="9">/api/xai/explain (Isolated failure mode)</text>
+  </g>
+
+  <g transform="translate(610, 290)">
+    <rect width="250" height="85" rx="8" fill="#1e293b" stroke="#06b6d4" stroke-width="1.5"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Digital Twin Studio</text>
+    <text x="15" y="44" fill="#67e8f9" font-size="10">SCS-CN Runoff &amp; Elevation Profiles</text>
+    <text x="15" y="60" fill="#94a3b8" font-size="9">Terrain slopes, soil type, DEM slices</text>
+    <text x="15" y="74" fill="#06b6d4" font-size="9">/api/digital-twin</text>
+  </g>
+
+  <g transform="translate(890, 290)">
+    <rect width="250" height="85" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="15" y="26" fill="#f8fafc" font-size="13" font-weight="600">Flood Propagation Simulator</text>
+    <text x="15" y="44" fill="#fde68a" font-size="10">Rainfall / Dam Release / Overtopping</text>
+    <text x="15" y="60" fill="#94a3b8" font-size="9">Dynamic wave expansion (3h-48h)</text>
+    <text x="15" y="74" fill="#f59e0b" font-size="9">/api/simulation (Exposure &amp; Depth tiers)</text>
+  </g>
+
+  <!-- Connectors L2 -> L3 -->
+  <line x1="600" y1="390" x2="600" y2="420" stroke="#38bdf8" stroke-width="2.5"/>
+  <polygon points="595,418 600,426 605,418" fill="#38bdf8"/>
+
+  <!-- Layer 3: Central Orchestration & Decision Support -->
+  <rect x="30" y="420" width="1140" height="135" rx="10" fill="#131c31" stroke="#3b82f6" stroke-width="1.8"/>
+  <text x="45" y="440" fill="#93c5fd" font-size="11" font-weight="700" letter-spacing="1.5">LAYER 3: PLATFORM ORCHESTRATION &amp; DECISION SUPPORT (CORE INTEGRATION BUS)</text>
+
+  <g transform="translate(50, 455)">
+    <rect width="520" height="85" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#ffffff" font-size="14" font-weight="700">Platform Orchestrator (PlatformOrchestrator)</text>
+    <text x="20" y="48" fill="#cbd5e1" font-size="11">Unified lifecycle coordinator running cross-module workflows:</text>
+    <text x="20" y="66" fill="#38bdf8" font-size="10">• Gauge Breach Alert  • Predict &amp; Explain  • Simulation-to-Evacuation  • End-to-End</text>
+    <text x="20" y="80" fill="#64748b" font-size="9">Prefix: /api/integration (Failure-isolated, asynchronous multi-dispatch)</text>
+  </g>
+
+  <g transform="translate(610, 455)">
+    <rect width="530" height="85" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#ffffff" font-size="14" font-weight="700">Evacuation Route Engine &amp; Shelter Service</text>
+    <text x="20" y="48" fill="#cbd5e1" font-size="11">Multi-factor Dijkstra &amp; A* pathfinding avoiding submerged roads</text>
+    <text x="20" y="66" fill="#6ee7b7" font-size="10">• 10 Relief Shelters  • Lowest-Risk / Shortest / Fastest  • Turn-by-turn guidance</text>
+    <text x="20" y="80" fill="#64748b" font-size="9">Prefix: /api/evacuation</text>
+  </g>
+
+  <!-- Connectors L3 -> L4 -->
+  <line x1="310" y1="555" x2="310" y2="585" stroke="#f43f5e" stroke-width="2"/>
+  <line x1="875" y1="555" x2="875" y2="585" stroke="#38bdf8" stroke-width="2"/>
+
+  <!-- Layer 4: Central Alerting & Communication Channels -->
+  <rect x="30" y="585" width="1140" height="115" rx="10" fill="#111827" stroke="#374151" stroke-dasharray="4,4"/>
+  <text x="45" y="605" fill="#64748b" font-size="11" font-weight="700" letter-spacing="1.5">LAYER 4: CENTRALIZED MULTI-CHANNEL DISPATCH &amp; USER PRESENTATION</text>
+
+  <g transform="translate(50, 620)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#f43f5e" stroke-width="1.2"/>
+    <text x="15" y="24" fill="#f8fafc" font-size="12" font-weight="600">SMS Alert Channel</text>
+    <text x="15" y="42" fill="#fda4af" font-size="10">Twilio Cellular SMS Broadcast</text>
+    <text x="15" y="56" fill="#94a3b8" font-size="9">Warning / Critical / Evacuation SMS</text>
+  </g>
+
+  <g transform="translate(330, 620)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="1.2"/>
+    <text x="15" y="24" fill="#f8fafc" font-size="12" font-weight="600">WhatsApp Alert Channel</text>
+    <text x="15" y="42" fill="#86efac" font-size="10">Interactive Templates &amp; Shelter Pin</text>
+    <text x="15" y="56" fill="#94a3b8" font-size="9">Rich media &amp; route links</text>
+  </g>
+
+  <g transform="translate(610, 620)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#0ea5e9" stroke-width="1.2"/>
+    <text x="15" y="24" fill="#f8fafc" font-size="12" font-weight="600">Telegram Alert Channel</text>
+    <text x="15" y="42" fill="#7dd3fc" font-size="10">Community Broadcast Bot</text>
+    <text x="15" y="56" fill="#94a3b8" font-size="9">Instant group alerts &amp; SOS notifications</text>
+  </g>
+
+  <g transform="translate(890, 620)">
+    <rect width="250" height="65" rx="8" fill="#1e293b" stroke="#eab308" stroke-width="1.5"/>
+    <text x="15" y="24" fill="#f8fafc" font-size="12" font-weight="600">IVRS Voice Calling Channel</text>
+    <text x="15" y="42" fill="#fef08a" font-size="10">Twilio Voice API / TwiML Engine</text>
+    <text x="15" y="56" fill="#94a3b8" font-size="9">Automated emergency audio phone calls</text>
+  </g>
+
+  <!-- Layer 5: Data Persistence & Migrations -->
+  <rect x="30" y="720" width="1140" height="80" rx="10" fill="#0c1322" stroke="#1e293b"/>
+  <text x="45" y="740" fill="#64748b" font-size="11" font-weight="700" letter-spacing="1.5">DATA PERSISTENCE, MIGRATIONS &amp; AUDIT LOGS (SQLITE 3)</text>
+  <text x="45" y="762" fill="#94a3b8" font-size="11">Automated Schema Migrations (schema_migrations) · River Gauge Records · IVRS Call Records · XAI Explanation Records</text>
+  <text x="45" y="780" fill="#94a3b8" font-size="11">Digital Twin Simulations · Flood Propagation Records · Multi-Channel Alert Deliveries · Evacuation Routes History · SOS Reports</text>
+  <rect x="1000" y="740" width="140" height="34" rx="6" fill="#1e293b" stroke="#38bdf8"/>
+  <text x="1070" y="762" fill="#38bdf8" font-size="11" font-weight="600" text-anchor="middle">data/pravah_telemetry.db</text>
+</svg>

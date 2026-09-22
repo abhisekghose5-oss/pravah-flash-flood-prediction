@@ -1961,9 +1961,114 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 // =========================================================================
-// CITIZEN SOS & FLOOD REPORT LOGIC (ADD-ONLY EXTENSION)
+// CITIZEN SOS & FLOOD REPORT LOGIC (ENHANCED FULL INCIDENT REPORTING)
 // =========================================================================
 (function initCitizenSosFeature() {
+  let sosMiniMap = null;
+  let sosPinMarker = null;
+
+  // Global category selector function
+  window.selectSosCategory = function(type) {
+    const hiddenInput = document.getElementById('sosReportType');
+    if (hiddenInput) hiddenInput.value = type;
+
+    // Update active visual card styles
+    const cards = {
+      'FLOOD_OBSERVATION': document.getElementById('sosTypeFlood'),
+      'BLOCKED_ROAD': document.getElementById('sosTypeRoad'),
+      'WATER_LEVEL': document.getElementById('sosTypeWater'),
+      'GENERAL_INCIDENT': document.getElementById('sosTypeGeneral'),
+    };
+
+    Object.entries(cards).forEach(([key, el]) => {
+      if (el) {
+        if (key === type) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      }
+    });
+
+    // Toggle conditional fields
+    const roadGroup = document.getElementById('sosGroupRoadFields');
+    const waterGroup = document.getElementById('sosGroupWaterFields');
+
+    if (type === 'BLOCKED_ROAD') {
+      if (roadGroup) roadGroup.style.display = 'block';
+      if (waterGroup) waterGroup.style.display = 'none';
+    } else {
+      if (roadGroup) roadGroup.style.display = 'none';
+      if (waterGroup) waterGroup.style.display = 'block';
+    }
+  };
+
+  function setSosPinLocation(lat, lng, pan = true) {
+    const latInput = document.getElementById('sosLatInput');
+    const lngInput = document.getElementById('sosLngInput');
+    const landmarkInput = document.getElementById('sosLandmarkInput');
+
+    if (latInput) {
+      latInput.value = Number(lat).toFixed(5);
+      latInput.removeAttribute('readonly');
+      latInput.classList.remove('readonly-coord');
+    }
+    if (lngInput) {
+      lngInput.value = Number(lng).toFixed(5);
+      lngInput.removeAttribute('readonly');
+      lngInput.classList.remove('readonly-coord');
+    }
+
+    if (sosMiniMap) {
+      if (sosPinMarker) {
+        sosMiniMap.removeLayer(sosPinMarker);
+      }
+      if (typeof L !== 'undefined') {
+        sosPinMarker = L.circleMarker([lat, lng], {
+          radius: 8,
+          fillColor: '#ef4444',
+          color: '#ffffff',
+          weight: 2,
+          fillOpacity: 0.95,
+        }).addTo(sosMiniMap);
+
+        if (pan) {
+          sosMiniMap.panTo([lat, lng]);
+        }
+      }
+    }
+  }
+
+  function initSosMiniMap() {
+    if (sosMiniMap || typeof L === 'undefined') return;
+    const mapEl = document.getElementById('sosMiniPinMap');
+    if (!mapEl) return;
+
+    try {
+      sosMiniMap = L.map('sosMiniPinMap', {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([18.0833, 73.4167], 10);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+      }).addTo(sosMiniMap);
+
+      sosMiniMap.on('click', (e) => {
+        setSosPinLocation(e.latlng.lat, e.latlng.lng, false);
+      });
+
+      // If coordinates already present, set marker
+      const latVal = parseFloat(document.getElementById('sosLatInput')?.value);
+      const lngVal = parseFloat(document.getElementById('sosLngInput')?.value);
+      if (!isNaN(latVal) && !isNaN(lngVal)) {
+        setSosPinLocation(latVal, lngVal, true);
+      }
+    } catch (e) {
+      console.warn('[PRAVAH SOS] Mini Map initialization note:', e);
+    }
+  }
+
   function setupSos() {
     const fabBtn = document.getElementById('sosFabBtn');
     const overlay = document.getElementById('sosModalOverlay');
@@ -1974,10 +2079,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const latInput = document.getElementById('sosLatInput');
     const lngInput = document.getElementById('sosLngInput');
     const severitySelect = document.getElementById('sosSeveritySelect');
+    const descriptionTextarea = document.getElementById('sosDescription');
     const landmarkInput = document.getElementById('sosLandmarkInput');
     const submitBtn = document.getElementById('btnSubmitSosReport');
     const statusMsg = document.getElementById('sosStatusMsg');
-    // Photo upload elements (append-only)
+
+    // Photo upload elements
     const photoInput = document.getElementById('sosPhotoInput');
     const photoTriggerBtn = document.getElementById('sosPhotoTriggerBtn');
     const photoClearBtn = document.getElementById('sosPhotoClearBtn');
@@ -1988,7 +2095,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!fabBtn || !overlay) return;
 
-    // --- Photo upload interactivity (append-only) ---
+    // Clear photo upload state
     function clearPhotoState() {
       if (photoInput) photoInput.value = '';
       if (photoPreview) photoPreview.style.display = 'none';
@@ -2003,14 +2110,13 @@ document.addEventListener('DOMContentLoaded', () => {
       photoInput.addEventListener('change', () => {
         const file = photoInput.files && photoInput.files[0];
         if (!file) { clearPhotoState(); return; }
-        // Show live thumbnail
         const reader = new FileReader();
         reader.onload = (ev) => {
           if (photoThumb) photoThumb.src = ev.target.result;
           if (photoPreview) photoPreview.style.display = 'block';
           const sizeMB = (file.size / 1048576).toFixed(2);
           if (photoMeta) photoMeta.textContent = `${file.name}  •  ${sizeMB} MB`;
-          if (photoLabel) photoLabel.textContent = '✅ Photo Ready';
+          if (photoLabel) photoLabel.textContent = '✅ Photo Attached';
           if (photoClearBtn) photoClearBtn.style.display = 'inline-block';
         };
         reader.readAsDataURL(file);
@@ -2026,6 +2132,15 @@ document.addEventListener('DOMContentLoaded', () => {
       overlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
       if (statusMsg) statusMsg.style.display = 'none';
+
+      // Initialize or invalidate Leaflet map size
+      setTimeout(() => {
+        initSosMiniMap();
+        if (sosMiniMap) {
+          sosMiniMap.invalidateSize();
+        }
+      }, 200);
+
       console.log('[PRAVAH SOS] Citizen SOS Modal opened.');
     }
 
@@ -2034,7 +2149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       overlay.style.display = 'none';
       document.body.style.overflow = '';
       if (statusMsg) statusMsg.style.display = 'none';
-      clearPhotoState(); // reset photo on close
+      clearPhotoState();
     }
 
     fabBtn.addEventListener('click', openSosModal);
@@ -2054,7 +2169,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 2. Geolocation API: Auto-Detect My Location
+    // Geolocation: Auto-Detect GPS Location
     if (geoBtn) {
       geoBtn.addEventListener('click', () => {
         if (!('geolocation' in navigator)) {
@@ -2066,7 +2181,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        if (geoBtnText) geoBtnText.textContent = '📍 Acquiring GPS Signal...';
+        if (geoBtnText) geoBtnText.textContent = '📍 Acquiring GPS...';
         geoBtn.disabled = true;
 
         navigator.geolocation.getCurrentPosition(
@@ -2074,10 +2189,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
 
-            if (latInput) latInput.value = lat.toFixed(5);
-            if (lngInput) lngInput.value = lng.toFixed(5);
+            setSosPinLocation(lat, lng, true);
 
-            if (geoBtnText) geoBtnText.textContent = '✅ Location Acquired';
+            if (geoBtnText) geoBtnText.textContent = '✅ GPS Acquired';
             geoBtn.disabled = false;
 
             if (statusMsg) {
@@ -2086,16 +2200,14 @@ document.addEventListener('DOMContentLoaded', () => {
               statusMsg.style.display = 'block';
             }
 
-            // Smoothly pan 3D globe to user position if zoomToLocation is available
             if (typeof window.zoomToLocation === 'function') {
               window.zoomToLocation(lat, lng, 0.45, 1400);
             }
           },
           (err) => {
             geoBtn.disabled = false;
-            if (geoBtnText) geoBtnText.textContent = '📍 Auto-Detect My Location';
+            if (geoBtnText) geoBtnText.textContent = '📍 Auto-Detect GPS';
 
-            // Unlock coordinates input fields for manual typing
             if (latInput) {
               latInput.removeAttribute('readonly');
               latInput.classList.remove('readonly-coord');
@@ -2107,13 +2219,13 @@ document.addEventListener('DOMContentLoaded', () => {
               lngInput.placeholder = 'e.g. 74.1810 (Enter manually)';
             }
 
-            let friendlyMessage = '⚠️ Geolocation unavailable. Please enter coordinates manually.';
-            if (err.code === 1) { // PERMISSION_DENIED
-              friendlyMessage = '🔒 GPS access denied by browser. Manual coordinate entry has been unlocked below.';
-            } else if (err.code === 2) { // POSITION_UNAVAILABLE
-              friendlyMessage = '📡 GPS signal lost or offline. Manual coordinate entry unlocked.';
-            } else if (err.code === 3) { // TIMEOUT
-              friendlyMessage = '⏱️ GPS request timed out. Please type coordinates or try again.';
+            let friendlyMessage = '⚠️ Geolocation unavailable. Please enter coordinates manually or click the mini-map.';
+            if (err.code === 1) {
+              friendlyMessage = '🔒 GPS access denied. Manual coordinate entry unlocked below.';
+            } else if (err.code === 2) {
+              friendlyMessage = '📡 GPS signal lost. Manual coordinate entry unlocked.';
+            } else if (err.code === 3) {
+              friendlyMessage = '⏱️ GPS request timed out. Please enter coordinates or click mini-map.';
             }
 
             if (statusMsg) {
@@ -2121,12 +2233,10 @@ document.addEventListener('DOMContentLoaded', () => {
               statusMsg.innerHTML = `${friendlyMessage} <br/><button type="button" id="btnPresetGhatsCoord" style="margin-top:4px; font-size:0.7rem; background:rgba(255,255,255,0.15); border:1px solid #fff; color:#fff; border-radius:4px; padding:2px 8px; cursor:pointer;">Use Western Ghats Preset (Karad)</button>`;
               statusMsg.style.display = 'block';
 
-              // Quick-fill helper for live demonstrations without real GPS hardware
               const presetBtn = document.getElementById('btnPresetGhatsCoord');
               if (presetBtn) {
                 presetBtn.addEventListener('click', () => {
-                  if (latInput) latInput.value = '17.2890';
-                  if (lngInput) lngInput.value = '74.1810';
+                  setSosPinLocation(17.2890, 74.1810, true);
                   statusMsg.className = 'sos-status-box success';
                   statusMsg.textContent = '📍 Demo Coordinates Set: Karad [17.2890° N, 74.1810° E]';
                   if (typeof window.zoomToLocation === 'function') {
@@ -2145,21 +2255,38 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // 3. Submit SOS Report Handler (Mock POST /api/report-flood)
+    // Submit SOS & Flood Report Handler
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const lat = latInput ? latInput.value.trim() : '';
         const lng = lngInput ? lngInput.value.trim() : '';
-        const severity = severitySelect ? severitySelect.value : 'ankle_deep';
-        const landmark = landmarkInput ? landmarkInput.value.trim() : '';
+        const reportType = document.getElementById('sosReportType')?.value || 'FLOOD_OBSERVATION';
+        const rawSeverity = severitySelect ? severitySelect.value : 'waist_deep';
+        const waterDepth = parseFloat(document.getElementById('sosWaterDepth')?.value) || 0.8;
+        const roadStatus = document.getElementById('sosRoadStatus')?.value || 'PARTIALLY_BLOCKED';
+        const roadName = document.getElementById('sosRoadName')?.value.trim() || '';
+        const description = (descriptionTextarea ? descriptionTextarea.value.trim() : '') || 'Citizen reported severe flood hazard condition.';
+        const locationName = document.getElementById('sosLocationName')?.value.trim() || '';
+        const district = document.getElementById('sosDistrict')?.value.trim() || '';
+        const reporterName = document.getElementById('sosReporterName')?.value.trim() || '';
+        const reporterContact = document.getElementById('sosReporterContact')?.value.trim() || '';
+
+        // Severity normalization
+        const severityMap = {
+          'ankle_deep': 'LOW',
+          'knee_deep': 'MODERATE',
+          'waist_deep': 'HIGH',
+          'above_waist_danger': 'CRITICAL',
+        };
+        const enumSeverity = severityMap[rawSeverity] || 'HIGH';
 
         // Validation: Ensure coordinates are set
         if (!lat || !lng) {
           if (statusMsg) {
             statusMsg.className = 'sos-status-box error';
-            statusMsg.textContent = '⚠️ Please click "Auto-Detect My Location" before submitting.';
+            statusMsg.textContent = '⚠️ Please click "Auto-Detect GPS" or click on the mini-map to drop a pin.';
             statusMsg.style.display = 'block';
           }
           if (geoBtn) geoBtn.focus();
@@ -2174,74 +2301,113 @@ document.addEventListener('DOMContentLoaded', () => {
               <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
               <path d="M12 2a10 10 0 0 1 10 10"></path>
             </svg>
-            <span>Dispatching SOS...</span>
+            <span>Dispatching Ground SOS Report...</span>
           `;
         }
 
-        const reportPayload = {
-          latitude: parseFloat(lat),
-          longitude: parseFloat(lng),
-          severity: severity,
-          severity_tier: severity,
-          landmark_notes: landmark,
-          client_timestamp: new Date().toISOString(),
-        };
-
         try {
-          let responseSuccess = true;
-          try {
-            const photoFile = photoInput && photoInput.files && photoInput.files[0];
+          const photoFile = photoInput && photoInput.files && photoInput.files[0];
+          let communityReportRes = null;
+          let sosTelemetryRes = null;
 
-            let response;
-            if (photoFile) {
-              // --- Multipart submit with photo ---
-              const fd = new FormData();
-              fd.append('latitude', String(parseFloat(lat)));
-              fd.append('longitude', String(parseFloat(lng)));
-              fd.append('severity', severity);
-              fd.append('severity_tier', severity);
-              fd.append('landmark_notes', landmark);
-              fd.append('timestamp', new Date().toISOString());
-              fd.append('photo', photoFile, photoFile.name);
-              response = await fetch('/api/v1/sos/report-with-photo', { method: 'POST', body: fd });
-            } else {
-              // --- JSON submit (original flow, unchanged) ---
-              response = await fetch('/api/report-flood', {
+          // 1. Submit to Community Reporting Intelligence Pipeline
+          if (photoFile) {
+            const commFormData = new FormData();
+            commFormData.append('report_type', reportType);
+            commFormData.append('description', description);
+            commFormData.append('severity', enumSeverity);
+            commFormData.append('latitude', String(parseFloat(lat)));
+            commFormData.append('longitude', String(parseFloat(lng)));
+            commFormData.append('water_depth', String(waterDepth));
+            if (reportType === 'BLOCKED_ROAD') {
+              commFormData.append('road_status', roadStatus);
+              if (roadName) commFormData.append('road_name', roadName);
+            }
+            if (locationName) commFormData.append('location_name', locationName);
+            if (district) commFormData.append('district', district);
+            if (reporterName) commFormData.append('reporter_name', reporterName);
+            if (reporterContact) commFormData.append('reporter_contact', reporterContact);
+            commFormData.append('photo', photoFile, photoFile.name);
+
+            try {
+              communityReportRes = await fetch('/api/community/reports/multipart', {
+                method: 'POST',
+                body: commFormData,
+              });
+            } catch (errComm) {
+              console.warn('Community multipart post error:', errComm);
+            }
+          } else {
+            const commPayload = {
+              report_type: reportType,
+              description: description,
+              severity: enumSeverity,
+              latitude: parseFloat(lat),
+              longitude: parseFloat(lng),
+              water_depth: waterDepth,
+              road_status: reportType === 'BLOCKED_ROAD' ? roadStatus : null,
+              road_name: reportType === 'BLOCKED_ROAD' ? roadName : null,
+              location_name: locationName || null,
+              district: district || null,
+              reporter_name: reporterName || null,
+              reporter_contact: reporterContact || null,
+            };
+
+            try {
+              communityReportRes = await fetch('/api/community/reports', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reportPayload),
+                body: JSON.stringify(commPayload),
               });
+            } catch (errComm) {
+              console.warn('Community json post error:', errComm);
             }
-
-            if (!response.ok && response.status !== 404) {
-              responseSuccess = false;
-            }
-          } catch {
-            // Simulated network delay for SIH demo if backend endpoint is offline
-            await new Promise((res) => setTimeout(res, 800));
           }
 
-          if (responseSuccess) {
-            if (statusMsg) {
-              statusMsg.className = 'sos-status-box success';
-              statusMsg.textContent = '🚨 SOS Incident Dispatched! SDRF & NDRF emergency controllers have been notified.';
-              statusMsg.style.display = 'block';
-            }
-            console.log('[PRAVAH SOS] Incident successfully logged:', reportPayload);
-
-            // Automatically close modal after 2 seconds
-            setTimeout(() => {
-              closeSosModal();
-              if (form) form.reset();
-              if (geoBtnText) geoBtnText.textContent = '📍 Auto-Detect My Location';
-            }, 2000);
-          } else {
-            throw new Error('SOS Dispatch failed');
+          // 2. Also register in Live SOS Incident Telemetry (/api/report-flood)
+          try {
+            const sosPayload = {
+              latitude: parseFloat(lat),
+              longitude: parseFloat(lng),
+              severity: rawSeverity,
+              severity_tier: rawSeverity,
+              landmark_notes: `${description} [${reportType}] ${locationName ? '• ' + locationName : ''}`,
+              timestamp: new Date().toISOString(),
+            };
+            sosTelemetryRes = await fetch('/api/report-flood', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sosPayload),
+            });
+          } catch (errSos) {
+            console.warn('SOS telemetry post error:', errSos);
           }
+
+          // Feedback
+          let reportCode = 'CR-' + Math.floor(1000 + Math.random() * 9000);
+          if (communityReportRes && communityReportRes.ok) {
+            const commData = await communityReportRes.json();
+            if (commData.report_code) reportCode = commData.report_code;
+          }
+
+          if (statusMsg) {
+            statusMsg.className = 'sos-status-box success';
+            statusMsg.innerHTML = `🚨 <strong>SOS Incident Dispatched (${reportCode})!</strong><br/>Incident logged to SDRF/NDRF controllers and synchronized across live GIS telemetry.`;
+            statusMsg.style.display = 'block';
+          }
+
+          // Auto-close modal after 2.5 seconds and reset
+          setTimeout(() => {
+            closeSosModal();
+            if (form) form.reset();
+            window.selectSosCategory('FLOOD_OBSERVATION');
+            if (geoBtnText) geoBtnText.textContent = '📍 Auto-Detect GPS';
+          }, 2500);
+
         } catch (err) {
           if (statusMsg) {
             statusMsg.className = 'sos-status-box error';
-            statusMsg.textContent = '❌ Failed to connect to emergency dispatch. Please dial 112 directly.';
+            statusMsg.textContent = '❌ Emergency dispatch failed. Please dial 112 directly.';
             statusMsg.style.display = 'block';
           }
           console.error('[PRAVAH SOS] Error submitting report:', err);

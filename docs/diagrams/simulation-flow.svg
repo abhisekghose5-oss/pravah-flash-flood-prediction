@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#0a0f1d; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <rect x="30" y="20" width="940" height="60" rx="10" fill="#131d33" stroke="#1e293b"/>
+  <text x="50" y="55" fill="#38bdf8" font-size="20" font-weight="700">PRAVAH — FLOOD PROPAGATION &amp; INUNDATION SIMULATOR</text>
+  <text x="640" y="55" fill="#94a3b8" font-size="12">Scenario Modeling · Wave Dynamics · Exposure Analytics</text>
+
+  <!-- Step 1: Scenarios -->
+  <g transform="translate(40, 105)">
+    <rect width="210" height="420" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect width="210" height="35" rx="10" fill="#d97706"/>
+    <text x="105" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">1. SCENARIO SETUP</text>
+
+    <!-- Rainfall -->
+    <g transform="translate(15, 50)">
+      <rect width="180" height="95" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1"/>
+      <text x="12" y="22" fill="#38bdf8" font-size="11" font-weight="600">Rainfall Convective</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">Total Rainfall: 50 - 300 mm</text>
+      <text x="12" y="52" fill="#94a3b8" font-size="9">Duration: 1h to 48h storm</text>
+      <text x="12" y="66" fill="#94a3b8" font-size="8">Core vs Orographic Crest</text>
+      <text x="12" y="80" fill="#38bdf8" font-size="8">Initial Soil Saturation %</text>
+    </g>
+
+    <!-- Dam Release -->
+    <g transform="translate(15, 160)">
+      <rect width="180" height="105" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1"/>
+      <text x="12" y="22" fill="#f87171" font-size="11" font-weight="600">Dam Emergency Release</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">Target: Koyna / Ujani / Radhanagari</text>
+      <text x="12" y="52" fill="#94a3b8" font-size="9">Discharge: 100 - 15,000 m³/s</text>
+      <text x="12" y="66" fill="#94a3b8" font-size="8">Bankfull conveyance capacity</text>
+      <text x="12" y="80" fill="#f87171" font-size="8">Simulated drill disclaimer</text>
+      <text x="12" y="94" fill="#94a3b8" font-size="8">Reservoir fullness %</text>
+    </g>
+
+    <!-- River Overflow -->
+    <g transform="translate(15, 280)">
+      <rect width="180" height="95" rx="6" fill="#1e293b" stroke="#a855f7" stroke-width="1"/>
+      <text x="12" y="22" fill="#c084fc" font-size="11" font-weight="600">River Overtopping</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">River: Savitri / Krishna / Beki</text>
+      <text x="12" y="52" fill="#94a3b8" font-size="9">Stage Crest: Danger mark + 3m</text>
+      <text x="12" y="66" fill="#94a3b8" font-size="8">Levee breach width: 25 - 100m</text>
+      <text x="12" y="80" fill="#c084fc" font-size="8">Duration: 4h - 24h</text>
+    </g>
+  </g>
+
+  <!-- Connect 1 -> 2 -->
+  <line x1="250" y1="315" x2="280" y2="315" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+  <!-- Step 2: Hydraulic Propagation -->
+  <g transform="translate(280, 105)">
+    <rect width="210" height="420" rx="10" fill="#111827" stroke="#0284c7" stroke-width="1.5"/>
+    <rect width="210" height="35" rx="10" fill="#0284c7"/>
+    <text x="105" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">2. WAVE PROPAGATION</text>
+
+    <g transform="translate(15, 50)">
+      <rect width="180" height="95" rx="6" fill="#1e293b"/>
+      <text x="12" y="22" fill="#38bdf8" font-size="11" font-weight="600">Topographic Routing</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">30m DEM Elevation Grid</text>
+      <text x="12" y="54" fill="#94a3b8" font-size="8">D8 Flow Direction Algorithm</text>
+      <text x="12" y="68" fill="#94a3b8" font-size="8">Catchment slope &amp; curvature</text>
+      <text x="12" y="82" fill="#38bdf8" font-size="8">Channel roughness (Manning's n)</text>
+    </g>
+
+    <g transform="translate(15, 160)">
+      <rect width="180" height="110" rx="6" fill="#1e293b"/>
+      <text x="12" y="22" fill="#38bdf8" font-size="11" font-weight="600">Temporal Stepping</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">Time Horizons:</text>
+      <text x="12" y="54" fill="#94a3b8" font-size="8">T+1h: Headwater buildup</text>
+      <text x="12" y="68" fill="#94a3b8" font-size="8">T+3h: Bank breach onset</text>
+      <text x="12" y="82" fill="#94a3b8" font-size="8">T+6h: Peak flood wave extent</text>
+      <text x="12" y="96" fill="#94a3b8" font-size="8">T+12h / 24h: Receding tail</text>
+    </g>
+
+    <g transform="translate(15, 285)">
+      <rect width="180" height="100" rx="6" fill="#1e293b"/>
+      <text x="12" y="22" fill="#38bdf8" font-size="11" font-weight="600">Wave Dynamics</text>
+      <text x="12" y="38" fill="#cbd5e1" font-size="9">Celerity: 1.8 - 4.2 m/s</text>
+      <text x="12" y="54" fill="#94a3b8" font-size="8">Lag to downstream Karad: 4.5h</text>
+      <text x="12" y="68" fill="#94a3b8" font-size="8">Peak attenuation: 22%</text>
+      <text x="12" y="84" fill="#34d399" font-size="8">Conserves water volume</text>
+    </g>
+  </g>
+
+  <!-- Connect 2 -> 3 -->
+  <line x1="490" y1="315" x2="520" y2="315" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr-cyan)"/>
+
+  <!-- Step 3: Inundation Depth Classification -->
+  <g transform="translate(520, 105)">
+    <rect width="210" height="420" rx="10" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+    <rect width="210" height="35" rx="10" fill="#059669"/>
+    <text x="105" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">3. DEPTH CLASSIFICATION</text>
+
+    <g transform="translate(15, 50)">
+      <rect width="180" height="100" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1"/>
+      <text x="12" y="22" fill="#38bdf8" font-size="11" font-weight="600">Low Depth (&lt; 0.5m)</text>
+      <text x="12" y="40" fill="#cbd5e1" font-size="9">Shallow street runoff</text>
+      <text x="12" y="56" fill="#94a3b8" font-size="8">Pedestrian caution advised</text>
+      <text x="12" y="70" fill="#94a3b8" font-size="8">Emergency vehicles passable</text>
+      <text x="12" y="86" fill="#38bdf8" font-size="8">Color: Cyan / Pale Blue</text>
+    </g>
+
+    <g transform="translate(15, 165)">
+      <rect width="180" height="100" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1"/>
+      <text x="12" y="22" fill="#fbbf24" font-size="11" font-weight="600">Moderate (0.5 - 1.5m)</text>
+      <text x="12" y="40" fill="#cbd5e1" font-size="9">Ground floors flooded</text>
+      <text x="12" y="56" fill="#94a3b8" font-size="8">Vehicles submerged &amp; stalled</text>
+      <text x="12" y="70" fill="#94a3b8" font-size="8">Road transit severed</text>
+      <text x="12" y="86" fill="#fbbf24" font-size="8">Color: Amber / Orange</text>
+    </g>
+
+    <g transform="translate(15, 280)">
+      <rect width="180" height="110" rx="6" fill="#1e293b" stroke="#ef4444" stroke-width="1.2"/>
+      <text x="12" y="22" fill="#f87171" font-size="11" font-weight="600">Severe Depth (&gt; 1.5m)</text>
+      <text x="12" y="40" fill="#cbd5e1" font-size="9">Life-threatening flash surge</text>
+      <text x="12" y="56" fill="#fca5a5" font-size="8">Single-story homes submerged</text>
+      <text x="12" y="70" fill="#fca5a5" font-size="8">Mandatory evacuation</text>
+      <text x="12" y="86" fill="#f87171" font-size="8">Color: Deep Crimson</text>
+      <text x="12" y="100" fill="#fca5a5" font-size="8">Bridges overtopped</text>
+    </g>
+  </g>
+
+  <!-- Connect 3 -> 4 -->
+  <line x1="730" y1="315" x2="760" y2="315" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr-cyan)"/>
+
+  <!-- Step 4: Exposure Impact Analytics -->
+  <g transform="translate(760, 105)">
+    <rect width="200" height="420" rx="10" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+    <rect width="200" height="35" rx="10" fill="#6d28d9"/>
+    <text x="100" y="23" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">4. EXPOSURE IMPACT</text>
+
+    <g transform="translate(15, 50)">
+      <rect width="170" height="85" rx="6" fill="#1e293b"/>
+      <text x="12" y="22" fill="#c084fc" font-size="11" font-weight="600">Population Impact</text>
+      <text x="12" y="40" fill="#cbd5e1" font-size="9">Census mesh overlay</text>
+      <text x="12" y="56" fill="#fca5a5" font-size="9">Est: 14,200 exposed</text>
+      <text x="12" y="72" fill="#94a3b8" font-size="8">High-density wards flagged</text>
+    </g>
+
+    <g transform="translate(15, 150)">
+      <rect width="170" height="85" rx="6" fill="#1e293b"/>
+      <text x="12" y="22" fill="#c084fc" font-size="11" font-weight="600">Infrastructure Impact</text>
+      <text x="12" y="40" fill="#cbd5e1" font-size="9">Roads submerged: 18.4 km</text>
+      <text x="12" y="56" fill="#cbd5e1" font-size="9">Bridges cut off: 2</text>
+      <text x="12" y="72" fill="#fbbf24" font-size="8">Power substation isolated</text>
+    </g>
+
+    <g transform="translate(15, 250)">
+      <rect width="170" height="135" rx="6" fill="#1e293b"/>
+      <text x="12" y="20" fill="#c084fc" font-size="11" font-weight="600">Downstream Actions</text>
+      <text x="12" y="38" fill="#38bdf8" font-size="8">1. Feed blocked roads into</text>
+      <text x="12" y="52" fill="#38bdf8" font-size="8">   Evacuation Engine</text>
+      <text x="12" y="70" fill="#34d399" font-size="8">2. Send IVRS / SMS alerts</text>
+      <text x="12" y="84" fill="#34d399" font-size="8">   to exposed wards</text>
+      <text x="12" y="102" fill="#fbbf24" font-size="8">3. Render dynamic layer</text>
+      <text x="12" y="116" fill="#fbbf24" font-size="8">   in Digital Twin Studio</text>
+    </g>
+  </g>
+
+  <!-- Bottom Summary -->
+  <g transform="translate(40, 545)">
+    <rect width="920" height="110" rx="10" fill="#0f172a" stroke="#1e293b"/>
+    <text x="25" y="26" fill="#38bdf8" font-size="12" font-weight="700">SIMULATION AUDIT PERSISTENCE (SQLite: flood_propagation_simulation_records)</text>
+    <text x="25" y="48" fill="#cbd5e1" font-size="10">Records: simulation_id, scenario_type, scenario_title, max_extent_km2, peak_depth_m, total_population_impacted</text>
+    <text x="25" y="66" fill="#94a3b8" font-size="10">Integrates with Evacuation Engine: Submerged roads automatically excluded from shortest-path calculations</text>
+    <text x="25" y="84" fill="#34d399" font-size="10">Mandatory Provenance Disclaimer attached: "SIMULATION ONLY — Hydrological scenario for disaster preparedness planning."</text>
+  </g>
+</svg>

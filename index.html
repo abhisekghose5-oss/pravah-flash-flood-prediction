@@ -19,6 +19,10 @@
 
   <!-- Lightweight Charting Library: Chart.js (Requirement 3) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Leaflet GIS Library for Mini Pin Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -96,13 +100,13 @@
         <span>Simulate Disaster</span>
       </button>
 
-      <button class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem;">
+      <a href="alerts.html" class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem;" title="Open Multi-Channel Alerts Center">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
         </svg>
-        <span>Alerts</span>
-      </button>
+        <span>Alerts Center</span>
+      </a>
 
       <!-- Live Weather Navigation Button -->
       <a href="weather.html" target="_blank" class="nav-weather-btn magnetic" title="Launch Advanced Weather Forecasting">
@@ -112,6 +116,43 @@
         </svg>
         <span>Live Weather</span>
         <span class="weather-radar-badge">LIVE</span>
+      </a>
+
+      <!-- Evacuation Route Planner Navigation Button -->
+      <a href="evacuation.html" class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;" title="Evacuation Planning & Safe Route Generation">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+        </svg>
+        <span>Evacuation Plan</span>
+      </a>
+
+      <!-- Explainable AI (XAI) Navigation Button -->
+      <a href="xai.html" class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem; border-color: rgba(6, 182, 212, 0.4); color: #38bdf8;" title="Explainable AI & SHAP Interpretability Center">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
+        </svg>
+        <span>XAI Center</span>
+      </a>
+
+      <!-- Digital Twin Studio Navigation Button -->
+      <a href="digital_twin.html" class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem; border-color: rgba(6, 182, 212, 0.4); color: #22d3ee;" title="Virtual Watershed Hydrology & Runoff Simulation">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Digital Twin</span>
+      </a>
+
+      <!-- Flood Propagation Simulation Navigation Button -->
+      <a href="simulation.html" class="btn btn-ghost magnetic" style="padding: 0.5rem 0.85rem; font-size: 0.78rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" title="Flood Inundation & Wave Propagation Simulator">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12h20M2 17h20M2 7h20"></path>
+          <circle cx="12" cy="12" r="3" fill="#06b6d4"></circle>
+        </svg>
+        <span>Propagation</span>
       </a>
 
       <!-- CSS-Only Navigation Dropdown Menu (Requirement 1) -->
@@ -159,6 +200,51 @@
               <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
             </svg>
             <span>Live Weather</span>
+          </a>
+          <a href="community.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Community Flood Reports</span>
+          </a>
+          <a href="alerts.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span>Multi-Channel Alerts Center</span>
+          </a>
+          <a href="evacuation.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+            </svg>
+            <span>Evacuation & Safe Routes</span>
+          </a>
+          <a href="xai.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+            <span>Explainable AI (SHAP)</span>
+          </a>
+          <a href="digital_twin.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            <span>Digital Twin Studio</span>
+          </a>
+          <a href="simulation.html" target="_blank" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12h20M2 17h20M2 7h20"></path>
+              <circle cx="12" cy="12" r="3" fill="#06b6d4"></circle>
+            </svg>
+            <span>Flood Propagation Simulator</span>
           </a>
         </div>
       </div>
@@ -1259,61 +1345,137 @@
         </div>
         <h2 id="sosModalTitle" class="sos-modal-title">Citizen SOS &amp; Flood Report</h2>
         <p class="sos-modal-subtitle">
-          Submit live field ground-truth telemetry directly to SDRF incident controllers. Your GPS coordinates will calibrate real-time catchment hydrodynamic verification.
+          Submit live field ground-truth telemetry directly to SDRF &amp; NDRF incident controllers. Your GPS coordinates will calibrate real-time catchment hydrodynamic verification.
         </p>
       </div>
 
       <!-- Modal Form -->
       <form id="sosReportForm" class="sos-form" onsubmit="event.preventDefault();">
-        <!-- Geolocation Trigger Button -->
-        <button type="button" id="btnAutoDetectLocation" class="btn btn-geolocate magnetic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
-            <circle cx="12" cy="12" r="8"></circle>
-          </svg>
-          <span id="geoBtnText">📍 Auto-Detect My Location</span>
-        </button>
-
-        <!-- Coordinates Inputs (Read-Only) -->
-        <div class="sos-coords-grid">
-          <div class="sos-form-group">
-            <label for="sosLatInput" class="sos-form-label">Latitude</label>
-            <input type="text" id="sosLatInput" class="sos-form-input readonly-coord" placeholder="Waiting for GPS..." readonly required />
-          </div>
-          <div class="sos-form-group">
-            <label for="sosLngInput" class="sos-form-label">Longitude</label>
-            <input type="text" id="sosLngInput" class="sos-form-input readonly-coord" placeholder="Waiting for GPS..." readonly required />
-          </div>
-        </div>
-
-        <!-- Water Level Severity Dropdown -->
+        
+        <!-- 1. Incident Category Selection (What happened?) -->
         <div class="sos-form-group">
-          <label for="sosSeveritySelect" class="sos-form-label">Water Level Severity</label>
-          <div class="sos-select-wrap">
-            <select id="sosSeveritySelect" class="sos-form-input sos-select" required>
-              <option value="ankle_deep" selected>Ankle Deep (&lt; 15 cm)</option>
-              <option value="knee_deep">Knee Deep (15 - 50 cm)</option>
-              <option value="waist_deep">Waist Deep (50 - 100 cm)</option>
-              <option value="above_waist_danger">Above Waist / Dangerous (&gt; 100 cm)</option>
-            </select>
-            <svg class="sos-chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+          <label class="sos-form-label">What happened? (Select Incident Category)</label>
+          <div class="sos-report-type-selector" id="sosReportTypeSelector">
+            <div class="sos-type-card selected" id="sosTypeFlood" onclick="selectSosCategory('FLOOD_OBSERVATION')">
+              <span class="sos-type-title">🌊 Flood Observation</span>
+              <span class="sos-type-desc">Water entering streets, houses, or agricultural fields</span>
+            </div>
+            <div class="sos-type-card" id="sosTypeRoad" onclick="selectSosCategory('BLOCKED_ROAD')">
+              <span class="sos-type-title">🚧 Blocked Road</span>
+              <span class="sos-type-desc">Highways or local roads impassable due to water or debris</span>
+            </div>
+            <div class="sos-type-card" id="sosTypeWater" onclick="selectSosCategory('WATER_LEVEL')">
+              <span class="sos-type-title">📏 Water Level</span>
+              <span class="sos-type-desc">Observed river water mark or bridge pier gauge reading</span>
+            </div>
+            <div class="sos-type-card" id="sosTypeGeneral" onclick="selectSosCategory('GENERAL_INCIDENT')">
+              <span class="sos-type-title">⚠️ General Incident</span>
+              <span class="sos-type-desc">Landslides, bridge scour, damaged infrastructure, stranded persons</span>
+            </div>
+          </div>
+          <input type="hidden" id="sosReportType" value="FLOOD_OBSERVATION" />
+        </div>
+
+        <!-- 2. Conditional: Road Fields (Only for Blocked Road) -->
+        <div class="sos-form-group" id="sosGroupRoadFields" style="display: none;">
+          <div class="sos-coords-grid">
+            <div>
+              <label for="sosRoadStatus" class="sos-form-label">Road Passability Status</label>
+              <div class="sos-select-wrap">
+                <select id="sosRoadStatus" class="sos-form-input sos-select">
+                  <option value="COMPLETELY_BLOCKED">Completely Blocked</option>
+                  <option value="PARTIALLY_BLOCKED" selected>Partially Blocked</option>
+                  <option value="OPEN">Open with Caution</option>
+                  <option value="UNKNOWN">Unknown</option>
+                </select>
+                <svg class="sos-chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div>
+              <label for="sosRoadName" class="sos-form-label">Road / Highway Name</label>
+              <input type="text" id="sosRoadName" class="sos-form-input" placeholder="e.g. NH-48 Wai Bypass" />
+            </div>
           </div>
         </div>
 
-        <!-- Optional Landmark / Description Field -->
-        <div class="sos-form-group">
-          <label for="sosLandmarkInput" class="sos-form-label">Landmark / Immediate Situation (Optional)</label>
-          <input type="text" id="sosLandmarkInput" class="sos-form-input" placeholder="e.g., Near Karad bridge, culvert overflowing..." maxlength="120" />
+        <!-- 3. Conditional: Water Depth & Severity (For Flood, Water Level, General) -->
+        <div class="sos-form-group" id="sosGroupWaterFields">
+          <div class="sos-coords-grid">
+            <div>
+              <label for="sosWaterDepth" class="sos-form-label">Approximate Water Depth (Meters)</label>
+              <input type="number" step="0.1" min="0" max="25" id="sosWaterDepth" class="sos-form-input" placeholder="e.g. 0.8" value="0.8" />
+            </div>
+            <div>
+              <label for="sosSeveritySelect" class="sos-form-label">Reported Severity</label>
+              <div class="sos-select-wrap">
+                <select id="sosSeveritySelect" class="sos-form-input sos-select" required>
+                  <option value="ankle_deep">Low (Ankle deep &lt; 15cm)</option>
+                  <option value="knee_deep">Moderate (Knee deep 15-50cm)</option>
+                  <option value="waist_deep" selected>High (Waist deep 50-100cm)</option>
+                  <option value="above_waist_danger">Critical (Above waist &gt; 100cm)</option>
+                </select>
+                <svg class="sos-chevron-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Photo Upload (optional) — Append-only addition -->
+        <!-- 4. Incident Description & Current Situation * -->
+        <div class="sos-form-group">
+          <label for="sosDescription" class="sos-form-label">Incident Description &amp; Current Situation *</label>
+          <textarea id="sosDescription" class="sos-form-input sos-textarea" rows="3" required placeholder="Describe what you see: water speed, submerged landmarks, trapped vehicles, culvert overflow..."></textarea>
+          <!-- Keep sosLandmarkInput hidden as legacy alias for backwards compatibility -->
+          <input type="hidden" id="sosLandmarkInput" value="" />
+        </div>
+
+        <!-- 5. Location & GPS Coordinates with Mini-Map -->
+        <div class="sos-form-group">
+          <div class="sos-loc-header">
+            <label class="sos-form-label" style="margin: 0;">Location &amp; GPS Coordinates *</label>
+            <button type="button" id="btnAutoDetectLocation" class="btn btn-geolocate-compact magnetic">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+                <circle cx="12" cy="12" r="8"></circle>
+              </svg>
+              <span id="geoBtnText">📍 Auto-Detect GPS</span>
+            </button>
+          </div>
+
+          <!-- Latitude & Longitude -->
+          <div class="sos-coords-grid" style="margin-bottom: 0.5rem;">
+            <div>
+              <input type="text" id="sosLatInput" class="sos-form-input readonly-coord" placeholder="Latitude (e.g. 18.0833)" required />
+            </div>
+            <div>
+              <input type="text" id="sosLngInput" class="sos-form-input readonly-coord" placeholder="Longitude (e.g. 73.4167)" required />
+            </div>
+          </div>
+
+          <!-- Landmark & District -->
+          <div class="sos-coords-grid" style="margin-bottom: 0.5rem;">
+            <div>
+              <input type="text" id="sosLocationName" class="sos-form-input" placeholder="Village / Town / Landmark" />
+            </div>
+            <div>
+              <input type="text" id="sosDistrict" class="sos-form-input" placeholder="District (e.g. Satara, Raigad, Barpeta)" />
+            </div>
+          </div>
+
+          <!-- Interactive Mini Pin Selector Map -->
+          <div id="sosMiniPinMap" class="sos-mini-pin-map"></div>
+          <p class="sos-map-hint">💡 Click anywhere on the mini-map to drop a pin at the exact hazard location.</p>
+        </div>
+
+        <!-- 6. Flood Scene Photo Upload -->
         <div class="sos-form-group sos-photo-group">
-          <label class="sos-form-label">Flood Scene Photo <span style="opacity:0.55; font-size:0.75rem;">(Optional — max 10 MB)</span></label>
-          <div class="sos-photo-upload-wrap">
-            <input type="file" id="sosPhotoInput" accept="image/*" capture="environment" style="display:none;" />
+          <label class="sos-form-label">Upload Flood Photograph <span style="opacity:0.6; font-size:0.72rem;">(Optional — max 10 MB)</span></label>
+          <div class="sos-photo-dropzone" id="sosPhotoDropzone">
+            <input type="file" id="sosPhotoInput" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" style="display:none;" />
             <button type="button" id="sosPhotoTriggerBtn" class="btn-sos-photo magnetic">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="13" r="4"></circle>
@@ -1327,20 +1489,29 @@
           <!-- Live thumbnail preview -->
           <div id="sosPhotoPreview" style="display:none; margin-top:8px; position:relative;">
             <img id="sosPhotoThumb" src="" alt="Preview" style="max-width:100%; max-height:180px; border-radius:8px; border:1px solid rgba(6,182,212,0.35); object-fit:cover;" />
-            <div id="sosPhotoMeta" style="font-size:0.7rem; color:rgba(255,255,255,0.5); margin-top:4px;"></div>
+            <div id="sosPhotoMeta" style="font-size:0.7rem; color:rgba(255,255,255,0.6); margin-top:4px;"></div>
           </div>
         </div>
 
-        <!-- Submit Button -->
+        <!-- 7. Optional Citizen Reporter Details -->
+        <div class="sos-reporter-details-box">
+          <label class="sos-form-label" style="color: #94a3b8; margin-bottom: 0.4rem;">Citizen Reporter Details (Optional &amp; Strictly Private)</label>
+          <div class="sos-coords-grid">
+            <input type="text" id="sosReporterName" class="sos-form-input" placeholder="Your name (e.g. Rohit K.)" />
+            <input type="text" id="sosReporterContact" class="sos-form-input" placeholder="Contact number (never published)" />
+          </div>
+          <p class="sos-privacy-guarantee">🔒 PRAVAH Privacy Guarantee: Contact details are never exposed in public feeds or APIs.</p>
+        </div>
+
+        <!-- 8. Submit Button & Status Notification -->
         <button type="submit" id="btnSubmitSosReport" class="btn btn-sos-submit magnetic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
-          <span>Submit SOS Report</span>
+          <span>Submit Ground SOS Report</span>
         </button>
 
-        <!-- Status Notification -->
         <div id="sosStatusMsg" class="sos-status-box" style="display: none;" role="status" aria-live="polite"></div>
       </form>
     </div>

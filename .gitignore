@@ -229,3 +229,8 @@ node_modules/
 dist/
 .vite/
 .DS_Store
+
+# User uploaded media
+data/uploads/*
+!data/uploads/.gitkeep
+!data/uploads/*/.gitkeep
