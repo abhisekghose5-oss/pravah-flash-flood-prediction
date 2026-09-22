@@ -104,6 +104,7 @@ class LivePredictionResponse(BaseModel):
     task_a_onset: Dict[str, Any]
     task_b_active: Dict[str, Any]
     antecedent_rainfall_summary: Dict[str, Any]
+    hydrological_context: Optional[Dict[str, Any]] = None
 
 
 class HistoricalCatchmentResult(BaseModel):

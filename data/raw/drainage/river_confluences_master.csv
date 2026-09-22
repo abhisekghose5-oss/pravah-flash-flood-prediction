@@ -1,0 +1,9 @@
+confluence_id,confluence_name,primary_river,tributary_river,basin,district,latitude,longitude,catchment_gauge_id,confluence_angle_degrees,backwater_hazard_risk,historical_flash_flood_events,notes
+CONF-01,Karad Confluence,Krishna,Koyna,Krishna,Satara,17.2885,74.1870,684,68.0,EXTREME,18,Preeti Sangam; massive reverse swell during simultaneous dam discharges
+CONF-02,Kurundwad Confluence,Krishna,Panchganga,Krishna,Kolhapur,16.6840,74.6050,678,75.0,EXTREME,22,Narsobawadi confluence; high chronic submergence zone in Kolhapur-Sangli
+CONF-03,Haripur Sangam,Krishna,Varna,Krishna,Sangli,16.8510,74.5420,681,62.0,HIGH,15,Upstream backwater inundates Sangli city riverfront and agriculture
+CONF-04,Mahad Sangam,Savitri,Kal,West flowing rivers from Tapi of Tadri,Raigad,18.0940,73.4650,602,82.0,EXTREME,12,Tidal bottleneck; flash flood waters encounter Arabian Sea high tide
+CONF-05,Sangam Bridge Pune,Mula,Mutha,Krishna,Pune,18.5285,73.8610,640,54.0,HIGH,9,Sangamwadi confluence; backwater swells across central Pune during dam release
+CONF-06,Sarati Nira Confluence,Bhima,Nira,Krishna,Solapur,17.9150,75.0120,682,58.0,HIGH,8,Convergence of Nira basin runoff and upper Bhima discharge
+CONF-07,Kalyan Confluence,Ulhas,Waldhuni,West flowing rivers from Tapi of Tadri,Thane,19.2420,73.1380,668,85.0,HIGH,11,Urban bottleneck in Kalyan-Dombivli belt with high industrial runoff
+CONF-08,Narsingpur Confluence,Bhima,Sina,Krishna,Solapur,17.9750,75.1420,642,65.0,MODERATE,6,Major downstream drainage convergence before entering Ujani backwaters

@@ -1,0 +1,11 @@
+unit_id,unit_name,force_type,base_location,district,state,latitude,longitude,rescue_boats_count,deep_divers_count,inflatable_rafts_count,satellite_comms_ready,helpline_24x7,operational_jurisdiction
+RESP-01,5th Battalion NDRF HQ,NDRF (National Disaster Response Force),Sudumbare,Pune,Maharashtra,18.721,73.714,45,60,30,1,+91-2114-247000,Maharashtra Western Ghats / Konkan / Goa
+RESP-02,NDRF Regional Response Centre Andheri,NDRF,Andheri,Mumbai Suburban,Maharashtra,19.119,72.846,20,25,15,1,+91-22-26840000,Mumbai Metropolitan Region / Thane / Palghar
+RESP-03,Maharashtra SDRF Battalion 1,SDRF (State Disaster Response Force),Daund,Pune,Maharashtra,18.462,74.581,25,30,20,1,+91-2117-262300,Pune / Satara / Solapur / Kolhapur
+RESP-04,Maharashtra SDRF Battalion 2,SDRF,Nagpur,Nagpur,Maharashtra,21.1458,79.0882,25,30,20,1,+91-712-2560000,Vidarbha / Marathwada / Central Maharashtra
+RESP-05,Indian Navy Flood Rescue Unit INS Shivaji,Indian Navy,Lonavala,Pune,Maharashtra,18.734,73.412,15,40,12,1,+91-2114-284000,Ghat Escarpments / Western Rivers
+RESP-06,Indian Coast Guard Station Murud,Indian Coast Guard,Murud,Raigad,Maharashtra,18.324,72.964,12,20,10,1,+91-2144-274100,Konkan Coastline / Savitri & Amba Estuaries
+RESP-07,District Emergency Operations Centre (DEOC) Satara,DEOC,Satara,Satara,Maharashtra,17.685,74.005,8,12,8,1,1077,Satara / Koyna Catchment
+RESP-08,District Emergency Operations Centre (DEOC) Kolhapur,DEOC,Kolhapur,Kolhapur,Maharashtra,16.705,74.243,10,16,10,1,1077,Kolhapur / Panchganga Basin
+RESP-09,District Emergency Operations Centre (DEOC) Raigad,DEOC,Alibag,Raigad,Maharashtra,18.641,72.872,12,18,12,1,1077,Raigad / Mahad / Savitri Basin
+RESP-10,1st Battalion NDRF HQ,NDRF,Patgaon,Kamrup Metropolitan,Assam,26.115,91.642,50,65,35,1,+91-361-2840284,Assam / Northeast Flood Pluri-Basin

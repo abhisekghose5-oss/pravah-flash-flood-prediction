@@ -1,0 +1,645 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7486,
+          17.3995
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-01",
+        "dam_name": "Koyna Dam",
+        "river": "Koyna",
+        "basin": "Krishna",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "latitude": 17.3995,
+        "longitude": 73.7486,
+        "gross_storage_capacity_mcm": 2797.4,
+        "full_reservoir_level_frl_m": 657.91,
+        "crest_level_m": 649.0,
+        "live_storage_capacity_mcm": 2650.0,
+        "current_storage_pct": 89.5,
+        "inflow_cumecs": 1450.0,
+        "spillway_outflow_cumecs": 750.0,
+        "gate_opening_status": "4 Gates Open 1.5m",
+        "downstream_gauge_id": "654",
+        "distance_to_downstream_gauge_km": 42.5,
+        "flood_cushion_remaining_pct": 10.5,
+        "emergency_release_travel_time_hrs": 3.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.993,
+          16.411
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-02",
+        "dam_name": "Radhanagari Dam",
+        "river": "Bhogawati",
+        "basin": "Krishna",
+        "district": "Kolhapur",
+        "state": "Maharashtra",
+        "latitude": 16.411,
+        "longitude": 73.993,
+        "gross_storage_capacity_mcm": 236.8,
+        "full_reservoir_level_frl_m": 548.64,
+        "crest_level_m": 542.5,
+        "live_storage_capacity_mcm": 219.0,
+        "current_storage_pct": 94.2,
+        "inflow_cumecs": 620.0,
+        "spillway_outflow_cumecs": 480.0,
+        "gate_opening_status": "Automatic Gates Tripped",
+        "downstream_gauge_id": "643",
+        "distance_to_downstream_gauge_km": 58.0,
+        "flood_cushion_remaining_pct": 5.8,
+        "emergency_release_travel_time_hrs": 4.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7633,
+          18.4419
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-03",
+        "dam_name": "Khadakwasla Dam",
+        "river": "Mutha",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.4419,
+        "longitude": 73.7633,
+        "gross_storage_capacity_mcm": 86.0,
+        "full_reservoir_level_frl_m": 582.47,
+        "crest_level_m": 576.0,
+        "live_storage_capacity_mcm": 56.0,
+        "current_storage_pct": 88.4,
+        "inflow_cumecs": 450.0,
+        "spillway_outflow_cumecs": 380.0,
+        "gate_opening_status": "6 Gates Open 1.0m",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 68.0,
+        "flood_cushion_remaining_pct": 11.6,
+        "emergency_release_travel_time_hrs": 5.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.619,
+          18.3756
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-04",
+        "dam_name": "Panshet Dam",
+        "river": "Ambi",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.3756,
+        "longitude": 73.619,
+        "gross_storage_capacity_mcm": 303.0,
+        "full_reservoir_level_frl_m": 636.42,
+        "crest_level_m": 628.0,
+        "live_storage_capacity_mcm": 294.0,
+        "current_storage_pct": 91.0,
+        "inflow_cumecs": 510.0,
+        "spillway_outflow_cumecs": 280.0,
+        "gate_opening_status": "Radial Gates Active",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 79.0,
+        "flood_cushion_remaining_pct": 9.0,
+        "emergency_release_travel_time_hrs": 6.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.593,
+          18.398
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-05",
+        "dam_name": "Varasgaon Dam",
+        "river": "Mose",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.398,
+        "longitude": 73.593,
+        "gross_storage_capacity_mcm": 374.0,
+        "full_reservoir_level_frl_m": 638.0,
+        "crest_level_m": 629.5,
+        "live_storage_capacity_mcm": 362.0,
+        "current_storage_pct": 92.5,
+        "inflow_cumecs": 580.0,
+        "spillway_outflow_cumecs": 320.0,
+        "gate_opening_status": "Radial Gates Active",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 82.0,
+        "flood_cushion_remaining_pct": 7.5,
+        "emergency_release_travel_time_hrs": 6.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.498,
+          18.528
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-06",
+        "dam_name": "Mulshi Dam",
+        "river": "Mula",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.528,
+        "longitude": 73.498,
+        "gross_storage_capacity_mcm": 572.0,
+        "full_reservoir_level_frl_m": 607.16,
+        "crest_level_m": 601.0,
+        "live_storage_capacity_mcm": 523.0,
+        "current_storage_pct": 87.0,
+        "inflow_cumecs": 690.0,
+        "spillway_outflow_cumecs": 410.0,
+        "gate_opening_status": "Spillway Crest Flow",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 94.0,
+        "flood_cushion_remaining_pct": 13.0,
+        "emergency_release_travel_time_hrs": 7.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.489,
+          18.665
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-07",
+        "dam_name": "Pawana Dam",
+        "river": "Pawana",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.665,
+        "longitude": 73.489,
+        "gross_storage_capacity_mcm": 271.0,
+        "full_reservoir_level_frl_m": 612.95,
+        "crest_level_m": 606.0,
+        "live_storage_capacity_mcm": 241.0,
+        "current_storage_pct": 86.5,
+        "inflow_cumecs": 410.0,
+        "spillway_outflow_cumecs": 210.0,
+        "gate_opening_status": "2 Gates Open",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 88.0,
+        "flood_cushion_remaining_pct": 13.5,
+        "emergency_release_travel_time_hrs": 6.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.856,
+          18.172
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-08",
+        "dam_name": "Bhatghar Dam",
+        "river": "Velvandi",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.172,
+        "longitude": 73.856,
+        "gross_storage_capacity_mcm": 672.0,
+        "full_reservoir_level_frl_m": 623.28,
+        "crest_level_m": 615.0,
+        "live_storage_capacity_mcm": 666.0,
+        "current_storage_pct": 90.2,
+        "inflow_cumecs": 720.0,
+        "spillway_outflow_cumecs": 460.0,
+        "gate_opening_status": "Automatic Siphon Open",
+        "downstream_gauge_id": "682",
+        "distance_to_downstream_gauge_km": 74.0,
+        "flood_cushion_remaining_pct": 9.8,
+        "emergency_release_travel_time_hrs": 5.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.098,
+          18.148
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-09",
+        "dam_name": "Veer Dam",
+        "river": "Nira",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.148,
+        "longitude": 74.098,
+        "gross_storage_capacity_mcm": 266.0,
+        "full_reservoir_level_frl_m": 579.5,
+        "crest_level_m": 573.0,
+        "live_storage_capacity_mcm": 266.0,
+        "current_storage_pct": 93.0,
+        "inflow_cumecs": 890.0,
+        "spillway_outflow_cumecs": 620.0,
+        "gate_opening_status": "Radial Gates Full Open",
+        "downstream_gauge_id": "682",
+        "distance_to_downstream_gauge_km": 51.0,
+        "flood_cushion_remaining_pct": 7.0,
+        "emergency_release_travel_time_hrs": 3.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.829,
+          17.989
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-10",
+        "dam_name": "Dhom Dam",
+        "river": "Krishna",
+        "basin": "Krishna",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "latitude": 17.989,
+        "longitude": 73.829,
+        "gross_storage_capacity_mcm": 382.0,
+        "full_reservoir_level_frl_m": 746.76,
+        "crest_level_m": 738.0,
+        "live_storage_capacity_mcm": 331.0,
+        "current_storage_pct": 85.2,
+        "inflow_cumecs": 520.0,
+        "spillway_outflow_cumecs": 310.0,
+        "gate_opening_status": "3 Gates Open 1.0m",
+        "downstream_gauge_id": "684",
+        "distance_to_downstream_gauge_km": 62.0,
+        "flood_cushion_remaining_pct": 14.8,
+        "emergency_release_travel_time_hrs": 4.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.916,
+          17.742
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-11",
+        "dam_name": "Kanher Dam",
+        "river": "Venna",
+        "basin": "Krishna",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "latitude": 17.742,
+        "longitude": 73.916,
+        "gross_storage_capacity_mcm": 286.0,
+        "full_reservoir_level_frl_m": 690.0,
+        "crest_level_m": 682.0,
+        "live_storage_capacity_mcm": 272.0,
+        "current_storage_pct": 88.0,
+        "inflow_cumecs": 440.0,
+        "spillway_outflow_cumecs": 260.0,
+        "gate_opening_status": "2 Gates Open 1.0m",
+        "downstream_gauge_id": "684",
+        "distance_to_downstream_gauge_km": 48.0,
+        "flood_cushion_remaining_pct": 12.0,
+        "emergency_release_travel_time_hrs": 3.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.118,
+          18.075
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-12",
+        "dam_name": "Ujani Dam",
+        "river": "Bhima",
+        "basin": "Krishna",
+        "district": "Solapur",
+        "state": "Maharashtra",
+        "latitude": 18.075,
+        "longitude": 75.118,
+        "gross_storage_capacity_mcm": 3170.0,
+        "full_reservoir_level_frl_m": 496.83,
+        "crest_level_m": 491.0,
+        "live_storage_capacity_mcm": 1517.0,
+        "current_storage_pct": 96.0,
+        "inflow_cumecs": 3400.0,
+        "spillway_outflow_cumecs": 2800.0,
+        "gate_opening_status": "16 Gates Open 2.0m",
+        "downstream_gauge_id": "612",
+        "distance_to_downstream_gauge_km": 78.0,
+        "flood_cushion_remaining_pct": 4.0,
+        "emergency_release_travel_time_hrs": 5.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.248,
+          15.756
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-13",
+        "dam_name": "Tillari Dam",
+        "river": "Tillari",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Kolhapur",
+        "state": "Maharashtra",
+        "latitude": 15.756,
+        "longitude": 74.248,
+        "gross_storage_capacity_mcm": 462.0,
+        "full_reservoir_level_frl_m": 113.3,
+        "crest_level_m": 105.0,
+        "live_storage_capacity_mcm": 447.0,
+        "current_storage_pct": 84.0,
+        "inflow_cumecs": 380.0,
+        "spillway_outflow_cumecs": 190.0,
+        "gate_opening_status": "Spillway Active",
+        "downstream_gauge_id": "596",
+        "distance_to_downstream_gauge_km": 65.0,
+        "flood_cushion_remaining_pct": 16.0,
+        "emergency_release_travel_time_hrs": 4.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.542,
+          19.789
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-14",
+        "dam_name": "Upper Vaitarna Dam",
+        "river": "Vaitarna",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Nashik",
+        "state": "Maharashtra",
+        "latitude": 19.789,
+        "longitude": 73.542,
+        "gross_storage_capacity_mcm": 331.0,
+        "full_reservoir_level_frl_m": 603.5,
+        "crest_level_m": 597.0,
+        "live_storage_capacity_mcm": 329.0,
+        "current_storage_pct": 89.0,
+        "inflow_cumecs": 540.0,
+        "spillway_outflow_cumecs": 310.0,
+        "gate_opening_status": "Radial Gates Active",
+        "downstream_gauge_id": "585",
+        "distance_to_downstream_gauge_km": 46.0,
+        "flood_cushion_remaining_pct": 11.0,
+        "emergency_release_travel_time_hrs": 3.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.421,
+          19.521
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-15",
+        "dam_name": "Bhatsa Dam",
+        "river": "Bhatsa",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Thane",
+        "state": "Maharashtra",
+        "latitude": 19.521,
+        "longitude": 73.421,
+        "gross_storage_capacity_mcm": 976.0,
+        "full_reservoir_level_frl_m": 142.07,
+        "crest_level_m": 135.0,
+        "live_storage_capacity_mcm": 942.0,
+        "current_storage_pct": 93.5,
+        "inflow_cumecs": 1120.0,
+        "spillway_outflow_cumecs": 780.0,
+        "gate_opening_status": "5 Gates Open 1.5m",
+        "downstream_gauge_id": "668",
+        "distance_to_downstream_gauge_km": 34.0,
+        "flood_cushion_remaining_pct": 6.5,
+        "emergency_release_travel_time_hrs": 2.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.342,
+          19.192
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-16",
+        "dam_name": "Barvi Dam",
+        "river": "Barvi",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Thane",
+        "state": "Maharashtra",
+        "latitude": 19.192,
+        "longitude": 73.342,
+        "gross_storage_capacity_mcm": 338.0,
+        "full_reservoir_level_frl_m": 72.6,
+        "crest_level_m": 68.0,
+        "live_storage_capacity_mcm": 335.0,
+        "current_storage_pct": 95.0,
+        "inflow_cumecs": 640.0,
+        "spillway_outflow_cumecs": 490.0,
+        "gate_opening_status": "Radial Gates Full Open",
+        "downstream_gauge_id": "668",
+        "distance_to_downstream_gauge_km": 14.5,
+        "flood_cushion_remaining_pct": 5.0,
+        "emergency_release_travel_time_hrs": 1.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.432,
+          19.702
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-17",
+        "dam_name": "Middle Vaitarna Dam",
+        "river": "Vaitarna",
+        "basin": "West flowing rivers from Tapi of Tadri",
+        "district": "Thane",
+        "state": "Maharashtra",
+        "latitude": 19.702,
+        "longitude": 73.432,
+        "gross_storage_capacity_mcm": 455.0,
+        "full_reservoir_level_frl_m": 285.0,
+        "crest_level_m": 277.0,
+        "live_storage_capacity_mcm": 449.0,
+        "current_storage_pct": 91.2,
+        "inflow_cumecs": 780.0,
+        "spillway_outflow_cumecs": 520.0,
+        "gate_opening_status": "Crest Spillway Open",
+        "downstream_gauge_id": "668",
+        "distance_to_downstream_gauge_km": 52.0,
+        "flood_cushion_remaining_pct": 8.8,
+        "emergency_release_travel_time_hrs": 3.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.541,
+          18.529
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-18",
+        "dam_name": "Temghar Dam",
+        "river": "Mutha",
+        "basin": "Krishna",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "latitude": 18.529,
+        "longitude": 73.541,
+        "gross_storage_capacity_mcm": 107.0,
+        "full_reservoir_level_frl_m": 705.0,
+        "crest_level_m": 698.0,
+        "live_storage_capacity_mcm": 97.0,
+        "current_storage_pct": 82.5,
+        "inflow_cumecs": 290.0,
+        "spillway_outflow_cumecs": 140.0,
+        "gate_opening_status": "Controlled Sluice Open",
+        "downstream_gauge_id": "640",
+        "distance_to_downstream_gauge_km": 84.0,
+        "flood_cushion_remaining_pct": 17.5,
+        "emergency_release_travel_time_hrs": 6.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.521,
+          25.968
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-NE01",
+        "dam_name": "Karbi Langpi Dam",
+        "river": "Borpani",
+        "basin": "Brahmaputra",
+        "district": "Karbi Anglong",
+        "state": "Assam",
+        "latitude": 25.968,
+        "longitude": 92.521,
+        "gross_storage_capacity_mcm": 128.0,
+        "full_reservoir_level_frl_m": 315.0,
+        "crest_level_m": 305.0,
+        "live_storage_capacity_mcm": 115.0,
+        "current_storage_pct": 88.0,
+        "inflow_cumecs": 420.0,
+        "spillway_outflow_cumecs": 280.0,
+        "gate_opening_status": "Radial Spillway Open",
+        "downstream_gauge_id": "NE-01",
+        "distance_to_downstream_gauge_km": 72.0,
+        "flood_cushion_remaining_pct": 12.0,
+        "emergency_release_travel_time_hrs": 5.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          94.262,
+          27.553
+        ]
+      },
+      "properties": {
+        "dam_id": "DAM-NE02",
+        "dam_name": "Subansiri Lower",
+        "river": "Subansiri",
+        "basin": "Brahmaputra",
+        "district": "Dhemaji",
+        "state": "Assam",
+        "latitude": 27.553,
+        "longitude": 94.262,
+        "gross_storage_capacity_mcm": 1365.0,
+        "full_reservoir_level_frl_m": 205.0,
+        "crest_level_m": 195.0,
+        "live_storage_capacity_mcm": 626.0,
+        "current_storage_pct": 76.5,
+        "inflow_cumecs": 2800.0,
+        "spillway_outflow_cumecs": 1650.0,
+        "gate_opening_status": "Spillway Regulated",
+        "downstream_gauge_id": "NE-02",
+        "distance_to_downstream_gauge_km": 55.0,
+        "flood_cushion_remaining_pct": 23.5,
+        "emergency_release_travel_time_hrs": 4.0
+      }
+    }
+  ]
+}

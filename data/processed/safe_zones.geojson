@@ -1,0 +1,677 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8445,
+          18.5312
+        ]
+      },
+      "properties": {
+        "id": 1,
+        "name": "Shivaji Nagar Elevated Disaster Shelter",
+        "category": "Elevated Shelter",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "640",
+        "latitude": 18.5312,
+        "longitude": 73.8445,
+        "elevation_amsl_m": 568.0,
+        "capacity_persons": 650,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-20-25501111",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8192,
+          18.4789
+        ]
+      },
+      "properties": {
+        "id": 2,
+        "name": "Sinhagad Road Government Higher Secondary School",
+        "category": "Government School",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "640",
+        "latitude": 18.4789,
+        "longitude": 73.8192,
+        "elevation_amsl_m": 572.0,
+        "capacity_persons": 500,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-20-24330200",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.4091,
+          18.7557
+        ]
+      },
+      "properties": {
+        "id": 3,
+        "name": "Lonavala High Ground Emergency Refuge Center",
+        "category": "Elevated Shelter",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "668",
+        "latitude": 18.7557,
+        "longitude": 73.4091,
+        "elevation_amsl_m": 635.0,
+        "capacity_persons": 1200,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2114-273030",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.2567,
+          16.7142
+        ]
+      },
+      "properties": {
+        "id": 4,
+        "name": "Panchganga Zilla Parishad Model School",
+        "category": "Government School",
+        "district": "Kolhapur",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "643",
+        "latitude": 16.7142,
+        "longitude": 74.2567,
+        "elevation_amsl_m": 554.0,
+        "capacity_persons": 450,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 0,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-231-2651234",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.195,
+          17.298
+        ]
+      },
+      "properties": {
+        "id": 5,
+        "name": "Karad Government Polytechnic High Ground Base",
+        "category": "Government College",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "684",
+        "latitude": 17.298,
+        "longitude": 74.195,
+        "elevation_amsl_m": 578.0,
+        "capacity_persons": 850,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2164-222456",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.472,
+          18.0985
+        ]
+      },
+      "properties": {
+        "id": 6,
+        "name": "Mahad Tehsil Elevated Multipurpose Cyclone/Flood Shelter",
+        "category": "Elevated Shelter",
+        "district": "Raigad",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "602",
+        "latitude": 18.0985,
+        "longitude": 73.472,
+        "elevation_amsl_m": 24.0,
+        "capacity_persons": 750,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2145-222123",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.518,
+          17.528
+        ]
+      },
+      "properties": {
+        "id": 7,
+        "name": "Chiplun DBJ College Elevated Campus",
+        "category": "Government College",
+        "district": "Ratnagiri",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "596",
+        "latitude": 17.528,
+        "longitude": 73.518,
+        "elevation_amsl_m": 32.0,
+        "capacity_persons": 1100,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2355-252088",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.162,
+          18.528
+        ]
+      },
+      "properties": {
+        "id": 8,
+        "name": "Nagothane Community Health Center Emergency Refuge",
+        "category": "Hospital/Refuge",
+        "district": "Raigad",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "646",
+        "latitude": 18.528,
+        "longitude": 73.162,
+        "elevation_amsl_m": 18.0,
+        "capacity_persons": 400,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2144-232100",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.118,
+          18.742
+        ]
+      },
+      "properties": {
+        "id": 9,
+        "name": "Pen High School Ground & Indoor Hall",
+        "category": "Government School",
+        "district": "Raigad",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "648",
+        "latitude": 18.742,
+        "longitude": 73.118,
+        "elevation_amsl_m": 22.0,
+        "capacity_persons": 550,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 0,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2143-252200",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.262,
+          19.168
+        ]
+      },
+      "properties": {
+        "id": 10,
+        "name": "Badlapur East Zilla Parishad High Ground Refuge",
+        "category": "Government School",
+        "district": "Thane",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "668",
+        "latitude": 19.168,
+        "longitude": 73.262,
+        "elevation_amsl_m": 28.0,
+        "capacity_persons": 600,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-251-2690123",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.134,
+          19.221
+        ]
+      },
+      "properties": {
+        "id": 11,
+        "name": "Kalyan-Dombivli Municipal Sports Complex",
+        "category": "Sports Stadium",
+        "district": "Thane",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "668",
+        "latitude": 19.221,
+        "longitude": 73.134,
+        "elevation_amsl_m": 30.0,
+        "capacity_persons": 1500,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-251-2200100",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.004,
+          17.689
+        ]
+      },
+      "properties": {
+        "id": 12,
+        "name": "Satara Chhatrapati Shivaji College Hall",
+        "category": "Government College",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "654",
+        "latitude": 17.689,
+        "longitude": 74.004,
+        "elevation_amsl_m": 685.0,
+        "capacity_persons": 900,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2162-234500",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.642,
+          16.835
+        ]
+      },
+      "properties": {
+        "id": 13,
+        "name": "Sangli Miraj Government Medical College Ground",
+        "category": "Hospital/Medical Campus",
+        "district": "Sangli",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "681",
+        "latitude": 16.835,
+        "longitude": 74.642,
+        "elevation_amsl_m": 558.0,
+        "capacity_persons": 1350,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-233-2232000",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.612,
+          16.691
+        ]
+      },
+      "properties": {
+        "id": 14,
+        "name": "Kurundwad Municipal Council High Ground Hall",
+        "category": "Civic Hall",
+        "district": "Kolhapur",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "678",
+        "latitude": 16.691,
+        "longitude": 74.612,
+        "elevation_amsl_m": 548.0,
+        "capacity_persons": 480,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 0,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2322-244100",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.774,
+          19.988
+        ]
+      },
+      "properties": {
+        "id": 15,
+        "name": "Nashik Golf Club Elevated Relief Staging Base",
+        "category": "High-Ground Complex",
+        "district": "Nashik",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "645",
+        "latitude": 19.988,
+        "longitude": 73.774,
+        "elevation_amsl_m": 582.0,
+        "capacity_persons": 1400,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-253-2578500",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.475,
+          19.892
+        ]
+      },
+      "properties": {
+        "id": 16,
+        "name": "Kopergaon Shirdi Sai Trust Multi-Hall Shelter",
+        "category": "Civic Hall",
+        "district": "Ahmednagar",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "635",
+        "latitude": 19.892,
+        "longitude": 74.475,
+        "elevation_amsl_m": 512.0,
+        "capacity_persons": 1600,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2423-258500",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          74.588,
+          18.465
+        ]
+      },
+      "properties": {
+        "id": 17,
+        "name": "Daund Railway High School Ground Refuge",
+        "category": "Government School",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "640",
+        "latitude": 18.465,
+        "longitude": 74.588,
+        "elevation_amsl_m": 518.0,
+        "capacity_persons": 520,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 0,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2117-262100",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.912,
+          17.665
+        ]
+      },
+      "properties": {
+        "id": 18,
+        "name": "Solapur District Sports Stadium Elevated Pavilion",
+        "category": "Sports Stadium",
+        "district": "Solapur",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "612",
+        "latitude": 17.665,
+        "longitude": 75.912,
+        "elevation_amsl_m": 470.0,
+        "capacity_persons": 1800,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-217-2740300",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          75.025,
+          18.118
+        ]
+      },
+      "properties": {
+        "id": 19,
+        "name": "Indapur Tehsil High Ground Relief Center",
+        "category": "Government Refuge",
+        "district": "Pune",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "642",
+        "latitude": 18.118,
+        "longitude": 75.025,
+        "elevation_amsl_m": 520.0,
+        "capacity_persons": 700,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2111-223100",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.759,
+          17.408
+        ]
+      },
+      "properties": {
+        "id": 20,
+        "name": "Koynanagar Earthquake & Disaster Resistant Refuge",
+        "category": "Specialized Refuge",
+        "district": "Satara",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "654",
+        "latitude": 17.408,
+        "longitude": 73.759,
+        "elevation_amsl_m": 660.0,
+        "capacity_persons": 650,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-2167-244200",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.565,
+          19.698
+        ]
+      },
+      "properties": {
+        "id": 21,
+        "name": "Igatpuri High Altitude Relief Camp",
+        "category": "Government School",
+        "district": "Nashik",
+        "state": "Maharashtra",
+        "nearby_catchment_gauge_id": "585",
+        "latitude": 19.698,
+        "longitude": 73.565,
+        "elevation_amsl_m": 605.0,
+        "capacity_persons": 750,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-2553-244100",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.752,
+          26.189
+        ]
+      },
+      "properties": {
+        "id": 22,
+        "name": "Guwahati Cotton University Elevated Refuge",
+        "category": "University Campus",
+        "district": "Kamrup Metropolitan",
+        "state": "Assam",
+        "nearby_catchment_gauge_id": "NE-01",
+        "latitude": 26.189,
+        "longitude": 91.752,
+        "elevation_amsl_m": 58.0,
+        "capacity_persons": 2000,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-361-2735100",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          94.921,
+          27.482
+        ]
+      },
+      "properties": {
+        "id": 23,
+        "name": "Dibrugarh DHSK College Safe Evacuation Hall",
+        "category": "College Campus",
+        "district": "Dibrugarh",
+        "state": "Assam",
+        "nearby_catchment_gauge_id": "NE-02",
+        "latitude": 27.482,
+        "longitude": 94.921,
+        "elevation_amsl_m": 112.0,
+        "capacity_persons": 1200,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 0,
+        "nodal_officer_contact": "+91-373-2321500",
+        "accessibility_status": "HIGH_GROUND_SAFE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.751,
+          24.685
+        ]
+      },
+      "properties": {
+        "id": 24,
+        "name": "Silchar Assam University Sports Complex Refuge",
+        "category": "University Complex",
+        "district": "Cachar",
+        "state": "Assam",
+        "nearby_catchment_gauge_id": "NE-03",
+        "latitude": 24.685,
+        "longitude": 92.751,
+        "elevation_amsl_m": 48.0,
+        "capacity_persons": 1500,
+        "has_medical_facility": 1,
+        "has_potable_water": 1,
+        "has_emergency_power_backup": 1,
+        "has_helipad_access": 1,
+        "nodal_officer_contact": "+91-3842-270800",
+        "accessibility_status": "ELEVATED_STAGING"
+      }
+    }
+  ]
+}

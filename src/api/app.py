@@ -932,6 +932,115 @@ async def report_flood_with_photo(
 # =============================================================================
 import math
 
+SAFE_ZONES_CSV = REPO_ROOT / "data" / "processed" / "safe_zones.csv"
+SAFE_ZONES_GEOJSON = REPO_ROOT / "data" / "processed" / "safe_zones.geojson"
+DAMS_GEOJSON = REPO_ROOT / "data" / "processed" / "dams_reservoirs.geojson"
+DAMS_CSV = REPO_ROOT / "data" / "processed" / "dams_reservoirs.csv"
+RIVER_LEVELS_CSV = REPO_ROOT / "data" / "processed" / "river_level_telemetry.csv"
+TERRAIN_CSV = REPO_ROOT / "data" / "processed" / "mountain_terrain_features.csv"
+TERRAIN_GEOJSON = REPO_ROOT / "data" / "processed" / "mountain_peaks_passes.geojson"
+SOIL_CSV = REPO_ROOT / "data" / "processed" / "soil_hydrology_features.csv"
+CONFLUENCES_GEOJSON = REPO_ROOT / "data" / "processed" / "drainage_confluences.geojson"
+DISASTER_RESP_CSV = REPO_ROOT / "data" / "processed" / "disaster_response_units.csv"
+
+def load_all_safe_zones() -> List[Dict[str, Any]]:
+    if SAFE_ZONES_CSV.exists():
+        try:
+            import pandas as pd
+            df = pd.read_csv(SAFE_ZONES_CSV)
+            camps = []
+            for _, r in df.iterrows():
+                camp = r.to_dict()
+                camp["type"] = str(camp.get("type") or camp.get("category") or "Elevated Shelter")
+                camp["capacity"] = int(camp.get("capacity_persons", camp.get("capacity", 500)))
+                camps.append(camp)
+            return camps
+        except Exception as e:
+            logger.warning("Could not load safe_zones.csv: %s", e)
+    return [
+        {
+            "id": 1,
+            "name": "Shivaji Nagar Elevated Disaster Shelter",
+            "latitude": 18.5312,
+            "longitude": 73.8445,
+            "capacity": 650,
+            "type": "Elevated Shelter",
+        },
+        {
+            "id": 2,
+            "name": "Sinhagad Road Government Higher Secondary School",
+            "latitude": 18.4789,
+            "longitude": 73.8192,
+            "capacity": 500,
+            "type": "Government School",
+        },
+        {
+            "id": 3,
+            "name": "Lonavala High Ground Emergency Refuge Center",
+            "latitude": 18.7557,
+            "longitude": 73.4091,
+            "capacity": 1200,
+            "type": "Elevated Shelter",
+        },
+        {
+            "id": 4,
+            "name": "Panchganga Zilla Parishad Model School",
+            "latitude": 18.3842,
+            "longitude": 73.8567,
+            "capacity": 450,
+            "type": "Government School",
+        },
+    ]
+
+RELIEF_CAMPS: List[Dict[str, Any]] = load_all_safe_zones()
+
+
+def calculate_nearest_camp(lat: float, lng: float) -> tuple[Dict[str, Any], float]:
+    """
+    Computes the shortest great-circle distance between a given GPS coordinate
+    and all registered relief camps using the spherical Haversine formula.
+    """
+    if not RELIEF_CAMPS:
+        raise ValueError("No relief camps are currently registered.")
+
+    earth_radius_km = 6371.0
+    user_lat_rad = math.radians(lat)
+    user_lng_rad = math.radians(lng)
+
+    closest_camp = None
+    min_dist_km = float("inf")
+
+    for camp in RELIEF_CAMPS:
+        camp_lat_rad = math.radians(camp["latitude"])
+        camp_lng_rad = math.radians(camp["longitude"])
+
+        dlat = camp_lat_rad - user_lat_rad
+        dlng = camp_lng_rad - user_lng_rad
+
+        a = (
+            math.sin(dlat / 2.0) ** 2
+            + math.cos(user_lat_rad)
+            * math.cos(camp_lat_rad)
+            * math.sin(dlng / 2.0) ** 2
+        )
+        c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+        dist_km = earth_radius_km * c
+
+        if dist_km < min_dist_km:
+            min_dist_km = dist_km
+            closest_camp = camp
+
+    return closest_camp, round(min_dist_km, 2)
+
+
+@app.get("/api/safe-zones", response_model=List[Dict[str, Any]], tags=["Evacuation"])
+def get_safe_zones() -> List[Dict[str, Any]]:
+    """
+    Retrieve the directory of all operational disaster relief shelters,
+    elevated refuges, and emergency staging schools.
+    """
+    return RELIEF_CAMPS
+
 
 @app.get("/api/v1/evacuation/nearest", tags=["Evacuation"])
 @app.get("/api/evacuation-route", tags=["Evacuation"])
@@ -1155,6 +1264,88 @@ def get_latest_radar_scan(station_id: Optional[str] = Query("DWR_GUWAHATI")) -> 
 
 
 # =============================================================================
+# Additional Hydrological, Topographic & Disaster Intelligence Endpoints
+# =============================================================================
+
+@app.get("/api/v1/dams", tags=["Hydrology & Reservoirs"])
+def get_dams(format: str = Query("geojson", description="'geojson' or 'json'")) -> Any:
+    """Returns directory and live status of major Western Ghats and Northeast dams and reservoirs."""
+    if format == "geojson" and DAMS_GEOJSON.exists():
+        with open(DAMS_GEOJSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    elif DAMS_CSV.exists():
+        import pandas as pd
+        return pd.read_csv(DAMS_CSV).to_dict(orient="records")
+    return {"type": "FeatureCollection", "features": []}
+
+
+@app.get("/api/v1/river-levels", tags=["Hydrology & Reservoirs"])
+def get_river_levels(gauge_id: Optional[str] = Query(None, description="Optional CWC GaugeID filter")) -> List[Dict[str, Any]]:
+    """Returns daily and real-time river stage telemetry, freeboard margins, and alert statuses."""
+    if RIVER_LEVELS_CSV.exists():
+        import pandas as pd
+        df = pd.read_csv(RIVER_LEVELS_CSV)
+        if gauge_id:
+            gid = clean_gauge_id(gauge_id)
+            df = df[df["GaugeID"].astype(str).str.contains(gid)]
+        return df.to_dict(orient="records")
+    return []
+
+
+@app.get("/api/v1/terrain", tags=["Topography & Orography"])
+def get_terrain_data(gauge_id: Optional[str] = Query(None, description="Optional CWC GaugeID filter")) -> List[Dict[str, Any]]:
+    """Returns catchment relief, slope steepness gradients, and Topographic Wetness Index (TWI)."""
+    if TERRAIN_CSV.exists():
+        import pandas as pd
+        df = pd.read_csv(TERRAIN_CSV)
+        if gauge_id:
+            gid = clean_gauge_id(gauge_id)
+            df = df[df["GaugeID"].astype(str).str.contains(gid)]
+        return df.to_dict(orient="records")
+    return []
+
+
+@app.get("/api/v1/terrain/peaks-passes", tags=["Topography & Orography"])
+def get_peaks_and_passes() -> Any:
+    """Returns GeoJSON FeatureCollection of major mountain peaks, escarpments, and Ghat passes."""
+    if TERRAIN_GEOJSON.exists():
+        with open(TERRAIN_GEOJSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"type": "FeatureCollection", "features": []}
+
+
+@app.get("/api/v1/soil", tags=["Soil Hydrology"])
+def get_soil_profiles(gauge_id: Optional[str] = Query(None, description="Optional CWC GaugeID filter")) -> List[Dict[str, Any]]:
+    """Returns soil hydraulic conductivity (Ksat), Hydrologic Soil Groups, and SCS Curve Numbers."""
+    if SOIL_CSV.exists():
+        import pandas as pd
+        df = pd.read_csv(SOIL_CSV)
+        if gauge_id:
+            gid = clean_gauge_id(gauge_id)
+            df = df[df["GaugeID"].astype(str).str.contains(gid)]
+        return df.to_dict(orient="records")
+    return []
+
+
+@app.get("/api/v1/confluences", tags=["Hydrology & Reservoirs"])
+def get_river_confluences() -> Any:
+    """Returns GeoJSON FeatureCollection of high-risk river confluences and backwater bottlenecks."""
+    if CONFLUENCES_GEOJSON.exists():
+        with open(CONFLUENCES_GEOJSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"type": "FeatureCollection", "features": []}
+
+
+@app.get("/api/v1/disaster-response", tags=["Emergency Response"])
+def get_disaster_response_units() -> List[Dict[str, Any]]:
+    """Returns emergency response infrastructure: NDRF, SDRF, Coast Guard/Navy, and DEOC units."""
+    if DISASTER_RESP_CSV.exists():
+        import pandas as pd
+        return pd.read_csv(DISASTER_RESP_CSV).to_dict(orient="records")
+    return []
+
+
+# =============================================================================
 # Crowdsourced Community Reporting & Intelligence Module (Modular Extension)
 # =============================================================================
 from src.community.report_service import init_community_tables
@@ -1255,5 +1446,6 @@ from src.integration.routes.integration_routes import router as platform_integra
 
 # Register consolidated workflows and unified health under /api/integration
 app.include_router(platform_integration_router)
+
 
 

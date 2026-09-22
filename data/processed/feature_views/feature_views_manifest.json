@@ -1,0 +1,89 @@
+{
+  "join_key": "GaugeID",
+  "source_files": [
+    "target_catchment_characteristics.csv",
+    "target_catchment_spatial_features.csv"
+  ],
+  "canonical_inputs_unchanged": true,
+  "views": {
+    "terrain_and_morphometry.csv": {
+      "rows": 20,
+      "columns": [
+        "GaugeID",
+        "dem_elev_mean_m",
+        "dem_elev_min_m",
+        "dem_elev_max_m",
+        "dem_elev_std_m",
+        "terrain_slope_mean_deg",
+        "terrain_aspect_deg_mean",
+        "twi_mean",
+        "tri_mean",
+        "Catchment Relief",
+        "Drainage Area",
+        "Drainage Density",
+        "Stream Order",
+        "Ruggedness Number"
+      ]
+    },
+    "soil_landcover_geology.csv": {
+      "rows": 20,
+      "columns": [
+        "GaugeID",
+        "Soil type",
+        "Land cover",
+        "lithology type"
+      ]
+    },
+    "atmospheric_climate.csv": {
+      "rows": 20,
+      "columns": [
+        "GaugeID",
+        "Annual Mean Temperature",
+        "Mean Diurnal Range",
+        "Isothermality",
+        "Temperature Seasonality",
+        "Max Temperature of Warmest Month",
+        "Min Temperature of Coldest Month",
+        "Temperature Annual Range",
+        "Mean Temperature of Wettest Quarter",
+        "Mean Temperature of Driest Quarter",
+        "Mean Temperature of Warmest Quarter",
+        "Mean Temperature of Coldest Quarter",
+        "Annual Precipitation",
+        "Precipitation of Wettest Month",
+        "Precipitation of Driest Month",
+        "Precipitation Seasonality",
+        "Precipitation of Wettest Quarter",
+        "Precipitation of Driest Quarter",
+        "Precipitation of Warmest Quarter",
+        "Precipitation of Coldest Quarter",
+        "KoppenGeiger Climate Type"
+      ]
+    },
+    "population_landuse_infrastructure.csv": {
+      "rows": 20,
+      "columns": [
+        "GaugeID",
+        "Population Count",
+        "Population Density",
+        "Night Light",
+        "Road Density",
+        "Urban percentage",
+        "2010_HDI",
+        "2015_HDI",
+        "Land cover",
+        "road_density_km_per_km2",
+        "hospital_count",
+        "nearest_hospital_distance_km",
+        "population_total",
+        "population_density_per_km2",
+        "urban_built_up_pct",
+        "dense_forest_pct",
+        "agriculture_pct",
+        "water_body_pct",
+        "barren_rocky_pct",
+        "impervious_surface_pct"
+      ]
+    }
+  }
+}
